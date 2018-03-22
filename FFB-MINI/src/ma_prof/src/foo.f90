@@ -1,0 +1,13 @@
+MODULE xxx
+  
+  INTERFACE aaa
+     module PROCEDURE zzz
+  END INTERFACE aaa
+
+CONTAINS
+
+  SUBROUTINE zzz
+  END SUBROUTINE zzz
+
+END MODULE xxx
+
