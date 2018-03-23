@@ -1,0 +1,35 @@
+Env_base: K-1.2.0-11
+ natom= 19530
+ mdxyz.bin read end successfully!
+ npara= 3
+ input,nvoid= 6
+ input,nljsp= 0
+ input,nclsp= 0
+ mdff.bin read end successfully!
+ nstep_skip_middle= 1
+ nstep_skip_long  = 1
+ Velocities is reset to Maxwell distribution
+ with temperature= 300.1500000000000
+ LJ correction term is off
+ FMM is selected
+ nmax= 4
+ lgflg= 1
+ ewald sterm is off
+ MPI auto division
+ nxdiv,nydiv,nzdiv= 2 2 2
+Ncmm0 =  125
+       WARNING: NO CMAP
+         IF YOU USE CHARMM 22 PROTEIN POTENTIAL,                CMAP
+ ***********************
+ Modylas normally ended!
+ ***********************
+ <P_inner>=             
+ -2.266532945340E+09 [Pa]
+ <P_outer>=             
+  1.932926854011E+09 [Pa]
+ <P_outermost>=         
+  2.310094117806E+08 [Pa]
+ ***********************
+ <P_total>=             
+ -1.025966795484E+08 [Pa]
+ ***********************

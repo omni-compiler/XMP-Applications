@@ -1,0 +1,102 @@
+MODYLAS Mini App Software Program License Agreement
+
+MODYLAS Mini App Copyright Administrator (the "Licensor"), representing all the members listed in Exhibit 1 (the "Copyright Holders") who are the copyright holders of MODYLAS Mini App (the "Program"), grants to a person which is identified in the application page (the "Licensee") the right to use the Program in accordance with the terms and the conditions of this MODYLAS Mini App Software Program License Agreement (this "Agreement") free of charge.
+
+Article 1 (Definition)
+1. "Commercial use" means, including but not limited to, selling MODYLAS Mini App for a fee MODYLAS Mini App, doing consulting and contract calculation for a fee by using MODYLAS Mini App, using MODYLAS Mini App for business directly. "Non-commercial use" means the use of any other, including but not limited to, research and development in a for-profit company as well as academic use. 
+
+2. "Military use" means, including but not limited to, using MODYLAS Mini App to develop any military weapons and/or directly to other military actions. "Non-military use" of MODYLAS Mini App means the use of any other.
+
+Article 2 (Provision of the Program)
+1. The Program shall be provided for all the non-military, non-commercial research purposes (the "Purpose") only. If you would like to use MODYLAS Mini App for business, then please contact us at the address described in the end of this agreement.
+
+2. The Licensor shall provide the Licensee with the Program in source code form.
+
+3. The Licensor provides the Licensee with sample input and output relating to the Program. 
+
+Article 3 (Granted Rights)
+1. The Licensor grants to the Licensee the non-exclusive and non-transferable right to use the Program for the Purpose in accordance with the terms and the conditions of this Agreement. Under any circumstances the Licensee shall not use the Program for purposes other than the Purpose.
+
+2. If the Licensee is a member or an employee of an organization for profit, the Licensee may, within the scope of the Purpose, use the Program and the Derivative Program (defined in Paragraph 3 of this Article) for research and development for such organization in accordance with the provision of this Agreement. 
+
+3. The Licensee may modify the Program to the extent necessary for the Purpose. When a program as a derivative work (a "Derivative Program") is created as a result of modification of the Program by the Licensee, the Licensee shall promptly notify the Licensor of such fact. Upon request from the Licensor, the Licensee shall provide the Licensor with the Derivative Program in source code, and grant to the Licensor the non-exclusive right to use and modify the Derivative Program, and to distribute and license the Derivative Program to third parties without charging any fees (other than reimbursement of expenses for distribution) for the purpose of research.
+
+4. Unless the Licensor grants a prior written consent, the Licensee shall not (i) provide to third parties or allow third parties to use the Program or any Derivative Program, (ii) make the Program or any Derivative Program public, or (iii) use the Program or any Derivative Program for any purpose other than the Purpose.
+
+5. Regardless of the preceding paragraph, Licensee is permitted with other Licensee who is an employee or member of the same organization, to perform information exchange and technology transfer on MODYLAS Mini App, including Derived Programs.
+
+6. The Licensee shall notify the Licensor of the Licensee's full legal name, the name of the organization to which the Licensor belongs, the Licensee's title in such organization and e-mail address. When any change is made for any item listed in the preceding sentence, the Licensee shall notify the Licensor of such change without delay. 
+
+7. The Licensee shall keep the Program and any Derivative Program confidential with utmost care, and shall be liable to the Licensor for any leak of information regarding the Program or any Derivative Program through negligence or willful misconduct of the Licensee.
+
+Article 4 (Prohibition of the Use for the Purpose of Profit)
+1. Unless upon prior written express consent from the Licensor, the Licensee shall not use the Program or any Derivative Program for commercial purposes other than research and development. 
+
+2. If the Licensee is a member or an employee of an organization with the purpose of profit, the Licensee's use of the Program or any Derivative Program for business purposes of such organization other than research and development shall fall under the use for commercial purposes which is prohibited in the preceding Paragraph.
+
+Article 5 (Retention of Title and Rights)
+The Copyright Holders retain all the rights in the Program including ownership. The Program is protected by laws and treaties relating to copyright and other intellectual properties.
+
+Article 6 (Provision of Information)
+Upon request from the Licensor, the Licensee shall provide the Licensor with information relating to the use of the Program or any Derivative Program (including feedback, comments, bugs, etc.).
+
+Article 7 (Prohibition of Use of Components of the Program)
+The license under this Agreement is a license to use the Program as a single and inseparable program. Unless explicitly permitted in writing by the Licensor, the Licensee shall not separate any components of the Program (including the part in any Derivative Program derived from the Program, and the same shall apply hereinafter.) from the Program or incorporate any components of the Program into another program.
+
+Article 8 (Term and Termination)
+1. This Agreement shall be effective as of the time of the downloading any of MODYLAS Mini App program files and shall continue in effect unless terminated in accordance with this Article.
+
+2. The Licensor may terminate this Agreement immediately when the Licensee makes a breach of this Agreement.
+
+3. Each party may terminate this Agreement at any time by giving at least fourteen (14) days prior notice to the other party. If the notification by e-mail to the Licensee ends with an error, Licensor may notify Licensee by posting its contents on the homepage.
+
+4. Upon termination of this Agreement, the Licensee shall stop using the Program and any Derivative Program entirely and shall destroy the Program, all Derivative Programs, their components and all of their duplications.
+
+5. Article 3 Paragraph 3, Article 5, Article 6, Article 8 Paragraph 4, Article 9, Article 11, Article 12, Article 13, and Article 14 shall survive the termination of this Agreement.
+
+Article 9 (Publication of the Results)
+When the Licensee wishes to publish the results of the research using the Program or any Derivative Program through theses or other means (each, a "Publication"), the Licensee shall include the following paper in reference. 
+
+Andoh, Y. et al., "MODYLAS: A Highly Parallelized General-Purpose Molecular Dynamics Simulation Program for Large-Scale Systems with Long-Range Forces Calculated by Fast Multipole Method (FMM) and Highly Scalable Fine-Grained New Parallel Processing Algorithms," J. Chem. Theory Comput., 2013, 9 (7), pp 3201-3209.
+DOI: 10.1021/ct400203a
+
+Article 10 (Authority of the Licensor)
+The Licensor hereby represents and warrants that it is given the authority to grant the right under this Agreement from Copyright Holders.
+
+Article 11 (Entire Agreement)
+This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof, and supersedes all prior written or oral agreements, understandings, proposals and representations with respect to the subject matter hereof.
+
+Article 12 (Disclaimer)
+The Licensor shall not be liable to the Licensee with respect to any damages that may arise in connection with the Program or the license regarding this Program, including but not limited to, defects in the Program, the use of the Program or inability to use the Program, even if the Licensor has been advised of the possibility of such damages. 
+
+Article 13 (Governing Law)
+This Agreement shall be governed by and construed in accordance with the laws of Japan.
+
+Article 14 (Jurisdiction)
+Nagoya District Court, Japan shall have the exclusive jurisdiction over any dispute that may arise out of or in connection with this Agreement.
+
+
+[Contact] MODYLAS Group
+C/O Theoretical and Computational Chemistry Initiative (TCCI) Office
+INSTITUTE FOR MOLECULAR SCIENCE (IMS)
+Myodaiji, Okazaki, Aichi 444-8585, JAPAN
+E-mail address: MODYLAS[ at ]yfep2.ims.ac.jp
+FAX: +81-564-54-2254
+TEL: +81-564-55-7074"
+
+
+Exhibit 1  List of the Copyright Holders
+
+Name                    Organization & Title 
+----------------        -----------------------------------------------
+*Susumu Okazaki,        Professor, Nagoya University
+Noriyuki Yoshii,        Associate Professor, Nagoya University
+Fumiyasu Mizutani,      Techinical Staff, Institute for Molecular Science
+Kensuke Iwahashi,       Techinical Staff, Institute for Molecular Science
+Atsushi Yamada,         Assistant Professor, Nagoya University
+Yoshimichi Ando,        Researcher, Nagoya University
+Kazushi Fujimoto,       Assistant Professor, Ritsumeikan University
+Hidekazu Kojima,        graduate student, Nagoya University
+Advanced Institute for Computational Science, RIKEN
+
+*: MODYLAS and MODYLAS Mini App Copyright Administrator

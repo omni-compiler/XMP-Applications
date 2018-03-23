@@ -1,0 +1,3 @@
+[submodule "src/ma_prof"]
+	path = src/ma_prof
+	url = git@hpci-aplfs.aics.riken.jp:ma_prof

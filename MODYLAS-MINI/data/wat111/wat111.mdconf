@@ -1,0 +1,14 @@
+trj_interval = 1000
+restart_interval = 1000
+mntr_interval = 10 # 1
+
+dt = 2.0e-15     # [sec]
+step = 1000
+
+maxwell_velocities = yes
+temperature = 300.150000
+
+cutoff=12.0    #  [A]
+
+ULswitch=0
+ncell=8

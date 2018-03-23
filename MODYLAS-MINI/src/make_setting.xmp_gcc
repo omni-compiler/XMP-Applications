@@ -1,0 +1,9 @@
+#
+# Linux64-GCC
+#
+
+FC     = xmpf90
+FFLAGS = -cpp -omp -O2 -w -fopenmp
+CC     = mpicc
+
+FFLAGS += -I$(MPIHOME)/include

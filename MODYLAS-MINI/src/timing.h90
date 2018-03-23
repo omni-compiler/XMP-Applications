@@ -1,0 +1,60 @@
+/*
+!----------------------------------------------------------------------
+! Copyright (C) 2003-2014 Kensuke Iwahashi, Noriyuki Yoshii,
+!                         Atsushi Yamada, Yoshimichi Andoh,
+!                         Kazushi Fujimoto, Hidekazu Kojima,
+!                         Fumiyasu Mizutani, and Susumu Okazaki
+! All Rights Reserved.
+!
+! Copyright (C) 20013-2014 RIKEN AICS
+! All Rights Reserved.
+!
+! This MD program has been developed at Nagoya University, and
+! Institute for Molecular Science, National Institutes of Natural
+! Sciences.
+! And this work was supported by
+!    Next-Generation Supercomputer Project, and
+!    NAREGI Nanoscience Project,
+! Ministry of Education, Culture, Sports, Science and Technology,
+! Japan.
+!
+! This program is NOT a free software and distributed under the
+! license described in the LICENSE.
+! All rights are reserved by the authors of this program.
+!
+! The authors do NOT warrant or assume any legal liability or
+! responsibility for the accuracy or completeness.
+!----------------------------------------------------------------------
+*/
+#ifdef PROF_MAPROF
+      use mod_maprof
+
+#define  TM_MAIN_LOOP      0
+#define  TM_FMM            1
+#define  TM_ENERGY_DIRECT  2
+#define  TM_SHAKE          3
+#define  TM_RATTLE         4
+#define  TM_COMM_DIRECT    5
+#define  TM_MIGRATION      6
+#define  TM_ENE_REDUCTION  7
+#define  TM_OUTPUT         8
+#define  TM_P2M            9
+#define  TM_M2M            10
+#define  TM_M2L_L2L        11
+#define  TM_L2P            12
+#define  TM_COMM_FMM       13
+
+#define TIME_START(id) call maprof_time_start(id)
+#define TIME_STOP(id)  call maprof_time_stop(id)
+
+#elif defined PROF_FAPP
+
+#define TIME_START(id) call fapp_start(#id, 0, 0)
+#define TIME_STOP(id)  call fapp_stop(#id, 0, 0)
+
+#else
+
+#define TIME_START(id)
+#define TIME_STOP(id)
+
+#endif

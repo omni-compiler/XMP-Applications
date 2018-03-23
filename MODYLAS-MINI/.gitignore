@@ -1,0 +1,13 @@
+src/modylas_mini
+src/*.o
+src/*.mod
+src/*.FOR
+src/*.list
+src/*.log
+
+test/log
+test/wat111.mdmntr
+test/wat111.mdrun
+test/wat111.mdtrj.bin
+test/wat111.restart.bin
+test/maprof_output.yaml

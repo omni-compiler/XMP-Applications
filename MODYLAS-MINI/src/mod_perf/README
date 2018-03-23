@@ -1,0 +1,86 @@
+mod_perf
+========
+
+how to use
+----------
+
+* For C without MPI
+
+    env CC=gcc make c
+
+  then link perf.o to your program. 
+
+* For C with MPI
+
+    env CC=mpicc make c_mpi
+
+  then link perf.o to your program. 
+
+* For Fortran without MPI
+
+    env CC=gcc FC=gfortran make f
+
+  Link mod_perf.o and perf.o to your program. 
+
+* For Fortran with MPI
+
+    env CC=mpicc FC=mpif90 make f_mpi
+
+  then link mod_perf.o and perf.o to your program. 
+
+
+APIs
+----
+
+* Measure execution time
+
+    use mod_perf
+
+    call perf_start(SEC)
+      ! do someting
+    call perf_stop(SEC)
+
+  key word SEC must be defined in mod_perf_sectons.f90.
+
+
+* Set operation counts
+
+    use mod_perf
+
+    !integer   :: fp_ops, ld_ops, st_ops, ld_min_ops, st_min_ops
+    integer(8) :: fp_ops, ld_ops, st_ops, ld_min_ops, st_min_ops
+    integer    :: cnt
+
+    call perf_set_ops(SEC, fp_ops, ld_ops, st_ops,  &
+                      ld_min_ops, st_min_ops, cnt)
+
+  All of five arguments fp_ops, ld_ops, st_ops, ld_min_ops
+  and st_min_ops are interger(8)s or integer(4)s.
+  Last argument cnt is optional. Its default value is 1.
+
+
+* Set operation counts separately
+
+    use mod_perf
+
+    integer(8) :: val  ! or integer(4) :: val
+    intger     :: cnt
+
+    call perf_set_fp_ops(SEC, val, cnt)
+    call perf_set_ld_ops(SEC, val, cnt)
+    call perf_set_st_ops(SEC, val, cnt)
+    call perf_set_ld_min_ops(SEC, val, cnt)
+    call perf_set_st_min_ops(SEC, val, cnt)
+
+  Argument val is integer(8) or inteer(4).
+  Last argument cnt is optional. Its default value is 1.
+
+
+* Print performance data
+
+    use mod_perf
+
+    character(*) :: section_name
+
+    call perf_print(SEC, section_name)
+
