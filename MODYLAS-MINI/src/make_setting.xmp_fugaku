@@ -1,0 +1,11 @@
+#
+# K, FX10
+#
+
+FC = xmpf90
+CC = mpifccpx
+FFLAGS = -cpp -omp -Cpp -DENERGY_DIRECT_K -Kfast,openmp,parallel,array_private,auto,ilfunc,ocl,preex,simd=2,mfunc=2
+FFLAGS += -I/opt/FJSVxtclanga/tcsds-1.2.30a/include/mpi/fujitsu
+
+# diagonostic (output *.lst files)
+#FFLAGS += -Qa,d,i,m,p,t,x
