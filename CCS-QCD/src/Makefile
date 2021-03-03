@@ -16,7 +16,12 @@ FFLAGS += -D_NDIMX=$(PX) -D_NDIMY=$(PY) -D_NDIMZ=$(PZ)
 endif
 export
 #######################################################################
-SOURCE = ccs_qcd_solver_bench.F90  ccs_qcd_solver_bench_class.F90  lattice_class.F90 comlib.F90
+SOURCE = ccs_qcd_solver_bench.F90  ccs_qcd_solver_bench_class.F90  lattice_class.F90
+ifeq ($(USE_XMP_API), yes)
+	SOURCE += xmpAPI_comlib.F90
+else
+	SOURCE += comlib.F90
+endif
 CONFIG = CLASS_$(CLASS)/config.h
 FFLAGS += -Ima_prof/src
 LDFLAGS += -Lma_prof/src

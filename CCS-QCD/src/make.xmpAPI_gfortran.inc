@@ -7,6 +7,7 @@ REVISION = -D_REVISION_='"$(shell cat .svnrevision)"'
 #
 
 # example: GNU gfortran, OpenMP enabled.
+USE_XMP_API = yes
 OMNI_HOME = $(shell xmpcc --show-env | grep OMNI_HOME | sed -e 's/OMNI_HOME=//' -e 's/"//g')
 OMNI_INC = -I$(OMNI_HOME)/include
 OMNI_LIB = $(shell xmpcc --show-env | grep OMNI_LINKER_OPT | sed -e 's/OMNI_LINKER_OPT=//' -e 's/"//g')
