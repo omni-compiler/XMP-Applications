@@ -14,7 +14,9 @@ OMNI_LIB = $(shell xmpcc --show-env | grep OMNI_LINKER_OPT | sed -e 's/OMNI_LINK
 
 FC      = mpif90
 CC      = mpicc
-FFLAGS  = -cpp -omp -O2 -ffixed-line-length-132 -march=native -g -fopenmp -mcmodel=medium -funderscoring 
-LDFLAGS = $(FFLAGS) $(OMNI_LIB)
+FFLAGS  = -cpp -O2 -ffixed-line-length-132 -march=native -g -fopenmp -mcmodel=medium -funderscoring \
+	$(OMNI_INC)
+LDFLAGS = $(FFLAGS)
+LIBS = $(OMNI_LIB)
 
 INCLUDE = -I./ $(OMNI_INC)

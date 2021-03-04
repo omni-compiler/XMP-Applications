@@ -265,8 +265,13 @@ end subroutine
 ! Initialize this library
 !
 !coarray use mpi
-  implicit none
 !coarray  integer :: ierr,iprov
+
+!--- 2020 Fujitsu
+use xmp_api
+use mpi
+integer :: ierr
+!--- 2020 Fujitsu end
 
 
   ntag=0
@@ -294,8 +299,14 @@ end subroutine
 !coarray
 !  call MPI_COMM_RANK(MPI_COMM_WORLD,myid,ierr)
 !  call MPI_COMM_SIZE(MPI_COMM_WORLD,numprocs,ierr)
-  myid = this_image() - 1
-  numprocs = num_images()
+  !--- 2020 Fujitsu
+  !myid = this_image() - 1
+  !numprocs = num_images()
+  call xmp_api_init
+  myid = xmp_this_image() - 1
+  !numprocs = xmp_num_images()
+  call MPI_COMM_SIZE(MPI_COMM_WORLD,numprocs,ierr)
+  !--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -309,6 +320,9 @@ end subroutine
 !coarray  integer :: ierr
 
 !coarray  call MPI_Finalize(ierr)
+  !--- 2020 Fujitsu
+  call xmp_api_finalize
+  !--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -357,7 +371,7 @@ end subroutine
      call co_broadcast(buf,i)
      !--- 2020 Fujitsu
      !sync all
-     call xmp_sync_all()
+     call xmp_sync_all(ierr)
      !--- 2020 Fujitsu end
      idall(i-1)%sdesc = buf
    end do
@@ -414,7 +428,7 @@ end subroutine
     call co_broadcast(buf,i)
     !--- 2020 Fujitsu
     !sync all
-    call xmp_sync_all()
+    call xmp_sync_all(ierr)
     !--- 2020 Fujitsu end
     idall(i-1)%sdesc = buf
   enddo
@@ -506,6 +520,9 @@ end subroutine
 ! Send and Recieve data indicated by id.
 !
 !coarray use mpi
+  !--- 2020 Fujitsu
+  use xmp_api
+  !--- 2020 Fujitsu end
   implicit none
   type(comlib_data_c16), intent(inout) :: id
 !coarray
@@ -518,8 +535,8 @@ end subroutine
   !allocate(sbuff(id%ssize/16)[*])
   !allocate(rbuff(id%rsize/16)[*])
   !
-  complex(8), pointer :: sbuff(:) => null()
-  complex(8), pointer :: rbuff(:) => null()
+  integer, pointer :: sbuff(:) => null()
+  integer, pointer :: rbuff(:) => null()
   integer(8) :: s_desc, r_desc
   integer(8), dimension(1) :: s_lb,s_ub, r_lb, r_ub
   integer(4), dimension(1) :: img_dims
@@ -553,8 +570,8 @@ end subroutine
   call xmp_array_section_set_triplet(s_sec, 1, start1,end1,stride1, status)
   call xmp_array_section_set_triplet(r_sec, 1, start1,end2,stride1, status)
   img_dims(1) = id%sdesc+1
-  call xmp_coarray_put(r_desc,r_sec, s_desc,s_sec, status);
-  call xmp_sync_all()
+  call xmp_coarray_put(img_dims, r_desc,r_sec, s_desc,s_sec, status);
+  call xmp_sync_all(status)
   !--- 2020 Fujitsu end
   call copy(id%rbuff, rbuff, id%rsize/16)
 
@@ -592,6 +609,9 @@ end subroutine
 ! Check communication ends.
 !
 !coarray use mpi
+  !--- 2020 Fujitsu
+  use xmp_api
+  !--- 2020 Fujitsu end
   implicit none
   type(comlib_data_c16), intent(inout) :: id
 !coarray
@@ -602,7 +622,8 @@ end subroutine
 !  call MPI_Wait(id%sreq,sstat,ierr)
    !--- 2020 Fujitsu
    !sync all
-   call xmp_sync_all()
+   integer :: ierr
+   call xmp_sync_all(ierr)
    !--- 2020 Fujitsu end
 !  write(*,'("RSTAT:",99I12,I8)')rstat,myid
 !  write(*,'("SSTAT:",99I12,I8)')sstat,myid
@@ -615,6 +636,9 @@ end subroutine
 ! Check communication ends.
 !
 !coarray use mpi
+  !--- 2020 Fujitsu
+  use xmp_api
+  !--- 2020 Fujitsu end
   implicit none
   type(comlib_data_c8), intent(inout) :: id
 !coarray
@@ -624,7 +648,8 @@ end subroutine
 !  call MPI_Wait(id%sreq,status,ierr)
   !--- 2020 Fujitsu
   !sync all
-  call xmp_sync_all()
+  integer :: ierr
+  call xmp_sync_all(ierr)
   !--- 2020 Fujitsu end
 
   return
@@ -635,6 +660,9 @@ end subroutine
 ! Barrier sync.
 !
 !coarray use mpi
+  !--- 2020 Fujitsu
+  use xmp_api
+  !--- 2020 Fujitsu end
   implicit none
 !coarray
 !  integer :: ierr
@@ -642,7 +670,8 @@ end subroutine
 !  call MPI_Barrier(MPI_COMM_WORLD,ierr)
   !--- 2020 Fujitsu
   !sync all
-  call xmp_sync_all()
+  integer :: ierr
+  call xmp_sync_all(ierr)
   !--- 2020 Fujitsu end
 
   return
