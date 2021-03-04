@@ -990,7 +990,10 @@
 !
 !      PRINT *,"NDOM:",NDOM
 !
-      ME=THIS_IMAGE()
+! Fujitsu start 202103
+!      ME=THIS_IMAGE()
+      ME=xmp_this_image()
+! Fujitsu end 202103
       START_DASH=0
       MAX_RECV_LEN = 0 
       NSTART = 1
