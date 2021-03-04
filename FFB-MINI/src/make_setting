@@ -1,12 +1,17 @@
 CC = mpicc
-FC = xmpf90
+#FC = xmpf90
+
+OMNI_HOME = $(shell xmpcc --show-env | grep OMNI_HOME | sed -e 's/OMNI_HOME=//' -e 's/"//g')
+FC     = mpif90
+FFLAGS = -I$(OMNI_HOME)/include -J$(OMNI_HOME)/include -fopenmp
+LIBS = $(shell xmpcc --show-env | grep OMNI_LINKER_OPT | sed -e 's/OMNI_LINKER_OPT=//' -e 's/"//g')
 
 DEFINE += -DNO_METIS
 DEFINE += -DNO_REFINER
 
 # timing option
 DEFINE += -DPROF_MAPROF
-
+MPIHOME =/usr/local/openmpi-2.1.1.gnu/
 CFLAGS += $(DEFINE) -O2
 FFLAGS += $(DEFINE) -O2 -I$(MPIHOME)/include
 
