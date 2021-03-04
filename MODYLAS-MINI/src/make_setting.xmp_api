@@ -1,0 +1,20 @@
+#
+# Linux64-GCC XMP-API
+#
+
+USE_XMP_API = yes
+# FC     = xmpf90
+FC     = mpif90
+#FFLAGS = -cpp -omp -O2 -w -fopenmp
+FFLAGS = -cpp -fopenmp -O2 -w -fopenmp
+CC     = mpicc
+
+OMNI_HOME = $(shell xmpcc --show-env | grep OMNI_HOME | sed -e 's/OMNI_HOME=//' -e 's/"//g')
+OMNI_INC = -I$(OMNI_HOME)/include
+OMNI_LIB = $(shell xmpcc --show-env | grep OMNI_LINKER_OPT | sed -e 's/OMNI_LINKER_OPT=//' -e 's/"//g')
+
+
+FFLAGS += -I$(MPIHOME)/include $(OMNI_LIB) $(OMNI_INC)
+
+# TODO: temporal option 
+FFLAGS += -fcoarray=lib
