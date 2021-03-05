@@ -75,6 +75,11 @@ c----------------------------------------------------------------------
       use mpivar
       implicit none
       integer(4) :: itmp
+      integer(8), dimension(1) :: irbuff_p_lb, irbuff_p_ub,
+     & irbuff_m_lb, irbuff_m_ub, irsbuf_p_lb, irsbuf_p_ub,
+     & irsbuf_m_lb, irsbuf_m_ub
+      integer(8), dimension(2) :: rbuff_p_lb,rbuff_p_ub,
+     & rbuff_m_lb, rbuff_m_ub
 
       npz = nzdiv
       npy = nydiv
@@ -106,13 +111,53 @@ c----------------------------------------------------------------------
       allocate(ibuffm  (  max_cellcbd*max_mvatom))
       allocate(isbufp  (2*max_cellcbd + 1 + max_cellcbd*max_mvseg))
       allocate(isbufm  (2*max_cellcbd + 1 + max_cellcbd*max_mvseg))
-      allocate(rbuff_p (6,max_cellcbd*max_mvatom)[*])
-      allocate(rbuff_m (6,max_cellcbd*max_mvatom)[*])
-      allocate(irbuff_p(  max_cellcbd*max_mvatom)[*])
-      allocate(irbuff_m(  max_cellcbd*max_mvatom)[*])
-      allocate(irsbuf_p(2*max_cellcbd + 1 + max_cellcbd*max_mvseg)[*])
-      allocate(irsbuf_m(2*max_cellcbd + 1 + max_cellcbd*max_mvseg)[*])
       allocate( ncatmw(32, nczdiv+2, ncydiv+2, ncxdiv+2) )
+
+!      !allocate(rbuff_p (6,max_cellcbd*max_mvatom)[*])
+      rbuff_p_lb(1) = 1
+      rbuff_p_lb(2) = 1
+      rbuff_p_ub(1) = max_cellcbd*max_mvatom
+      rbuff_p_ub(2) = 6
+      call xmp_new_coarray(rbuff_p_desc,8,2,
+     & rbuff_p_lb,rbuff_p_ub,1,comm_bd_img_dims)
+      call xmp_coarray_bind(rbuff_p_desc,rbuff_p)
+
+!      !allocate(rbuff_m (6,max_cellcbd*max_mvatom)[*])
+      rbuff_m_lb(1) = 1
+      rbuff_m_lb(2) = 1
+      rbuff_m_ub(1) = max_cellcbd*max_mvatom
+      rbuff_m_ub(2) = 6
+      call xmp_new_coarray(rbuff_m_desc,8,2,
+     & rbuff_m_lb,rbuff_m_ub,1,comm_bd_img_dims)
+      call xmp_coarray_bind(rbuff_m_desc,rbuff_m)
+
+!      !allocate(irbuff_p(  max_cellcbd*max_mvatom)[*])
+      irbuff_p_lb(1) = 1
+      irbuff_p_ub(1) = max_cellcbd*max_mvatom
+      call xmp_new_coarray(irbuff_p_desc,4,1,
+     & irbuff_p_lb,irbuff_p_ub,1,comm_bd_img_dims)
+      call xmp_coarray_bind(irbuff_p_desc,irbuff_p)
+
+!      !allocate(irbuff_m(  max_cellcbd*max_mvatom)[*])
+      irbuff_m_lb(1) = 1
+      irbuff_m_ub(1) = max_cellcbd*max_mvatom
+      call xmp_new_coarray(irbuff_m_desc,4,1,
+     & irbuff_m_lb,irbuff_m_ub,1,comm_bd_img_dims)
+      call xmp_coarray_bind(irbuff_m_desc,irbuff_m)
+
+!      !allocate(irsbuf_p(2*max_cellcbd + 1 + max_cellcbd*max_mvseg)[*])
+       irsbuf_p_lb(1) = 1
+       irsbuf_p_ub(1) = 2*max_cellcbd + 1 + max_cellcbd*max_mvseg
+      call xmp_new_coarray(irsbuf_p_desc,4,1,
+     & irsbuf_p_lb,irsbuf_p_ub,1,comm_bd_img_dims)
+      call xmp_coarray_bind(irsbuf_p_desc,irsbuf_p)
+
+!      !allocate(irsbuf_m(2*max_cellcbd + 1 + max_cellcbd*max_mvseg)[*])
+       irsbuf_m_lb(1) = 1
+       irsbuf_m_ub(1) = 2*max_cellcbd + 1 + max_cellcbd*max_mvseg
+      call xmp_new_coarray(irsbuf_m_desc,4,1,
+     & irsbuf_m_lb,irsbuf_m_ub,1,comm_bd_img_dims)
+      call xmp_coarray_bind(irsbuf_m_desc,irsbuf_m)
 
       return
       end
@@ -490,6 +535,11 @@ c----------------------------------------------------------------------
 !coarray     &             irsbuf_p, ncsr, MPI_INTEGER,
 !coarray     &             ipz_src, ipz_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
+      call xmp_new_array_section(irsbuf_p_sec,1)
+      call xmp_array_section_set_triplet(irsbuf_p_sec,1,1,
+     & ncs+1,1,status)
+
+      comm_bd_img_dims(1) = ipz_dest+1
       irsbuf_p(1:ncs+1)[ipz_dest+1] = isbufp(1:ncs+1) ! Put
 
       !sync all
@@ -1767,21 +1817,52 @@ c----------------------------------------------------------------------
       real(8),allocatable :: snd(:,:),rcv(:,:)
 !coarray      integer(4),allocatable :: natmlist(:),natmdisp(:)
       integer(4),allocatable :: natmdisp(:)
-      integer(4),allocatable :: natmlist(:)[:]
+!      integer(4),allocatable :: natmlist(:)[:]
+      integer(4), POINTER :: natmlist(:) => null ()
+      integer(8) :: natmlist_desc
+
       integer(4),allocatable :: natmlist_tmp(:)
-      integer,allocatable :: ndis(:)[:], mdis(:)[:]
-      real(8),allocatable :: rcvx(:,:)[:]
+!      integer,allocatable :: ndis(:)[:], mdis(:)[:]
+      integer, POINTER :: ndis(:) => null ()
+      integer, POINTER :: mdis(:) => null ()
+      integer(8) :: ndis_desc
+      integer(8) :: mdis_desc
+
+!      real(8),allocatable :: rcvx(:,:)[:]
+      real(8), POINTER :: rcvx(:,:) => null ()
+      integer(8) :: rcvx_desc
+
       integer :: me, np, ms, mm
 !!
       integer(4),allocatable :: nrearrange(:)
       integer(4) :: m2i_tmp(na1cell*lxdiv*lydiv*lzdiv)
+      integer(4) :: img_dims(1)
+      integer(8), dimension(1) :: natmlist_lb, natmlist_ub,
+     &  ndis_lb, ndis_ub,  mdis_lb, mdis_ub
+      integer(8), dimension(2) :: rcvx_lb, rcvx_ub
+
 
 !coarray
       me = this_image()
       np = num_images()
-      allocate(ndis(np)[*])
-      allocate(mdis(n)[*])
-      allocate(rcvx(6,n)[*])
+!      allocate(ndis(np)[*])
+!      allocate(mdis(n)[*])
+!      allocate(rcvx(6,n)[*])
+      ndis_lb(1) = 1
+      ndis_ub(1) = np
+      mdis_lb(1) = 1
+      mdis_ub(1) = n
+      rcvx_lb(1) = 1
+      rcvx_lb(2) = 1
+      rcvx_ub(1) = 6
+      rcvx_ub(2) = n
+      call xmp_new_coarray(ndis_desc,4,1,ndis_lb,ndis_ub,1, img_dims)
+      call xmp_new_coarray(mdis_desc,4,1,mdis_lb,mdis_ub,1, img_dims)
+      call xmp_new_coarray(rcvx_desc,8,2,rcvx_lb,rcvx_ub,1, img_dims)
+      call xmp_coarray_bind(ndis_desc,ndis)
+      call xmp_coarray_bind(mdis_desc,mdis)
+      call xmp_coarray_bind(rcvx_desc,rcvx)
+
 !!
 
       if(nprocs.eq.1) then
@@ -1799,7 +1880,13 @@ c----------------------------------------------------------------------
         allocate(snd(6,n))
         allocate(rcv(6,n))
 !coarray        allocate(natmlist(nprocs),natmdisp(nprocs))
-        allocate(natmlist(nprocs)[*])
+        !allocate(natmlist(nprocs)[*])
+        natmlist_lb(1) = 1
+        natmlist_ub(1) = nprocs
+        call xmp_new_coarray(natmlist_desc,8,2,
+     &   natmlist_lb,natmlist_ub,1,img_dims)
+        call xmp_coarray_bind(natmlist_desc,natmlist)
+
         allocate(natmlist_tmp(nprocs))
         allocate(natmdisp(nprocs))
 !!
