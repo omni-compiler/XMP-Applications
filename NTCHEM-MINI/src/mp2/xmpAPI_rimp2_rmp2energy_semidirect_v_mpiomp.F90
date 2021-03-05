@@ -258,8 +258,10 @@
 !     CALL MPI_Reduce(E2TP, E2T, 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, MPI_COMM_WORLD, IErr)
       E2S = E2SP
       E2T = E2TP
-      call co_sum(E2S,result_image=1)
-      call co_sum(E2T,result_image=1)
+!      call co_sum(E2S,result_image=1)
+!      call co_sum(E2T,result_image=1)
+      CALL MPI_Reduce(E2SP, E2S, 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, MPI_COMM_WORLD, IErr)
+      CALL MPI_Reduce(E2TP, E2T, 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, MPI_COMM_WORLD, IErr)
 !!
 
       IF (MyRank == 0) THEN
