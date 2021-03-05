@@ -124,7 +124,8 @@
         read(f_restart_bin,end=100) n
       endif
 !coarray      call MPI_Bcast(n, 1, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
-      call co_broadcast(n,source_image=1)
+      call MPI_Bcast(n, 1, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
+!      call co_broadcast(n,source_image=1)
 !!
 
       if (.not. allocated(xyz)) then
@@ -164,20 +165,35 @@ c       Read cell parameters (length and angles).
 !coarray      call MPI_Bcast(beta ,  1  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
 !coarray      call MPI_Bcast(gamma,  1  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
 !coarray      call MPI_Bcast(vboxg,  9  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
-      call co_broadcast(   xyz(1:3,1:n), source_image=1 )
-      call co_broadcast(     v(1:3,1:n), source_image=1 )
-      call co_broadcast(          n_nhc, source_image=1 )
-      call co_broadcast(       rss(1:5), source_image=1 )
-      call co_broadcast(       vss(1:5), source_image=1 )
-      call co_broadcast(      rssb(1:5), source_image=1 )
-      call co_broadcast(      vssb(1:5), source_image=1 )
-      call co_broadcast(          cellx, source_image=1 )
-      call co_broadcast(          celly, source_image=1 )
-      call co_broadcast(          cellz, source_image=1 )
-      call co_broadcast(          alpha, source_image=1 )
-      call co_broadcast(           beta, source_image=1 )
-      call co_broadcast(          gamma, source_image=1 )
-      call co_broadcast( vboxg(1:3,1:3), source_image=1 )
+
+      call MPI_Bcast(xyz  ,  3*n, MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(v    ,  3*n, MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(n_nhc,  1  , MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(rss  ,  5  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(vss  ,  5  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(rssb ,  5  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(vssb ,  5  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(cellx,  1  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(celly,  1  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(cellz,  1  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(alpha,  1  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(beta ,  1  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(gamma,  1  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(vboxg,  9  , MPI_REAL8   , 0, MPI_COMM_WORLD, ierr)
+!      call co_broadcast(   xyz(1:3,1:n), source_image=1 )
+!      call co_broadcast(     v(1:3,1:n), source_image=1 )
+!      call co_broadcast(          n_nhc, source_image=1 )
+!      call co_broadcast(       rss(1:5), source_image=1 )
+!      call co_broadcast(       vss(1:5), source_image=1 )
+!      call co_broadcast(      rssb(1:5), source_image=1 )
+!      call co_broadcast(      vssb(1:5), source_image=1 )
+!      call co_broadcast(          cellx, source_image=1 )
+!      call co_broadcast(          celly, source_image=1 )
+!      call co_broadcast(          cellz, source_image=1 )
+!      call co_broadcast(          alpha, source_image=1 )
+!      call co_broadcast(           beta, source_image=1 )
+!      call co_broadcast(          gamma, source_image=1 )
+!      call co_broadcast( vboxg(1:3,1:3), source_image=1 )
 !!
 !KF end
       cellxh = 0.5d0 * cellx
@@ -296,9 +312,16 @@ c       Read cell parameters (length and angles).
 !coarray     &               MPI_COMM_WORLD, ierr)
 !coarray      call MPI_Bcast(slength, rngrp_ps*10, MPI_REAL8, 0, 
 !coarray     &               MPI_COMM_WORLD, ierr)
-      call co_broadcast(  atom1S, source_image=1 )
-      call co_broadcast(  atom2S, source_image=1 )
-      call co_broadcast( slength, source_image=1 )
+      call MPI_Bcast(atom1S, rngrp_ps*10, MPI_INTEGER4, 0, 
+     &               MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(atom2S, rngrp_ps*10, MPI_INTEGER4, 0, 
+     &               MPI_COMM_WORLD, ierr)
+      call MPI_Bcast(slength, rngrp_ps*10, MPI_REAL8, 0, 
+     &               MPI_COMM_WORLD, ierr)
+
+!      call co_broadcast(  atom1S, source_image=1 )
+!      call co_broadcast(  atom2S, source_image=1 )
+!      call co_broadcast( slength, source_image=1 )
 !!
 
 !-- void
@@ -343,6 +366,7 @@ c       Read cell parameters (length and angles).
         if (myrank == 0) read(in) data(1:m,i)
       end do
 !coarray      call MPI_Bcast(data, n*m, MPI_REAL8, 0,  MPI_COMM_WORLD, ierr)
-      call co_broadcast( data(1:m,1:n), source_image=1 )
+      call MPI_Bcast(data, n*m, MPI_REAL8, 0,  MPI_COMM_WORLD, ierr)
+!      call co_broadcast( data(1:m,1:n), source_image=1 )
 !!
       end
