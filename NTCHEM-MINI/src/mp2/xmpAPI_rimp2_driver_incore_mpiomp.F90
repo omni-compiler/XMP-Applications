@@ -5,6 +5,7 @@
       USE MP2_Basis_Module, ONLY : Spherical, LtuvMin_Car, LtuvMin_Sph, LtuvMax_Car, LtuvMax_Sph
       USE RIMP2_Basis_Module, ONLY : NShel_RI, KType_RI
       USE MPI_Module, ONLY : NProcs, MyRank, NProcsMat, MyRankMat, NProcsMO, MyRankMO
+      USE XMP_API
 !
 !     o Driver subroutine for RI-MP2 energy evaluation
 !
@@ -16,6 +17,7 @@
       INTEGER :: KK, KBF_RI, NK, IAnglC
       INTEGER :: IErr
       REAL(8) :: TimeBgn, TimeEnd, WTimeBgn, WTimeEnd
+      INTEGER(4) :: status
 !
 !     o Obtaining RI-MP2 batch infomation and memory allocation
 !
@@ -66,7 +68,8 @@
 !
       CALL RIMP2_Tran3c1_InCore_V_MPIOMP
 !coarray      CALL MPI_Barrier(MPI_COMM_WORLD, IErr)
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       CALL CPU_TIME(TimeEnd)
       WTimeEnd = MPI_WTIME()
       IF (MyRank == 0) THEN
@@ -90,7 +93,8 @@
       ALLOCATE(RIInt3c3a(NBF_RI_per_ProcMat*NActO(1),LenOccBat_per_Proc))
       CALL RIMP2_Tran3c2_InCore_V_MPIOMP
 !coarray      CALL MPI_Barrier(MPI_COMM_WORLD, IErr)
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       CALL CPU_TIME(TimeEnd)
       WTimeEnd = MPI_WTIME()
       IF (MyRank == 0) THEN

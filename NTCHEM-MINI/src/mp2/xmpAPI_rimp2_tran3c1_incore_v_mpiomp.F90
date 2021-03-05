@@ -15,6 +15,7 @@
       USE MP2_Constant_Module, ONLY : Zero, One, Half, Pi252, RLN10
       USE MPI_Module, ONLY : NProcs, MyRank, MPIIO, IORank, MPI_COMM_IO, MPI_COMM_MO, NProcsMO, MyRankMO, &
      &   MPI_COMM_Mat, NProcsMat, MyRankMat
+      USE XMP_API
 !
 !     o 3c RI integral transformation from AO to MO basis
 !
@@ -71,6 +72,7 @@
       integer, parameter :: Num_Stream = 3
       integer :: id_st
       integer :: lm, ln, lk
+      integer(4) :: status
 !
       Time_T0 = Zero
       Time_T1 = Zero
@@ -587,7 +589,8 @@
 #endif
 !coarray
 !      call MPI_Barrier( MPI_COMM_WORLD, IErr )
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 !
       IF (MyRank == 0) THEN
