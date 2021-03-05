@@ -159,14 +159,16 @@ end subroutine
 ! - arg : integer
 ! - ids : source destination
 !
-!coarray use mpi
+  use mpi
   implicit none
   integer, intent(inout) :: arg
   integer, intent(in) :: ids
-!coarray  integer :: ierr
+  integer :: ierr
 
-!coarray  call MPI_BCAST(arg,1,MPI_INTEGER,ids,MPI_COMM_WORLD,ierr)
-  call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu
+  call MPI_BCAST(arg,1,MPI_INTEGER,ids,MPI_COMM_WORLD,ierr)
+  !call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -178,14 +180,16 @@ end subroutine
 ! - arg : real
 ! - ids : source destination
 !
-!coarray use mpi
+  use mpi
   implicit none
   real(8), intent(inout) :: arg
   integer, intent(in) :: ids
-!coarray  integer :: ierr
+  integer :: ierr
 
-!coarray  call MPI_BCAST(arg,1,MPI_REAL8,ids,MPI_COMM_WORLD,ierr)
-  call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu
+  call MPI_BCAST(arg,1,MPI_REAL8,ids,MPI_COMM_WORLD,ierr)
+  !call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -197,14 +201,16 @@ end subroutine
 ! - arg : complex
 ! - ids : source destination
 !
-!coarray use mpi
+  use mpi
   implicit none
   complex(8), intent(inout) :: arg
   integer, intent(in) :: ids
-!coarray  integer :: ierr
+  integer :: ierr
 
-!coarray  call MPI_BCAST(arg,1,MPI_COMPLEX16,ids,MPI_COMM_WORLD,ierr)
-  call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu
+  call MPI_BCAST(arg,1,MPI_COMPLEX16,ids,MPI_COMM_WORLD,ierr)
+  !call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -213,15 +219,17 @@ end subroutine
 !
 ! Broadcast integer(4) array
 !
-!coarray use mpi
+  use mpi
   implicit none
   integer, intent(inout) :: arg(:)
   integer, intent(in) :: ids
-!coarray  integer :: ilen,ierr
+  integer :: ilen,ierr
 
-!coarray  ilen=SIZE(arg)
-!coarray  call MPI_BCAST(arg,ilen,MPI_INTEGER,ids,MPI_COMM_WORLD,ierr)
-  call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu
+  ilen=SIZE(arg)
+  call MPI_BCAST(arg,ilen,MPI_INTEGER,ids,MPI_COMM_WORLD,ierr)
+  !call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -230,15 +238,17 @@ end subroutine
 !
 ! Broadcast real(8) array
 !
-!coarray use mpi
+  use mpi
   implicit none
   real(8), intent(inout) :: arg(:)
   integer, intent(in) :: ids
-!coarray  integer :: ilen,ierr
+  integer :: ilen,ierr
 
-!coarray  ilen=SIZE(arg)
-!coarray  call MPI_BCAST(arg,ilen,MPI_REAL8,ids,MPI_COMM_WORLD,ierr)
-  call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu
+  ilen=SIZE(arg)
+  call MPI_BCAST(arg,ilen,MPI_REAL8,ids,MPI_COMM_WORLD,ierr)
+  !call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -247,15 +257,17 @@ end subroutine
 !
 ! Broadcast complex(8) array
 !
-!coarray use mpi
+  use mpi
   implicit none
   complex(8), intent(inout) :: arg(:)
   integer, intent(in) :: ids
-!coarray  integer :: ilen,ierr
+  integer :: ilen,ierr
 
-!coarray  ilen=SIZE(arg)
-!coarray  call MPI_BCAST(arg,ilen,MPI_COMPLEX16,ids,MPI_COMM_WORLD,ierr)
-  call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu
+  ilen=SIZE(arg)
+  call MPI_BCAST(arg,ilen,MPI_COMPLEX16,ids,MPI_COMM_WORLD,ierr)
+  !call co_broadcast( arg,ids+1 )
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -351,7 +363,7 @@ integer :: ierr
 ! - recv : 1st component of reciever data array (complex(8))
 ! - isize : total data size to be send/recieved in unit of bytes
 !
-!coarray use mpi
+  use mpi
   implicit none
   type(comlib_data_c16), intent(out):: id
   integer, intent(in) :: node,isize
@@ -364,15 +376,15 @@ integer :: ierr
   idall(myid)%sdesc=node  ! send : myid -> node
 
 !**** make send receive table for all nodes
-!coarray   do i=0,numprocs-1
-!coarray     call MPI_BCAST(idall(i)%sdesc,1,MPI_INTEGER,i,MPI_COMM_WORLD,ierr)
-   do i=1,numprocs
-     buf = idall(i-1)%sdesc
-     call co_broadcast(buf,i)
-     !--- 2020 Fujitsu
+!--- 2020 Fujitsu
+   do i=0,numprocs-1
+     call MPI_BCAST(idall(i)%sdesc,1,MPI_INTEGER,i,MPI_COMM_WORLD,ierr)
+   !do i=1,numprocs
+     !buf = idall(i-1)%sdesc
+     !call co_broadcast(buf,i)
      !sync all
-     call xmp_sync_all(ierr)
-     !--- 2020 Fujitsu end
+     !call xmp_sync_all(ierr)
+!--- 2020 Fujitsu end
      idall(i-1)%sdesc = buf
    end do
   do i=0,numprocs-1
@@ -408,7 +420,7 @@ integer :: ierr
 ! - recv : 1st component of reciever data array (complex(4))
 ! - isize : total data size to be send/recieved in unit of bytes
 !
-!coarray use mpi
+  use mpi
   implicit none
   type(comlib_data_c8), intent(out):: id
   integer, intent(in) :: node,isize
@@ -421,15 +433,15 @@ integer :: ierr
   idall(myid)%sdesc=node  ! send : myid -> node
 
 !**** make send receive table for all nodes
-!coarray  do i=0,numprocs-1
-!coarray    call MPI_BCAST(idall(i)%sdesc,1,MPI_INTEGER,i,MPI_COMM_WORLD,ierr)
-  do i=1,numprocs
-    buf = idall(i-1)%sdesc
-    call co_broadcast(buf,i)
-    !--- 2020 Fujitsu
+!--- 2020 Fujitsu
+  do i=0,numprocs-1
+    call MPI_BCAST(idall(i)%sdesc,1,MPI_INTEGER,i,MPI_COMM_WORLD,ierr)
+  !do i=1,numprocs
+    !buf = idall(i-1)%sdesc
+    !call co_broadcast(buf,i)
     !sync all
-    call xmp_sync_all(ierr)
-    !--- 2020 Fujitsu end
+    !call xmp_sync_all(ierr)
+!--- 2020 Fujitsu end
     idall(i-1)%sdesc = buf
   enddo
   do i=0,numprocs-1
@@ -766,17 +778,19 @@ integer :: ierr
 !
 ! sum and broadcast of integer(4) data
 !
-!coarray use mpi
+  use mpi
   implicit none
   integer, intent(inout) :: i4
   integer :: i4tmp
 !coarray
-!  integer :: ierr
+  integer :: ierr
 !
-!  call MPI_Allreduce(i4,i4tmp,1,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
-  i4tmp = i4
-  call co_sum(i4tmp)
+!--- 2020 Fujitsu
+  call MPI_Allreduce(i4,i4tmp,1,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
+  !i4tmp = i4
+  !call co_sum(i4tmp)
   i4 = i4tmp
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -785,17 +799,19 @@ integer :: ierr
 !
 ! sum and broadcast of real(8) data
 !
-!coarray use mpi
+  use mpi
   implicit none
   real(8), intent(inout) :: r8
   real(8) :: r8tmp
 !coarray
-!  integer :: ierr
+  integer :: ierr
 !
-!  call MPI_Allreduce(r8,r8tmp,1,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
-  r8tmp = r8
-  call co_sum(r8tmp)
+!--- 2020 Fujitsu
+  call MPI_Allreduce(r8,r8tmp,1,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+  !r8tmp = r8
+  !call co_sum(r8tmp)
   r8 = r8tmp
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -804,17 +820,19 @@ integer :: ierr
 !
 ! sum and broadcast of real(4) data
 !
-!coarray use mpi
+  use mpi
   implicit none
   real(4), intent(inout) :: r4
   real(4) :: r4tmp
 !coarray
-!  integer :: ierr
+  integer :: ierr
 !
-!  call MPI_Allreduce(r4,r4tmp,1,MPI_REAL4,MPI_SUM,MPI_COMM_WORLD,ierr)
-  r4tmp = r4
-  call co_sum(r4tmp)
+!--- 2020 Fujitsu
+  call MPI_Allreduce(r4,r4tmp,1,MPI_REAL4,MPI_SUM,MPI_COMM_WORLD,ierr)
+  !r4tmp = r4
+  !call co_sum(r4tmp)
   r4 = r4tmp
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -823,17 +841,19 @@ integer :: ierr
 !
 ! sum and broadcast of complex(8) data
 !
-!coarray use mpi
+   use mpi
   implicit none
   complex(8), intent(inout) :: c16
   complex(8) :: c16tmp
 !coarray
-!  integer :: ierr
+  integer :: ierr
 !
-!  call MPI_Allreduce(c16,c16tmp,1,MPI_COMPLEX16,MPI_SUM,MPI_COMM_WORLD,ierr)
+!--- 2020 Fujitsu
+  call MPI_Allreduce(c16,c16tmp,1,MPI_COMPLEX16,MPI_SUM,MPI_COMM_WORLD,ierr)
   c16tmp = c16
-  call co_sum(c16tmp)
-  c16 = c16tmp
+  !call co_sum(c16tmp)
+  !c16 = c16tmp
+!--- 2020 Fujitsu end
 
   return
   end subroutine
@@ -842,17 +862,19 @@ integer :: ierr
 !
 ! sum and broadcast of complex(4) data
 !
-!coarray use mpi
+  use mpi
   implicit none
   complex(4), intent(inout) :: c8
   complex(4) :: c8tmp
 !coarray
-!  integer :: ierr
+  integer :: ierr
 !
-!  call MPI_Allreduce(c8,c8tmp,1,MPI_COMPLEX8,MPI_SUM,MPI_COMM_WORLD,ierr)
-  c8tmp = c8
-  call co_sum(c8tmp)
+!--- 2020 Fujitsu
+  call MPI_Allreduce(c8,c8tmp,1,MPI_COMPLEX8,MPI_SUM,MPI_COMM_WORLD,ierr)
+  !c8tmp = c8
+  !call co_sum(c8tmp)
   c8 = c8tmp
+!--- 2020 Fujitsu end
 
   return
   end subroutine

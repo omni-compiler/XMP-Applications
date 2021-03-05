@@ -4,7 +4,11 @@
      *                  B,NPFIX,LPFIX,
      *                  NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,NITR,RESR,S,
      *                  IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
-     *                  R0,RK,PK,APK,ATK,TK,FXYZ,RX,RY,MWRK,WRKN,
+C Fj
+C     *                  R0,RK,PK,APK,ATK,TK,FXYZ,RX,RY,MWRK,WRKN,
+     *                  R0,RK,PK,APK,ATK,TK,FXYZ,rx_desc,ry_desc,MWRK,
+     *                  WRKN,
+C Fj
      *                  IUT0,IERR)
 #include "timing.h"
       IMPLICIT NONE
@@ -40,6 +44,7 @@ CCC [WORK]
       REAL*4    RX(0:N,ME),RY(0:N,ME),
      1          R0(NE),RK(NE),PK(NE),APK(NE),ATK(NE),TK(NE),
      2          FXYZ(3,NP)
+      INTEGER*8 rx_desc,ry_desc
       INTEGER*4 MWRK
       REAL*4    WRKN(MWRK,9)
 C
@@ -160,7 +165,10 @@ C                              WORDS BY LIST )
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-     *            FXYZ,RX,RY,MWRK,WRKN,
+C Fj
+C     *            FXYZ,RX,RY,MWRK,WRKN,
+     *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
+C Fj
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C
@@ -228,7 +236,10 @@ C                              WORDS BY LIST )
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-     *            FXYZ,RX,RY,MWRK,WRKN,
+C Fj
+C     *            FXYZ,RX,RY,MWRK,WRKN,
+     *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
+C Fj
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C
@@ -291,7 +302,10 @@ C                              12 WORDS BY LIST )
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-     *            FXYZ,RX,RY,MWRK,WRKN,
+C Fj
+C     *            FXYZ,RX,RY,MWRK,WRKN,
+     *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
+C Fj
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C
