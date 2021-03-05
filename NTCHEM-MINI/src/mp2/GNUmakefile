@@ -22,6 +22,22 @@ F90EXT=-DDEBUG
 #F90EXT=-DUSE_MERGE -DDEBUG
 endif
 
+ifeq ($(USE_XMP_API),yes)
+DRIVER_INCORE=xmpAPI_rimp2_driver_incore_mpiomp
+RIINT2_MDINT2=xmpAPI_rimp2_riint2_mdint2_int2c_mpiomp
+ENERGE_INCORE=xmpAPI_rimp2_rmp2energy_incore_v_mpiomp
+RMP2_RMP2ENERGY=xmpAPI_rimp2_rmp2energy_semidirect_v_mpiomp
+RIMP2_TRAN3C1=xmpAPI_rimp2_tran3c1_incore_v_mpiomp
+RIMP2_TRAN3C2=xmpAPI_rimp2_tran3c2_incore_v_mpiomp
+else
+DRIVER_INCORE=rimp2_driver_incore_mpiomp
+RIINT2_MDINT2=rimp2_riint2_mdint2_int2c_mpiomp
+ENERGE_INCORE=rimp2_rmp2energy_incore_v_mpiomp
+RMP2_RMP2ENERGY=rimp2_rmp2energy_semidirect_v_mpiomp
+RIMP2_TRAN3C1=rimp2_tran3c1_incore_v_mpiomp
+RIMP2_TRAN3C2=rimp2_tran3c2_incore_v_mpiomp
+endif
+
 # Name of executable
 program = rimp2.exe
 
@@ -105,15 +121,15 @@ rimp2_int2_initial_mpiomp.o \
 rimp2_riint2_final_mpiomp.o \
 rimp2_tran3c1_semidirect_v_mpiomp.o \
 rimp2_tran3c2_semidirect_v_mpiomp.o \
-rimp2_rmp2energy_semidirect_v_mpiomp.o \
-rimp2_riint2_mdint2_int2c_mpiomp.o \
+$(RMP2_RMP2ENERGY).o \
+$(RIINT2_MDINT2).o \
 rimp2_riint2_mdint2_pscreen_mpiomp.o
 
 objects_mpiomp2= \
-rimp2_driver_incore_mpiomp.o \
-rimp2_tran3c1_incore_v_mpiomp.o \
-rimp2_tran3c2_incore_v_mpiomp.o \
-rimp2_rmp2energy_incore_v_mpiomp.o
+$(DRIVER_INCORE).o \
+$(RIMP2_TRAN3C1).o \
+$(RIMP2_TRAN3C2).o \
+$(ENERGE_INCORE).o
 
 objects_gpu= \
 cublas-fortran.o
