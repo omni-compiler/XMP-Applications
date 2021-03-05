@@ -43,10 +43,22 @@ c----------------------------------------------------------------------
       end module
 c----------------------------------------------------------------------
       module trj_mpi
-      real(8),allocatable :: wkxyz(:,:)[:]
+      integer(4) ::  trj_mpi_img_dims(1)
+      ! real(8),allocatable :: wkxyz(:,:)[:]
+      real(8), POINTER :: wkxyz(:,:) => null ()
+      integer(8) :: wkxyz_desc
+
       real(8),allocatable :: wkv(:,:)
-      integer(4),allocatable :: i2m(:), m2i(:)[:]
-      integer(4),allocatable :: tag(:,:,:),na_per_cell(:,:,:)[:]
+      ! integer(4),allocatable :: i2m(:), m2i(:)[:]
+      integer(4),allocatable :: i2m(:)
+      integer(4), POINTER :: m2i(:) => null ()
+      integer(8) :: m2i_desc
+
+      !integer(4),allocatable :: tag(:,:,:),na_per_cell(:,:,:)[:]
+      integer(4),allocatable :: tag(:,:,:)
+      integer(4), POINTER :: na_per_cell(:,:,:) => null ()
+      integer(8) :: na_per_cell_desc
+
       integer(4) :: na1cell,na5cell,nadirect 
       integer(4) :: naline,narea 
       real(8),parameter :: na1cellmargin=2.00d0 ! ya  !!100% margin
@@ -271,18 +283,30 @@ c----------------------------------------------------------------------
 c----------------------------------------------------------------------
       module comm_d3
       integer nczdiv, ncydiv, ncxdiv
-      integer,allocatable :: icbufp(:)[:]
-      integer,allocatable :: ircbufp(:)[:]
-      integer,allocatable :: icbufm(:)[:]
-      integer,allocatable :: ircbufm(:)[:]
-      integer,allocatable :: ibuffp(:)[:]
-      integer,allocatable :: irbuffp(:)[:]
-      integer,allocatable :: ibuffm(:)[:]
-      integer,allocatable :: irbuffm(:)[:]
-      real(8),allocatable :: buffp(:,:)[:]
-      real(8),allocatable :: rbuffp(:,:)[:]
-      real(8),allocatable :: buffm(:,:)[:]
-      real(8),allocatable :: rbuffm(:,:)[:]
+      ! integer,allocatable :: icbufp(:)[:]
+      integer, POINTER :: icbufp(:) => null ()
+      ! integer,allocatable :: ircbufp(:)[:]
+      integer, POINTER :: ircbufp(:) => null ()
+      ! integer,allocatable :: icbufm(:)[:]
+      integer, POINTER :: icbufm(:) => null ()
+      ! integer,allocatable :: ircbufm(:)[:]
+      integer, POINTER :: ircbufm(:) => null ()
+      ! integer,allocatable :: ibuffp(:)[:]
+      integer, POINTER :: ibuffp(:) => null ()
+      ! integer,allocatable :: irbuffp(:)[:]
+      integer, POINTER :: irbuffp(:) => null ()
+      ! integer,allocatable :: ibuffm(:)[:]
+      integer, POINTER :: ibuffm(:) => null ()
+      ! integer,allocatable :: irbuffm(:)[:]
+      integer, POINTER :: irbuffm(:) => null ()
+      ! real(8),allocatable :: buffp(:,:)[:]
+      real(8), POINTER :: buffp(:,:) => null ()
+      ! real(8),allocatable :: rbuffp(:,:)[:]
+      real(8), POINTER :: rbuffp(:,:) => null ()
+      ! real(8),allocatable :: buffm(:,:)[:]
+      real(8), POINTER :: buffm(:,:) => null ()
+      ! real(8),allocatable :: rbuffm(:,:)[:]
+      real(8), POINTER :: rbuffm(:,:) => null ()
       end module
 c----------------------------------------------------------------------
       module comm_bd
@@ -301,12 +325,28 @@ c----------------------------------------------------------------------
       integer,allocatable :: ibuffm(:)
       integer,allocatable :: isbufp(:)
       integer,allocatable :: isbufm(:)
-      real(8),allocatable :: rbuff_p(:,:)[:]
-      real(8),allocatable :: rbuff_m(:,:)[:]
-      integer,allocatable :: irbuff_p(:)[:]
-      integer,allocatable :: irbuff_m(:)[:]
-      integer,allocatable :: irsbuf_p(:)[:]
-      integer,allocatable :: irsbuf_m(:)[:]
+      ! real(8),allocatable :: rbuff_p(:,:)[:]
+      real(8), POINTER :: rbuff_p(:,:) => null ()
+      real(8) :: rbuff_p_desc
+      ! real(8),allocatable :: rbuff_m(:,:)[:]
+      real(8), POINTER :: rbuff_m(:,:) => null ()
+      real(8) :: rbuff_m_desc
+      ! integer,allocatable :: irbuff_p(:)[:]
+      integer, POINTER :: irbuff_p(:) => null ()
+      integer :: irbuff_p_desc
+      ! integer,allocatable :: irbuff_m(:)[:]
+      integer, POINTER :: irbuff_m(:) => null ()
+      integer :: irbuff_m_desc
+      ! integer,allocatable :: irsbuf_p(:)[:]
+      integer, POINTER :: irsbuf_p(:) => null ()
+      integer :: irsbuf_p_desc
+      ! integer,allocatable :: irsbuf_m(:)[:]
+      integer, POINTER :: irsbuf_m(:) => null ()
+
+      integer(4), dimension(1) :: comm_bd_img_dims
+
+      integer :: irsbuf_m_desc
+
       integer,allocatable :: ncatmw(:,:,:,:)
       end module
 c----------------------------------------------------------------------
