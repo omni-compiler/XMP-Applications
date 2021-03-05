@@ -8,6 +8,7 @@
       Use MP2_Constant_Module, ONLY : Zero, One, Two, Three, P12
       USE MPI_Module, ONLY : NProcs, MyRank, MPIIO, IORank, MPI_COMM_IO, MPI_COMM_MO, NProcsMO, MyRankMO, &
      &   MPI_COMM_MAT, NProcsMat, MyRankMat
+      USE XMP_API
 !
       IMPLICIT NONE
 !
@@ -91,10 +92,17 @@
       integer :: chunk, myChunk
 
 !coarray
-      real(8), allocatable :: sbuf(:)[:]
-      real(8), allocatable :: rbuf(:)[:]
+!      real(8), allocatable :: sbuf(:)[:]
+!      real(8), allocatable :: rbuf(:)[:]
+      real(8), pointer :: sbuf(:) => null()
+      real(8), pointer :: rbuf(:) => null()
+      integer(8) :: sbuf_desc, rbuf_desc
+      integer(8), dimension(1) :: sbuf_lb,sbuf_ub, rbuf_lb, rbuf_ub
+      integer(8) :: sbuf_sec, rbuf_sec
+
       integer bufsize
       integer, save :: jsta
+      integer(4) :: status
 !!
 
       Time_T3C = Zero
@@ -197,7 +205,8 @@
       !
       CALL CPU_TIME(TimeBgn)
 !coarray      call mpi_barrier(MPI_COMM_WORLD,ierr)  ! not essential, just make measured time meaningful
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
       call cublas_init()
       ! allocate memory space for matrix A,B and C on GPU
@@ -207,7 +216,8 @@
          call cublas_alloc( devptr_C(id_st), m, n )
       enddo
 !coarray      call mpi_barrier(MPI_COMM_WORLD,ierr)  ! not essential, just make measured time meaningful
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
       CALL CPU_TIME(TimeEnd)
 #ifdef DEBUG
@@ -413,11 +423,30 @@
 !                 CALL MPI_IRecv(RecvBuf(1,commIndexEach(commPhase)), commSizeEach(commPhase), &
 !                      MPI_DOUBLE_PRECISION, Jrankrecv_1, commPhase, MPI_COMM_MO, ireq(2), IErr)
                  bufsize = commSizeEach(commPhase)
-                 allocate(sbuf(bufsize)[*])
-                 allocate(rbuf(bufsize)[*])
+!                 allocate(sbuf(bufsize)[*])
+                 sbuf_lb(1)=1
+                 sbuf_ub(1)=bufsize
+                 call xmp_new_coarray(sbuf_desc,8,1,sbuf_lb,sbuf_ub,1,img_dims)
+                 call xmp_coarray_bind(sbuf_desc,sbuf)
+
+!                 allocate(rbuf(bufsize)[*])
+                 rbuf_lb(1)=1
+                 rbuf_ub(1)=bufsize
+                 call xmp_new_coarray(rbuf_desc,8,1,rbuf_lb,rbuf_ub,1,img_dims)
+                 call xmp_coarray_bind(rbuf_desc,rbuf)
+
+                 call xmp_new_array_section(sbuf_sec,1)
+                 call xmp_new_array_section(rbuf_sec,1)
+
                  jsta = commIndexEach(commPhase)
                  sbuf(1:bufsize) = SendBuf(1:bufsize,jsta)
-                 rbuf(1:bufsize)[Jranksend_1+1] = sbuf(1:bufsize)
+                 !rbuf(1:bufsize)[Jranksend_1+1] = sbuf(1:bufsize)
+                 img_dims(1) = Jranksend_1+1
+                 call xmp_coarray_put(img_dims,rbuf_desc,rbuf_sec,sbuf_desc,sbuf_sec)
+
+                 call xmp_free_array_sections(sbuf_sec)
+                 call xmp_free_array_sections(rbuf_sec)
+
 !!
                endif
                CALL CPU_TIME(TimeEnd)
@@ -574,10 +603,19 @@
 !coarray
 !                       CALL MPI_Wait(ireq(1), istat1, IErr)
 !                       CALL MPI_Wait(ireq(2), istat2, IErr)
-                       sync all
+!                       sync all
+                       call xmp_sync_all(status)
                        RecvBuf(1:bufsize,jsta) = rbuf(1:bufsize)
-                       if (allocated(sbuf)) deallocate(sbuf)
-                       if (allocated(rbuf)) deallocate(rbuf)
+!                       if (allocated(sbuf)) deallocate(sbuf)
+!                       if (allocated(rbuf)) deallocate(rbuf)
+! TODO: check
+                       if (allocated(sbuf)) then
+                         call xmp_coarray_deallocate(sbuf,status)
+                       endif
+                       if (allocated(rbuf)) then
+                         call xmp_coarray_deallocate(rbuf,status)
+                       endif
+
 !!
                      endif
 
@@ -591,11 +629,25 @@
 !                       CALL MPI_IRecv(RecvBuf(1,commIndexEach(commPhase)), commSizeEach(commPhase), &
 !                            MPI_DOUBLE_PRECISION, Jrankrecv_1, commPhase, MPI_COMM_MO, ireq(2), IErr)
                        bufsize = commSizeEach(commPhase)
-                       allocate(sbuf(bufsize)[*])
-                       allocate(rbuf(bufsize)[*])
+!                       allocate(sbuf(bufsize)[*])
+                       sbuf_lb(1)=1
+                       sbuf_ub(1)=bufsize
+                       call xmp_new_coarray(sbuf_desc,8,1,sbuf_lb,sbuf_ub,1,img_dims)
+                       call xmp_coarray_bind(sbuf_desc,sbuf)
+
+!                       allocate(rbuf(bufsize)[*])
+                       rbuf_lb(1)=1
+                       rbuf_ub(1)=bufsize
+                       call xmp_new_coarray(rbuf_desc,8,1,rbuf_lb,rbuf_ub,1,img_dims)
+                       call xmp_coarray_bind(rbuf_desc,rbuf)
+
                        jsta = commIndexEach(commPhase)
                        sbuf(1:bufsize) = SendBuf(1:bufsize,jsta)
-                       rbuf(1:bufsize)[Jranksend_1+1] = sbuf(1:bufsize)
+!                       rbuf(1:bufsize)[Jranksend_1+1] = sbuf(1:bufsize)
+                       call xmp_coarray_put(img_dims,rbuf_desc,rbuf_sec,sbuf_desc,sbuf_sec)
+
+                       call xmp_free_array_sections(sbuf_sec)
+                       call xmp_free_array_sections(rbuf_sec)
 !!
                      endif
                      CALL CPU_TIME(TimeEnd)
@@ -721,7 +773,8 @@
       !
       CALL CPU_TIME(TimeBgn)
 !coarray      call mpi_barrier(MPI_COMM_WORLD,ierr)  ! not essential, just make measured time meaningful
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
       ! free buffer on GPU
       do id_st = 1, NUM_STREAM
@@ -731,7 +784,8 @@
       enddo
       call cublas_fin()
 !coarray      call mpi_barrier(MPI_COMM_WORLD,ierr)  ! not essential, just make measured time meaningful
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
       CALL CPU_TIME(TimeEnd)
 #ifdef DEBUG
