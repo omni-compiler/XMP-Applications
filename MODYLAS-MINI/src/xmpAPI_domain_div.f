@@ -427,15 +427,29 @@ c----------------------------------------------------------------------
       use shakerattleroll
       use mpivar
       use ompvar
+      use xmp_api
       implicit none
       integer(4) :: itmp
+      integer(8), dimension(3) :: na_per_cell_lb, na_per_cell_ub
+      integer(8), dimension(2) :: wkxyz_lb, wkxyz_ub
+      integer(8), dimension(1) :: m2i_lb, m2i_ub
       include 'mpif.h'
 
 !############
 !  metadata
 !############
       allocate(tag(lzdiv+4,lydiv+4,lxdiv+4))
-      allocate(na_per_cell(lzdiv+4,lydiv+4,lxdiv+4)[*])
+      ! allocate(na_per_cell(lzdiv+4,lydiv+4,lxdiv+4)[*])
+      na_per_cell_lb(1) = 1
+      na_per_cell_lb(2) = 1
+      na_per_cell_lb(3) = 1
+      na_per_cell_ub(1) = lzdiv+4
+      na_per_cell_ub(2) = lydiv+4
+      na_per_cell_ub(3) = lxdiv+4
+      call xmp_new_coarray(na_per_cell_desc,4,3,
+     & na_per_cell_lb,na_per_cell_ub,1, trj_mpi_img_dims)
+      call xmp_coarray_bind(na_per_cell_desc,na_per_cell)
+
 !############
 !  segment
 !############
@@ -454,9 +468,24 @@ c----------------------------------------------------------------------
       na5cell=na1cell*5
       nadirect=na1cell*(lxdiv+4)*(lydiv+4)*(lzdiv+4)
 !Coordinate & Velocity
-      allocate(wkxyz(3,nadirect)[*])
+      ! allocate(wkxyz(3,nadirect)[*])
+      wkxyz_lb(1) = 1
+      wkxyz_lb(2) = 1
+      wkxyz_ub(1) = 3
+      wkxyz_ub(2) = nadirect
+      call xmp_new_coarray(wkxyz_desc,8,2,
+     & wkxyz_lb,wkxyz_ub,1, trj_mpi_img_dims)
+      call xmp_coarray_bind(wkxyz_desc,wkxyz)
+
       allocate(wkv(3,nadirect))
-      allocate(m2i(nadirect)[*])
+
+      ! allocate(m2i(nadirect)[*])
+      m2i_lb(1) = 1
+      m2i_ub(1) = nadirect
+      call xmp_new_coarray(m2i_desc,4,1,
+     & m2i_lb,m2i_ub,1,trj_mpi_img_dims)
+      call xmp_coarray_bind(m2i_desc,m2i)
+
 !Force
       allocate(wk_f(3,nadirect))
       allocate(w3_f(3,nadirect,0:nomp-1))
