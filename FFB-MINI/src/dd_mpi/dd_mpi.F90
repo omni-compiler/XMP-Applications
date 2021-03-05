@@ -806,14 +806,15 @@
       DIMENSION LDOM(NDOM),NBPDOM(NDOM),IPSLF(MBPDOM,NDOM),IPSND(MBPDOM,NDOM), FX(NP),FY(NP),FZ(NP)
 ! Fujitsu start 202103
 !      DIMENSION BUFSND(MAXBUF)[*], BUFRCV(MAXBUF)[*]
-      INTEGER*4 , POINTER :: BUFSND ( : , : ) => null ( )
-      INTEGER*4 , POINTER :: BUFRCV ( : , : ) => null ( )
+      REAL*4 , POINTER :: BUFSND ( : ) => null ( )
+      REAL*4 , POINTER :: BUFRCV ( : ) => null ( )
       INTEGER*8 :: snd_desc, rcv_desc
       INTEGER*8 :: snd_sec, rcv_sec
       INTEGER*8, DIMENSION(1) :: snd_lb, snd_ub, rcv_lb, rcv_ub
       INTEGER*8 :: st_desc, st_l_desc
       INTEGER*8 :: st_sec, st_l_sec
       INTEGER*8, DIMENSION(1) :: st_lb, st_ub, st_l_lb, st_l_ub
+      INTEGER*8 :: start1, end1, start2, end2
       INTEGER*4 :: img_dims(1)
       INTEGER*4 status
 ! Fujitsu end 202103
@@ -824,8 +825,8 @@
       INTEGER MAX_RECV_LEN
 ! Fujitsu start 202103
 !      INTEGER ,ALLOCATABLE :: START_R(:)[:]
-      INTEGER*4 , POINTER :: START_R ( : , : ) => null ( )
-      INTEGER*4 , POINTER :: start_rr_p ( : , : ) => null ( )
+      INTEGER*4 , POINTER :: START_R ( : ) => null ( )
+      INTEGER*4 , POINTER :: start_rr_p ( : ) => null ( )
 ! Fujitsu end 202103
 !      INTEGER ,ALLOCATABLE :: END_R(:)[:]
       INTEGER ,ALLOCATABLE :: START_S(:)
@@ -1128,8 +1129,12 @@
 !             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
 ! Fujitsu start 202103
 !        START_RR = START_R(ME)[LDOM(IDOM)]
-        call xmp_array_section_set_triplet(st_sec,1,ME,ME,1,status)
-        call xmp_array_section_set_triplet(st_l_sec,1,1,1,1,status)
+        start1 = ME
+        end1 = ME
+        start2 = 1
+        end2 = 1
+        call xmp_array_section_set_triplet(st_sec,1,start1,end1,1,status)
+        call xmp_array_section_set_triplet(st_l_sec,1,start2,end2,1,status)
         img_dims = LDOM(IDOM)
         call xmp_coarray_get(img_dims,st_desc,st_sec, &
                              st_l_desc,st_l_sec,status)
@@ -1139,10 +1144,14 @@
 ! Fujitsu start 202103
 !        BUFRCV(START_RR:END_RR)[LDOM(IDOM)] = &
 !             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
-        call xmp_array_section_set_triplet(rcv_sec,1,START_RR,END_RR,1,status)
+        start1 = START_RR
+        end1 = END_RR
+        call xmp_array_section_set_triplet(rcv_sec,1,start1,end1,1,status)
         START_RR = START_S(LDOM(IDOM))
         END_RR = END_S(LDOM(IDOM))
-        call xmp_array_section_set_triplet(snd_sec,1,START_RR,END_RR,1,status)
+        start1 = START_RR
+        end1 = END_RR
+        call xmp_array_section_set_triplet(snd_sec,1,start1,end1,1,status)
         img_dims = LDOM(IDOM)
         call xmp_coarray_put(img_dims,rcv_desc,rcv_sec,snd_desc,snd_sec,status);
 ! Fujitsu end 202103
@@ -1353,7 +1362,7 @@
 !      call xmp_coarray_deallocate(snd_desc, status)
 !      call xmp_coarray_deallocate(rcv_desc, status)
 !
-      call xmp_finalize_all
+      call xmp_api_finalize
 ! Fujitsu end 202103
 !
 !     IPART = IPART

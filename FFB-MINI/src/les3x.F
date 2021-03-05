@@ -1,4 +1,4 @@
-X======================================================================C
+C======================================================================C
 C                                                                      C
 C SOFTWARE NAME : FRONTFLOW_BLUE.8.1                                   C
 C                                                                      C
@@ -332,10 +332,10 @@ CC Fj end 202103
      *       WRK09(:),WRK10(:),WRK11(:),WRK12(:),
      *       WRK13(:),WRK3(:,:)
 CC Fj start 202103
-      INTEGER , POINTER :: RX ( : , : ) => null ( )
-      INTEGER , POINTER :: RY ( : , : ) => null ( )
+      REAL*4 , POINTER :: RX ( : , : ) => null ( )
+      REAL*4 , POINTER :: RY ( : , : ) => null ( )
       INTEGER*8 :: rx_desc, ry_desc
-      INTEGER*8, DIMENSION(1) :: rx_lb, rx_ub, ry_lb, ry_ub
+      INTEGER*8, DIMENSION(2) :: rx_lb, rx_ub, ry_lb, ry_ub
       INTEGER*4 :: img_dims(1)
       INTEGER*4 status
 CC Fj end 202103
@@ -1129,10 +1129,14 @@ C      ALLOCATE(RY(N1,ME)[*],    STAT=LERR(07))
       ALLOCATE(DWRK04(3,N1       ), STAT=LERR(26))
       ALLOCATE(DWRK05(     MGAUSS), STAT=LERR(27))
 C Fj start 202103
-      rx_lb(1) = N1
-      rx_ub(1) = ME
-      ry_lb(1) = N1
-      ry_ub(1) = ME
+      rx_lb(1) = 1
+      rx_lb(2) = 1
+      rx_ub(1) = N1
+      rx_ub(2) = ME
+      ry_lb(1) = 1
+      ry_lb(2) = 1
+      ry_ub(1) = N1
+      ry_ub(2) = ME
       call xmp_new_coarray(rx_desc, 4, 1, rx_lb, rx_ub, 1, img_dims)
       call xmp_new_coarray(ry_desc, 4, 1, ry_lb, ry_ub, 1, img_dims)
       call xmp_coarray_bind(rx_desc,RX)
@@ -1445,7 +1449,10 @@ C
      *               MDOM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
      *               WRK01,WRK02,WRK03,LWRK06, 
      *               DWRK3,LWRK01,LWRK02,WRK04,NODWK1,NODWK2,NODWK3,
-     *               RX,RY,NPB0, 
+C Fj
+C     *               RX,RY,NPB0, 
+     *               rx_desc,ry_desc,NPB0, 
+C Fj
      *               NPB1,LPB1,XPB1,YPB1,ZPB1,
      *               NPB2,LPB2,XPB2,YPB2,ZPB2,
      *               LWRK03,LWRK04,
@@ -1565,7 +1572,10 @@ C
      *            NPCCL ,LPCCL1,LPCCL2,   
      *            IPART ,MPINT ,NPINT ,LPINT1,LPINT2,LPINT3,
      *            MDOM  ,NDOM  ,LDOM  ,NBPDOM,MBPDOM,IPSLF,IPSND,
-     *            LPBTOA,IUT0,IUT6,IERR,RX,RY,
+C Fj
+C     *            LPBTOA,IUT0,IUT6,IERR,RX,RY,
+     *            LPBTOA,IUT0,IUT6,IERR,rx_desc,ry_desc,
+C Fj
      *            MWRK,WRK01,WRK02,WRK03,WRK04,WRK05,WRK06,
      *            LWRK01,LEWRK)
       CALL ERRCHK(IUT6,IPART,1,IERR,IERRA)
@@ -1652,7 +1662,10 @@ C
       MELM=NELM+1
       CALL ELM3DX(MGAUSS,IGAUSH,
      *            MELM,N1,NE,NP,NEX,XD,YD,ZD,NODE,
+C Fj
      *            SNI ,DNXI,DNYI,DNZI,SN,RX,RY,WRKN,
+C     *            SNI ,DNXI,DNYI,DNZI,SN,rx_desc,ry_desc,WRKN,
+C Fj
      *            E,EX,EY,EZ,EXX,EYY,EZZ,EXY,EXZ,EYZ,
      *            DWRK01,DWRK02,DWRK03,DWRK04,DWRK05,IUT0,IERR)
       CALL ERRCHK(IUT6,IPART,1,IERR,IERRA)
@@ -1690,7 +1703,10 @@ C
       ENDDO
       IDUM=1
       CALL DDCOMX(IPART,IDUM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *            CM,CM,CM,NP,IUT0,IERR,RX,RY,MAXBUF)
+C Fj
+C     *            CM,CM,CM,NP,IUT0,IERR,RX,RY,MAXBUF)
+     *            CM,CM,CM,NP,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
+C Fj
       DO 2700 IP=1,NP
           CM(IP)=1.0E0/CM(IP)
  2700 CONTINUE
@@ -1701,7 +1717,10 @@ C
           WRITE(IUT6,*) ' ** INTERPOLATING PRESSURE TO NODES **'
           CALL NODLEX(NODE,ME,NE,NP,N1,NEX,SN,
      *                IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *                P,PN,CM,IUT0,IERR,RX,RY,MAXBUF)
+C Fj
+C     *                P,PN,CM,IUT0,IERR,RX,RY,MAXBUF)
+     *                P,PN,CM,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
+C Fj
           IF(IERRA.NE.0) THEN
               WRITE(IUT0,*) BLANK
               WRITE(IUT0,*) ERMSGC
@@ -1852,7 +1871,10 @@ C
      *      LWRK01,LWRK02,
      *      WRK01,WRK02,WRK03,WRK04,WRK05,WRK06,
      *      WRK07,WRK08,WRK09,WRK10,WRK11,WRK12,
-     *      RX,RY,
+C Fj
+C     *      RX,RY,
+     *      rx_desc,ry_desc,
+C Fj
      *      JUNROL,NPPMAX,NCRS2,WRK13,TACRS,ITPCRS,
      *      IUT0,IERR)
           call maprof_time_stop(TM_VEL3D1)
@@ -1878,7 +1900,10 @@ C
      *             IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *             LWRK01,LWRK02,WRK3,WRK01,WRK02,WRK03,WRK04,
      *             WRK05,WRK06,WRK07,WRK08,WRK09,WRK10,
-     *             PRCM,APRCM,RX,RY,MWRK,WRKN,
+C Fj
+C     *             PRCM,APRCM,RX,RY,MWRK,WRKN,
+     *             PRCM,APRCM,rx_desc,ry_desc,MWRK,WRKN,
+C Fj
      *             IUT0,IERR)
              call maprof_time_stop(TM_PRES3E)
              IF(IERR.NE.0) GOTO 9999
@@ -1897,7 +1922,10 @@ C
      *                NPWALL,LPWALL,UWALL,VWALL,WWALL,
      *                NPSYMT,NPSYM2,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
      *                IPART ,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *                RX,RY,MWRK,WRKN,WRK3,WRK01,
+C Fj
+C     *                RX,RY,MWRK,WRKN,WRK3,WRK01,
+     *                rx_desc,ry_desc,MWRK,WRKN,WRK3,WRK01,
+C Fj
      *                IUT0,IERR,
      *                WRK05)
 C

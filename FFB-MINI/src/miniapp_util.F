@@ -76,7 +76,7 @@ c---
  
 c=========================================================
 
-      integer function total(ival)
+      integer*4 function total(ival)
 c
 c   return total amount of an integer variable over whole domains
 c
