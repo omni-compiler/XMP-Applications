@@ -28,15 +28,23 @@ c----------------------------------------------------------------------
 c
       subroutine mpistart
       use mpivar
+      use xmp_api
       implicit none
       include 'mpif.h'
       integer(4) :: ierr
 
+      call xmp_api_init
 !coarray      call mpi_init(ierr)
 !coarray      call mpi_comm_size(mpi_comm_world,nprocs,ierr)
 !coarray      call mpi_comm_rank(mpi_comm_world,myrank,ierr)
-      nprocs = num_images()
-      myrank = this_image()-1   
+      ! nprocs = num_images()
+!      nprocs = xmp_num_images()
+      ! TODO: use xmp_num_images
+      call mpi_comm_size(mpi_comm_world,nprocs,ierr)
+
+
+      ! myrank = this_image()-1   
+      myrank = xmp_this_image() - 1
 !!
       mpiout=0
       return 
@@ -47,6 +55,7 @@ c
 !coarray      include 'mpif.h'
 !coarray      integer ierr
 !coarray      call mpi_finalize(ierr)
+      call xmp_api_finalize
       return
       end
 
