@@ -1,4 +1,4 @@
-C======================================================================C
+X======================================================================C
 C                                                                      C
 C SOFTWARE NAME : FRONTFLOW_BLUE.8.1                                   C
 C                                                                      C
@@ -16,6 +16,7 @@ C                                                                      C
 C======================================================================C
 C*    PROGRAM LES3X
       SUBROUTINE LES3X(FILEIN)
+      use xmp_api
 #include "timing.h"
 !#include "xmp_coarray.h"
       IMPLICIT NONE 
@@ -322,11 +323,22 @@ CC
      *       NODWK1(:,:),LEWRK(:,:),
      *       LWRK01(:),LWRK02(:),LWRK04(:)
       REAL*4, ALLOCATABLE::
-     *       RX(:,:)[:], RY(:,:)[:], WRKN(:),
+CC Fj start 202103
+CC     *       RX(:,:)[:], RY(:,:)[:], WRKN(:),
+     *       WRKN(:),
+CC Fj end 202103
      *       WRK01(:),WRK02(:),WRK03(:),WRK04(:),
      *       WRK05(:),WRK06(:),WRK07(:),WRK08(:),
      *       WRK09(:),WRK10(:),WRK11(:),WRK12(:),
      *       WRK13(:),WRK3(:,:)
+CC Fj start 202103
+      INTEGER , POINTER :: RX ( : , : ) => null ( )
+      INTEGER , POINTER :: RY ( : , : ) => null ( )
+      INTEGER*8 :: rx_desc, ry_desc
+      INTEGER*8, DIMENSION(1) :: rx_lb, rx_ub, ry_lb, ry_ub
+      INTEGER*4 :: img_dims(1)
+      INTEGER*4 status
+CC Fj end 202103
       REAL*8,ALLOCATABLE::
      *       DWRK01(:,:),DWRK02(:),DWRK03(:,:,:),
      *       DWRK04(:,:),DWRK05(:)
@@ -743,6 +755,10 @@ C     NDOM = 0
       CALL DDINIT(NPART,IPART)
 C     IF(IPART.GE.1) NDOM = 1
 C
+C Fj start 202103
+      call xmp_api_init
+C Fj end 202103
+C
       IF(IPART.GE.2) THEN
           IUT6 = IUTLG
           CALL MFNAME(FILELG,FILE,IPART,IUT0,IERR)
@@ -1090,8 +1106,8 @@ C
       ALLOCATE(LWRK01(MWRK), STAT=LERR(03))
       ALLOCATE(LWRK02(MWRK), STAT=LERR(04))
       ALLOCATE(LWRK04(MWRK), STAT=LERR(05))
-      ALLOCATE(RX(N1,ME)[*],    STAT=LERR(06))
-      ALLOCATE(RY(N1,ME)[*],    STAT=LERR(07))
+C      ALLOCATE(RX(N1,ME)[*],    STAT=LERR(06))
+C      ALLOCATE(RY(N1,ME)[*],    STAT=LERR(07))
       ALLOCATE(WRKN(MWRK*9), STAT=LERR(08))
       ALLOCATE(WRK01(MWRK),  STAT=LERR(09))
       ALLOCATE(WRK02(MWRK),  STAT=LERR(10))
@@ -1112,6 +1128,16 @@ C
       ALLOCATE(DWRK03(3,N1,MGAUSS), STAT=LERR(25))
       ALLOCATE(DWRK04(3,N1       ), STAT=LERR(26))
       ALLOCATE(DWRK05(     MGAUSS), STAT=LERR(27))
+C Fj start 202103
+      rx_lb(1) = N1
+      rx_ub(1) = ME
+      ry_lb(1) = N1
+      ry_ub(1) = ME
+      call xmp_new_coarray(rx_desc, 4, 1, rx_lb, rx_ub, 1, img_dims)
+      call xmp_new_coarray(ry_desc, 4, 1, ry_lb, ry_ub, 1, img_dims)
+      call xmp_coarray_bind(rx_desc,RX)
+      call xmp_coarray_bind(ry_desc,RY)
+C Fj start 202103
       CALL ERRCHK(IUT6,IPART,27,LERR,IERR)
       IF(IERR.NE.0) THEN
           WRITE(IUT0,*) BLANK
@@ -2145,6 +2171,13 @@ C
       IF(IPART.GE.2) CLOSE(IUT6)
       CALL DDEXIT
 C
+C
+C Fj start 202103
+      call xmp_coarray_deallocate(rx_desc, status)
+      call xmp_coarray_deallocate(ry_desc, status)
+C
+      call xmp_api_finalize
+C Fj end 202103
 C
       STOP
 C

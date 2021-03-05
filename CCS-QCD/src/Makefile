@@ -16,12 +16,12 @@ FFLAGS += -D_NDIMX=$(PX) -D_NDIMY=$(PY) -D_NDIMZ=$(PZ)
 endif
 export
 #######################################################################
-SOURCE = ccs_qcd_solver_bench.F90  ccs_qcd_solver_bench_class.F90  lattice_class.F90
 ifeq ($(USE_XMP_API), yes)
-	SOURCE += xmpAPI_comlib.F90
+	COMLIB = xmpAPI_comlib
 else
-	SOURCE += comlib.F90
+	COMLIB = comlib
 endif
+SOURCE = ccs_qcd_solver_bench.F90  ccs_qcd_solver_bench_class.F90  lattice_class.F90 $(COMLIB).F90
 CONFIG = CLASS_$(CLASS)/config.h
 FFLAGS += -Ima_prof/src
 LDFLAGS += -Lma_prof/src
@@ -51,14 +51,14 @@ clean :
 	$(MAKE) -C ma_prof/src clean
 
 #######################################################################
-comlib.o : comlib.F90 config.h
-lattice_class.o : lattice_class.F90 comlib.o config.h
-ccs_qcd_solver_bench_class.o : ccs_qcd_solver_bench_class.F90 comlib.o lattice_class.o config.h
+$(COMLIB).o : $(COMLIB).F90 config.h
+lattice_class.o : lattice_class.F90 $(COMLIB).o config.h
+ccs_qcd_solver_bench_class.o : ccs_qcd_solver_bench_class.F90 $(COMLIB).o lattice_class.o config.h
 ccs_qcd_solver_bench_class.o : bicgstab_hmc.h90 clover.h90 clover_f1f2.h90 clvinv.h90
 ccs_qcd_solver_bench_class.o : clvinv_ldl.h90 copy_u.h90 copy_y.h90 expp_u.h90 full2linear_clv.h90 gauss_y.h90
 ccs_qcd_solver_bench_class.o : init_p.h90 init_u_and_y.h90 initset.h90 mult.h90 mult_eo_tzyx.h90
 ccs_qcd_solver_bench_class.o : mult_fclinv.h90 mult_mb_pre.h90 output.h90 xrand.h90
-ccs_qcd_solver_bench.o : ccs_qcd_solver_bench.F90 comlib.o ccs_qcd_solver_bench_class.o lattice_class.o config.h
+ccs_qcd_solver_bench.o : ccs_qcd_solver_bench.F90 $(COMLIB).o ccs_qcd_solver_bench_class.o lattice_class.o config.h
 
 .PHONY: CONFIG_GEN
 CONFIG_GEN:

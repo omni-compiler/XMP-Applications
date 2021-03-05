@@ -1,0 +1,9 @@
+# For K computer & FX10 servers - mpifrtpx compiler command and SSL2 library
+./config/configure \
+--lapack= \
+--blas= \
+--atlas=-SSL2BLAMP \
+linux64_xmp_omp_fugaku
+
+cd ./config
+ln -sf makeconfig makeconfig.xmp
