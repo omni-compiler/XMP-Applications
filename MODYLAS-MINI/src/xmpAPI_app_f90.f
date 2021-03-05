@@ -227,9 +227,11 @@ c-----------------------------------------------------------------------
       subroutine check_parallel_condition
 c-----------------------------------------------------------------------
       use mpivar
+      use xmp_api
       implicit none
       include 'mpif.h'
       integer(4) :: ierr
+      integer(4) :: status
 
 !### checm nprocs ###!
       if(mod(nprocs,2).ne.0)then
@@ -237,7 +239,8 @@ c-----------------------------------------------------------------------
         write(*,*) 'ERROR: nprocs is not equal to 2 powers.'
         endif
 !coarray        call mpi_barrier(mpi_comm_world, ierr)
-        sync all
+        !sync all
+        call xmp_sync_all(status)
 !!
         call mpiend
         stop 1
@@ -247,7 +250,8 @@ c-----------------------------------------------------------------------
         write(*,*) 'ERROR: nprocs less than 8 is not supported.'
         endif
 !coarray        call mpi_barrier(mpi_comm_world, ierr)
-        sync all
+        !sync all
+        call xmp_sync_all(status)
 !!
         call mpiend
         stop 1

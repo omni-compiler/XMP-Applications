@@ -32,6 +32,7 @@ c---------------------------------------------------------------------
       use comm_base
       use md_fmm
       use mpivar
+      use xmp_api
       implicit none
       INCLUDE 'mpif.h'
       integer m1
@@ -61,6 +62,7 @@ c---------------------------------------------------------------------
       integer iczb
       integer icyb0prior, icxb0prior
       integer ierr,istatus(mpi_status_size)
+      integer(4)  status
 
 !coarray
       allocate( rccbuf(mylm*5*nscydiv*nscxdiv,2)[*] )
@@ -116,7 +118,8 @@ c---------------------------------------------------------------------
 !coarray     &           myrank, rccbuf(1,1), ncc, MPI_DOUBLE_COMPLEX, 
 !coarray     &           ipz_src, ipz_src,mpi_comm_world,istatus,ierr)
       rccbuf(1:ncc,1)[ipz_dest+1] = ccbuf(1:ncc) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
             ncc2 = 0
@@ -146,7 +149,8 @@ c---------------------------------------------------------------------
 !coarray     &           myrank, rccbuf(1,ibr), ncc, MPI_DOUBLE_COMPLEX,
 !coarray     &           ipz_src, ipz_src,mpi_comm_world,istatus,ierr)
       rccbuf(1:ncc,ibr)[ipz_dest+1] = rccbuf(1:ncc,ibs) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
             ncc2 = 0
@@ -181,7 +185,8 @@ c---------------------------------------------------------------------
 !coarray     &           rccbuf(1,1), ncc, MPI_DOUBLE_COMPLEX,
 !coarray     &           ipz_src, ipz_src,mpi_comm_world,istatus,ierr)
       rccbuf(1:ncc,1)[ipz_dest+1] = ccbuf(1:ncc) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
             ncc2 = 0
             DO icx = icx0, icx1
@@ -205,7 +210,8 @@ c---------------------------------------------------------------------
 !coarray     &           myrank, rccbuf(1,ibr), ncc, MPI_DOUBLE_COMPLEX,
 !coarray     &           ipz_src, ipz_src,mpi_comm_world,istatus,ierr)
       rccbuf(1:ncc,ibr)[ipz_dest+1] = rccbuf(1:ncc,ibs) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
             ncc2 = 0
             DO icx = icx0, icx1
@@ -242,11 +248,13 @@ c---------------------------------------------------------------------
 !coarray     &              ipy_src, ipy_src,mpi_comm_world,istatus,ierr )
       nd = abs(icyb1 - icyb0)
       ndis(me)[ipy_src+1] = icyb0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipy_dest+1)
          wm_tmp( :, :,   nb:nb  +nd, icx )[ipy_dest+1]
      . = wm_tmp( :, :, icy0:icy0+nd, icx ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
             else
                icyb0prior = icyb0
@@ -258,11 +266,13 @@ c---------------------------------------------------------------------
 !coarray     &              MPI_DOUBLE_COMPLEX,
 !coarray     &              ipy_src, ipy_src,mpi_comm_world,istatus,ierr )
       ndis(me)[ipy_src+1] = icyb0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipy_dest+1)
          wm_tmp( :, :,         nb:nb        +nd, icx )[ipy_dest+1]
      . = wm_tmp( :, :, icyb0prior:icyb0prior+nd, icx ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
             endif
          END DO
@@ -289,11 +299,13 @@ c---------------------------------------------------------------------
 !coarray     &              ipy_src, ipy_src,mpi_comm_world,istatus,ierr)
       nd = abs(icyb1 - icyb0)
       ndis(me)[ipy_src+1] = icyb0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipy_dest+1)
          wm_tmp( :, :,   nb:nb  +nd, icx )[ipy_dest+1]
      . = wm_tmp( :, :, icy0:icy0+nd, icx ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
             else
                icyb0prior = icyb0
@@ -304,11 +316,13 @@ c---------------------------------------------------------------------
 !coarray     &              MPI_DOUBLE_COMPLEX,
 !coarray     &              ipy_src, ipy_src,mpi_comm_world,istatus,ierr)
       ndis(me)[ipy_src+1] = icyb0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipy_dest+1)
          wm_tmp( :, :,         nb:nb        +nd, icx )[ipy_dest+1]
      . = wm_tmp( :, :, icyb0prior:icyb0prior+nd, icx ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
             end if
          END DO
@@ -334,11 +348,13 @@ c---------------------------------------------------------------------
 !coarray     &           ipx_src, ipx_src,mpi_comm_world,istatus,ierr )
       nd = abs(icxb1 - icxb0)
       ndis(me)[ipx_src+1] = icxb0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipx_dest+1)
          wm_tmp( :, :, :,   nb:nb  +nd )[ipx_dest+1]
      . = wm_tmp( :, :, :, icx0:icx0+nd ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
          else
             icxb0prior = icxb0
@@ -349,11 +365,13 @@ c---------------------------------------------------------------------
 !coarray     &           MPI_DOUBLE_COMPLEX,
 !coarray     &           ipx_src, ipx_src,mpi_comm_world,istatus,ierr )
       ndis(me)[ipx_src+1] = icxb0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipx_dest+1)
          wm_tmp( :, :, :,         nb:nb        +nd )[ipx_dest+1]
      . = wm_tmp( :, :, :, icxb0prior:icxb0prior+nd ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
          end if
       END DO
@@ -378,11 +396,13 @@ c---------------------------------------------------------------------
 !coarray     &           ipx_src, ipx_src,mpi_comm_world,istatus,ierr )
       nd = abs(icxb1 - icxb0)
       ndis(me)[ipx_src+1] = icxb0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipx_dest+1)
          wm_tmp( :, :, :,   nb:nb  +nd )[ipx_dest+1]
      . = wm_tmp( :, :, :, icx0:icx0+nd ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
          else
             icxb0prior = icxb0
@@ -393,11 +413,13 @@ c---------------------------------------------------------------------
 !coarray     &           MPI_DOUBLE_COMPLEX,
 !coarray     &           ipx_src, ipx_src,mpi_comm_world,istatus,ierr )
       ndis(me)[ipx_src+1] = icxb0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipx_dest)
          wm_tmp( :, :, :,         nb:nb        +nd )[ipx_dest+1]
      . = wm_tmp( :, :, :, icxb0prior:icxb0prior+nd ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
          end if
       END DO
@@ -417,6 +439,7 @@ c---------------------------------------------------------------------
       use md_fmm
       use md_fmm_domdiv_flg
       use mpivar
+      use xmp_api
       implicit none
       include 'mpif.h'
       integer(4) :: ilevel
@@ -470,6 +493,7 @@ c---------------------------------------------------------------------
       integer m
       integer ibs, ibr
       integer istatus(mpi_status_size, 4), ierr
+      integer(4) status
 #ifndef SYNC_COM
       integer,dimension(4) :: irq
       integer nrq
@@ -581,7 +605,8 @@ c---------------------------------------------------------------------
 !coarray     &              mpi_comm_world, istatus, ierr )
       rccbufp(1:nccp,1)[ipz_pdest+1] = ccbufp(1:nccp) ! Put
       rccbufm(1:nccm,1)[ipz_mdest+1] = ccbufm(1:nccm) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
             call mpi_irecv(rccbufp(1,1), nccp,
@@ -650,7 +675,8 @@ c---------------------------------------------------------------------
 !coarray     &                mpi_comm_world, istatus, ierr )
       rccbufp(1:nccp,ibr)[ipz_pdest+1] = rccbufp(1:nccp,ibs) ! Put
       rccbufm(1:nccm,ibr)[ipz_mdest+1] = rccbufm(1:nccm,ibs) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
             call mpi_irecv(rccbufp(1,ibr), nccp,
@@ -701,7 +727,8 @@ c---------------------------------------------------------------------
 !coarray     &                   ipz_pdest, myrank, 
 !coarray     &                   mpi_comm_world, istatus, ierr )
       rccbufp(1:nccp,ibr)[ipz_pdest+1] = rccbufp(1:nccp,ibs) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                   call mpi_isend(rccbufp(1,ibs), nccp,
@@ -731,7 +758,8 @@ c---------------------------------------------------------------------
 !coarray     &                   ipz_mdest, myrank, 
 !coarray     &                   mpi_comm_world, istatus, ierr )
       rccbufm(1:nccm,ibr)[ipz_mdest+1] = rccbufm(1:nccm,ibs) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                   call mpi_isend(rccbufm(1,ibs), nccm,
@@ -835,11 +863,13 @@ c---------------------------------------------------------------------
 !coarray     &                mpi_comm_world, istatus, ierr  )
       nd = abs(icyp1 - icyp0)
       ndis(me)[ipy_psrc+1] = icybp0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipy_pdest+1)
          wm_tmp( :, :,    nb:nb   +nd, icx )[ipy_pdest+1]
      . = wm_tmp( :, :, icyp0:icyp0+nd, icx ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 !coarray               call mpi_sendrecv(wm_tmp(1,1,icym0,icx), nccm, 
 !coarray     &                MPI_DOUBLE_COMPLEX, 
@@ -849,11 +879,13 @@ c---------------------------------------------------------------------
 !coarray     &                mpi_comm_world, istatus, ierr )
       md = abs(icym1 - icym0)
       mdis(me)[ipy_msrc+1] = icybm0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       mb = mdis(ipy_mdest+1)
          wm_tmp( :, :, mb:mb      +md, icx )[ipy_mdest+1]
      . = wm_tmp( :, :, icym0:icym0+md, icx ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                call mpi_irecv(wm_tmp(1,1,icybp0,icx), nccp,
@@ -890,11 +922,13 @@ c---------------------------------------------------------------------
 !coarray     *                 ipy_psrc, ipy_psrc, 
 !coarray     &                 mpi_comm_world, istatus, ierr )
       ndis(me)[ipy_psrc+1] = icybp0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipy_pdest+1)
          wm_tmp( :, :,          nb:nb         +nd, icx )[ipy_pdest+1] ! Put
      . = wm_tmp( :, :, icybp0prior:icybp0prior+nd, icx )
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 !coarray                  call mpi_sendrecv(wm_tmp(1,1,icybm0prior,icx), nccm,
 !coarray     &                 MPI_DOUBLE_COMPLEX, 
@@ -903,11 +937,13 @@ c---------------------------------------------------------------------
 !coarray     &                 ipy_msrc, ipy_msrc, 
 !coarray     &                 mpi_comm_world, istatus, ierr )
       mdis(me)[ipy_msrc+1] = icybm0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       mb = mdis(ipy_mdest+1)
          wm_tmp( :, :,          mb:mb         +md, icx )[ipy_mdest+1] ! Put
      . = wm_tmp( :, :, icybm0prior:icybm0prior+md, icx )
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                   call mpi_irecv(wm_tmp(1,1,icybp0,icx), nccp,
@@ -935,11 +971,13 @@ c---------------------------------------------------------------------
 !coarray     &                      ipy_pdest, myrank, 
 !coarray     &                      mpi_comm_world, istatus, ierr )
       ndis(me)[ipy_psrc+1] = icybp0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipy_pdest+1)
          wm_tmp( :, :,          nb:nb         +nd, icx )[ipy_pdest+1]
      . = wm_tmp( :, :, icybp0prior:icybp0prior+nd, icx ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                      call mpi_isend(wm_tmp(1,1,icybp0prior,icx), nccp,
@@ -968,11 +1006,13 @@ c---------------------------------------------------------------------
 !coarray     &                      ipy_mdest, myrank, 
 !coarray     &                      mpi_comm_world, istatus, ierr )
       mdis(me)[ipy_msrc+1] = icybm0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       md = mdis(ipy_mdest+1)
          wm_tmp( :, :,          mb:mb         +md, icx )[ipy_mdest+1]
      . = wm_tmp( :, :, icybm0prior:icybm0prior+md, icx ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 #else
                      call mpi_isend(wm_tmp(1,1,icybm0prior,icx), nccm,
      &                      MPI_DOUBLE_COMPLEX, ipy_mdest, myrank, 
@@ -1049,11 +1089,13 @@ c---------------------------------------------------------------------
 !coarray     &             ipx_psrc, ipx_psrc, 
 !coarray     &             mpi_comm_world, istatus, ierr )
       ndis(me)[ipx_psrc+1] = icxbp0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipx_pdest+1)
          wm_tmp( :, :, :,    nb:nb   +nd )[ipx_pdest+1]
      . = wm_tmp( :, :, :, icxp0:icxp0+nd ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 !coarray            call mpi_sendrecv(wm_tmp(1,1,1,icxm0), nccm,
 !coarray     &             MPI_DOUBLE_COMPLEX,
@@ -1062,11 +1104,13 @@ c---------------------------------------------------------------------
 !coarray     &             ipx_msrc, ipx_msrc, 
 !coarray     &             mpi_comm_world, istatus, ierr )
       mdis(me)[ipx_msrc+1] = icxbm0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       mb = mdis(ipx_mdest+1)
          wm_tmp( :, :, :,    mb:mb   +md )[ipx_mdest+1]
      . = wm_tmp( :, :, :, icxm0:icxm0+md )
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
             call mpi_irecv(wm_tmp(1,1,1,icxbp0), nccp,
@@ -1106,11 +1150,13 @@ c---------------------------------------------------------------------
 !coarray     &                ipx_psrc, ipx_psrc, 
 !coarray     &                mpi_comm_world, istatus, ierr )
       ndis(me)[ipx_psrc+1] = icxbp0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipx_pdest+1)
          wm_tmp( :, :, :,          nb:nb         +nd-1 )[ipx_pdest+1]
      . = wm_tmp( :, :, :, icxbp0prior:icxbp0prior+nd-1 ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 !coarray               call mpi_sendrecv(wm_tmp(1,1,1,icxbm0prior), nccm,
 !coarray     &                MPI_DOUBLE_COMPLEX, 
@@ -1119,11 +1165,13 @@ c---------------------------------------------------------------------
 !coarray     &                ipx_msrc, ipx_msrc, 
 !coarray     &                mpi_comm_world, istatus, ierr )
       mdis(me)[ipx_msrc+1] = icxbm0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       mb = mdis(ipx_mdest+1)
          wm_tmp( :, :, :,          mb:mb         +md-1 )[ipx_mdest+1]
      . = wm_tmp( :, :, :, icxbm0prior:icxbm0prior+md-1 ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                call mpi_irecv(wm_tmp(1,1,1,icxbp0), nccp,
@@ -1151,11 +1199,13 @@ c---------------------------------------------------------------------
 !coarray     &                   ipx_pdest, myrank, 
 !coarray     &                   mpi_comm_world, istatus, ierr )
       ndis(me)[ipx_psrc+1] = icxbp0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nb = ndis(ipx_pdest+1)
          wm_tmp( :, :, :,          nb:nb         +nd-1 )[ipx_pdest+1]
      . = wm_tmp( :, :, :, icxbp0prior:icxbp0prior+nd-1 ) ! put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                   call mpi_isend(wm_tmp(1,1,1,icxbp0prior), nccp,
@@ -1184,11 +1234,13 @@ c---------------------------------------------------------------------
 !coarray     &                   ipx_mdest, myrank, 
 !coarray     &                   mpi_comm_world, istatus, ierr )
       mdis(me)[ipx_msrc+1] = icxbm0 ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       mb = mdis(ipx_mdest+1)
          wm_tmp( :, :, :,          mb:mb         +md )[ipx_mdest+1]
      . = wm_tmp( :, :, :, icxbm0prior:icxbm0prior+md ) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                   call mpi_isend(wm_tmp(1,1,1,icxbm0prior), nccm,

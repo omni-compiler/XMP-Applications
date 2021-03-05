@@ -130,6 +130,7 @@ c----------------------------------------------------------------------
       use param
       use mpivar
       use unitcell 
+      use xmp_api
       implicit none
       INCLUDE 'mpif.h'
       integer nbase, nbase2
@@ -164,6 +165,7 @@ c----------------------------------------------------------------------
 !
       integer istatus(mpi_status_size), ierr
 !
+      integer(4) status
       rdcellx=dble(ncell)/cellx
       rdcelly=dble(ncell)/celly
       rdcellz=dble(ncell)/cellz
@@ -489,7 +491,9 @@ c----------------------------------------------------------------------
 !coarray     &             ipz_src, ipz_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irsbuf_p(1:ncs+1)[ipz_dest+1] = isbufp(1:ncs+1) ! Put
-      sync all
+
+      !sync all
+      call xmp_sync_all(status)
 !!
 
       ncar = irsbuf_p(ncsr)
@@ -499,7 +503,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipz_src, ipz_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       rbuff_p(:,1:nca)[ipz_dest+1] = buffp(:,1:nca) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
 !coarray      call mpi_sendrecv(ibuffp, nca, MPI_INTEGER, 
@@ -508,7 +513,9 @@ c----------------------------------------------------------------------
 !coarray     &             ipz_src, ipz_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irbuff_p(1:nca)[ipz_dest+1] = ibuffp(1:nca) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
+
 !!
 
 !
@@ -647,7 +654,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipz_src, ipz_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irsbuf_m(1:ncs+1)[ipz_dest+1] = isbufm(1:ncs+1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
       ncar = irsbuf_m(ncsr)
@@ -657,7 +665,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipz_src, ipz_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       rbuff_m(1:6,1:nca)[ipz_dest+1] = buffm(1:6,1:nca) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
 !coarray      call mpi_sendrecv(ibuffm, nca, MPI_INTEGER, 
@@ -666,7 +675,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipz_src, ipz_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irbuff_m(1:nca)[ipz_dest+1] = ibuffm(1:nca) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
 !
@@ -1001,9 +1011,11 @@ c----------------------------------------------------------------------
 !coarray     &             irsbuf_p, ncsr, MPI_INTEGER,
 !coarray     &             ipy_src, ipy_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      sync all ! do Not change
+!      sync all ! do Not change
+      call xmp_sync_all(status)
       irsbuf_p(1:ncsp+1)[ipy_dest+1] = isbufp(1:ncsp+1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
       ncarp = irsbuf_p(ncsr)
@@ -1021,7 +1033,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipy_src, ipy_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irbuff_p(1:ncap)[ipy_dest+1] = ibuffp(1:ncap) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
 !
@@ -1043,7 +1056,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipy_src, ipy_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irsbuf_m(1:ncsm+1)[ipy_dest+1] = isbufm(1:ncsm+1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
       ncarm = irsbuf_m(ncsr)
@@ -1061,7 +1075,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipy_src, ipy_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irbuff_m(1:ncam)[ipy_dest+1] = ibuffm(1:ncam) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
 !
@@ -1297,9 +1312,11 @@ c----------------------------------------------------------------------
 !coarray     &             irsbuf_p, ncsr, MPI_INTEGER,
 !coarray     &             ipx_src, ipx_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      sync all ! do Not change
+!      sync all ! do Not change
+      call xmp_sync_all(status)
       irsbuf_p(1:ncs+1)[ipx_dest+1] = isbufp(1:ncs+1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
       ncar = irsbuf_p(ncsr)
@@ -1317,7 +1334,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipx_src, ipx_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irbuff_p(1:nca)[ipx_dest+1] = ibuffp(1:nca) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
 !
@@ -1390,9 +1408,11 @@ c----------------------------------------------------------------------
 !coarray     &             irsbuf_m, ncsr, MPI_INTEGER,
 !coarray     &             ipx_src, ipx_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       irsbuf_m(1:ncs+1)[ipx_dest+1] = isbufm(1:ncs+1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
       ncar = irsbuf_m(ncsr)
@@ -1410,7 +1430,8 @@ c----------------------------------------------------------------------
 !coarray     &             ipx_src, ipx_src,
 !coarray     &             mpi_comm_world, istatus, ierr )
       irbuff_m(1:nca)[ipx_dest+1] = ibuffm(1:nca) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
 !
@@ -1805,7 +1826,8 @@ c----------------------------------------------------------------------
 !coarray        natmdisp(1) = 0
         do mm = 1,np
           natmlist(me)[mm] = nselfatm ! Put
-          sync all
+!          sync all
+          call xmp_sync_all(status)
         enddo
         natmdisp(1) = 1
 !!
@@ -1820,7 +1842,8 @@ c----------------------------------------------------------------------
 !coarray     &                 mpiout,mpi_comm_world,ierr)
         ms = natmdisp(me)
         mdis(ms:ms+nselfatm-1)[mpiout+1] = m2i_tmp(1:nselfatm)
-        sync all
+!        sync all
+        call xmp_sync_all(status)
         nrearrange = mdis
 !!
 !
@@ -1849,7 +1872,8 @@ c----------------------------------------------------------------------
 !coarray     &            mpiout,mpi_comm_world,ierr)
         ms = natmdisp(me)/6
         rcvx(1:6,ms:ms+nselfatm-1)[mpiout+1] = snd(1:6,1:nselfatm)
-        sync all
+!        sync all
+        call xmp_sync_all(status)
         rcv = rcvx
 !!
 !

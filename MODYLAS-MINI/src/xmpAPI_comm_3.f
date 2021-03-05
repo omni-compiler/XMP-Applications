@@ -76,6 +76,7 @@ c----------------------------------------------------------------------
        use md_periodic
        use unitcell
       use mpivar
+      use xmp_api
       implicit none
       INCLUDE 'mpif.h'
       integer ipz_pdest, ipy_pdest, ipx_pdest
@@ -120,6 +121,7 @@ c----------------------------------------------------------------------
 #endif
 !coarray
       integer nd
+      integer(4) status
 !!
 
 c----- common parameters for coordinate communication. -----
@@ -186,7 +188,8 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             mpi_comm_world, istatus, ierr )
       ircbufp(1:nccp)[ipz_pdest+1] = icbufp(1:nccp) ! Put
       ircbufm(1:nccm)[ipz_mdest+1] = icbufm(1:nccm) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
             call mpi_irecv(ircbufp, nccp,
@@ -297,7 +300,8 @@ c----- common parameters for coordinate communication. -----
       irbuffp(1:ncap)[ipz_pdest+1]    = ibuffp(1:ncap)    ! Put
       rbuffm(1:3,1:ncam)[ipz_mdest+1] = buffm(1:3,1:ncam) ! Put
       irbuffm(1:ncam)[ipz_mdest+1]    = ibuffm(1:ncam)    ! Put 
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 
 #else
@@ -372,7 +376,8 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             mpi_comm_world, istatus, ierr )
       icbufp(1:nccp)[ipz_pdest+1] = ircbufp(1:nccp) ! Put
       icbufm(1:nccm)[ipz_mdest+1] = ircbufm(1:nccm) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
             call mpi_irecv(icbufp, nccp,
@@ -448,7 +453,8 @@ c----- common parameters for coordinate communication. -----
       ibuffp(1:ncarp)[ipz_pdest+1]    = irbuffp(1:ncarp)    ! Put
       buffm(1:3,1:ncarm)[ipz_mdest+1] = rbuffm(1:3,1:ncarm) ! Put
       ibuffm(1:ncarm)[ipz_mdest+1]    = irbuffm(1:ncarm)    ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
             call mpi_irecv(buffp, 3*ncar2p, 
@@ -556,7 +562,8 @@ c----- common parameters for coordinate communication. -----
       nd = abs(icym1 - icym0)
          na_per_cell(:, icybm0:icybm0+nd, icx)[ipy_mdest+1]
      . = na_per_cell(:,  icym0:icym0 +nd, icx) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                call mpi_irecv(na_per_cell(icz0,icybp0,icx), nccp,
@@ -631,12 +638,14 @@ c----- common parameters for coordinate communication. -----
      . = wkxyz(:,icasp:icasp+ncap-1) ! Put
          m2i(icarp:icarp+ncap-1)[ipy_pdest+1]
      . = m2i(icasp:icasp+ncap-1)     ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
          wkxyz(:,icarm:icarm+ncam-1)[ipy_mdest+1]
      . = wkxyz(:,icasm:icasm+ncam-1) ! Put
          m2i(icarm:icarm+ncam-1)[ipy_mdest+1]
      . = m2i(icasm:icasm+ncam-1)     ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                call mpi_irecv(wkxyz(1,icarp), 3*ncap, 
@@ -690,11 +699,13 @@ c----- common parameters for coordinate communication. -----
       nd = abs(icyp1 - icyp0)
          na_per_cell(:,   icybp0:icybp0+nd,   icx)[ipy_pdest+1]
      . = na_per_cell(:, icybp1st:icybp1st+nd, icx) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
       nd = abs(icym1 - icym0)
          na_per_cell(:,   icybm0:icybm0+nd,   icx)[ipy_pdest+1]
      . = na_per_cell(:, icybm1st:icybm1st+nd, icx) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                call mpi_irecv(na_per_cell(icz0,icybp0,icx), nccp,
@@ -759,12 +770,14 @@ c----- common parameters for coordinate communication. -----
      . = wkxyz(:,icasp:icasp+ncap-1) ! Put
          m2i(icarp:icarp+ncap-1)[ipy_pdest+1]
      . = m2i(icasp:icasp+ncap-1)     ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
          wkxyz(:,icarm:icarm+ncam-1)[ipy_mdest+1]
      . = wkxyz(:,icasm:icasm+ncam-1) ! Put
          m2i(icarm:icarm+ncam-1)[ipy_mdest+1]
      . = m2i(icasm:icasm+ncam-1)     ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
                call mpi_irecv(wkxyz(1,icarp), 3*ncap, 
@@ -845,7 +858,8 @@ c----- common parameters for coordinate communication. -----
       na_per_cell(icz0:icz1,icy0:icy1,icxbp0:icxbp0+(icxp1-icxp0))
      . [ipx_pdest+1]
      . = na_per_cell(icz0:icz1,icy0:icy1,icxp0:icxp1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #endif
 !coarray            call mpi_sendrecv(na_per_cell(icz0,icy0,icxm0), nccm,
@@ -856,7 +870,8 @@ c----- common parameters for coordinate communication. -----
       na_per_cell(icz0:icz1,icy0:icy1,icxbm0:icxbm0+(icxm1-icxm0))
      . [ipx_mdest+1]
      . = na_per_cell(icz0:icz1,icy0:icy1,icxm0:icxm1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
 #ifndef HALFDIREE
@@ -945,7 +960,8 @@ c----- common parameters for coordinate communication. -----
      . = wkxyz(:,icasp:icasp+ncap-1) ! Put
          m2i(icarp:icarp+ncap-1)[ipx_pdest+1]
      . = m2i(icasp:icasp+ncap-1)     ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #endif
 !coarray            call mpi_sendrecv(wkxyz(1,icasm), 3*ncam, 
@@ -961,7 +977,8 @@ c----- common parameters for coordinate communication. -----
      . = wkxyz(:,icasm:icasm+ncam-1) ! Put
          m2i(icarm:icarm+ncam-1)[ipx_mdest+1]
      . = m2i(icasm:icasm+ncam-1)     ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
 #ifndef HALFDIREE
@@ -1031,7 +1048,8 @@ c----- common parameters for coordinate communication. -----
       nd = abs(icxp1 - icxp0)
       na_per_cell(icz0:icz1,icy0:icy1,icxbp0:icxbp0+nd)[ipx_pdest+1]
      .= na_per_cell(icz0:icz1,icy0:icy1,icxbp1st:icxbp1st+nd)
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #endif
 !coarray            call mpi_sendrecv(na_per_cell(icz0,icy0,icxbm1st), nccm,
@@ -1042,7 +1060,8 @@ c----- common parameters for coordinate communication. -----
       nd = abs(icxm1 - icxm0)
       na_per_cell(icz0:icz1,icy0:icy1,icxbm0:icxbm0+nd)[ipx_pdest+1]
      .= na_per_cell(icz0:icz1,icy0:icy1,icxbm1st:icxbm1st+nd)
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
 #ifndef HALFDIREE
@@ -1118,7 +1137,8 @@ c----- common parameters for coordinate communication. -----
      . = wkxyz(:,icasp:icasp+ncap-1) ! Put
       m2i(icarp:icarp+ncap-1)[ipx_pdest+1]
      . = m2i(icasp:icasp+ncap-1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #endif
 !coarray            call mpi_sendrecv(wkxyz(1,icasm), 3*ncam, 
@@ -1134,7 +1154,8 @@ c----- common parameters for coordinate communication. -----
      . = wkxyz(:,icasm:icasm+ncam-1) ! Put
       m2i(icarm:icarm+ncam-1)[ipx_mdest+1]
      . = m2i(icasm:icasm+ncam-1) ! Put
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !!
 #else
 #ifndef HALFDIREE

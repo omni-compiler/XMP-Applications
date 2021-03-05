@@ -37,6 +37,7 @@ c----------------------------------------------------------------------
       integer(4) :: idx, idy, idz, imx, imy, imz,i
       include 'mpif.h'
       integer(4) :: ierr
+      integer(4) :: status
 
       maxdiv = nprocs
 !ya
@@ -137,7 +138,8 @@ c----------------------------------------------------------------------
       iymin=ncell
       izmin=ncell
 !coarray      call mpi_barrier(mpi_comm_world,ierr)
-      sync all
+      !sync all
+      call xmp_sync_all(status)
 !!
 
       if(myrank==0)then
