@@ -88,7 +88,7 @@ c--- in
 c--- local
       integer :: ierr
       integer*4 :: total1
-      integer*4 :: total
+      !Fujitsu! integer*4 :: total
       include 'mpif.h'
       ival=ival
 c     --
