@@ -1,7 +1,10 @@
 C=======================================================================
       SUBROUTINE CALAX3(A, S, AS, NP, NE, NCRS, IPCRS, NPP,
      *                  N,ME,IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *                  RX,RY,IUT0,IERR,
+C Fj
+C     *                  RX,RY,IUT0,IERR,
+     *                  rx_desc,ry_desc,IUT0,IERR,
+C Fj
      *                  JUNROL,NPPMAX,NCRS2,TS,TA,ITPCRS)
 C=======================================================================
 #include "timing.h"
@@ -16,6 +19,9 @@ C
       INTEGER MAXBUF,IDUM
       INTEGER N,ME,IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,IUT0,IERR
       REAL*4  RX,RY
+C Fj
+      INTEGER*8 rx_desc,ry_desc
+C Fj
 C
       DIMENSION LDOM(NDOM),NBPDOM(NDOM)
       DIMENSION IPSLF(MBPDOM,NDOM),IPSND(MBPDOM,NDOM)
@@ -177,7 +183,10 @@ C
       call maprof_time_start(TM_CALAX3_COM)
       IDUM = 1
       CALL DDCOMX(IPART,IDUM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *            AS,AS,AS,NP,IUT0,IERR,RX,RY,MAXBUF)
+C Fj
+C     *            AS,AS,AS,NP,IUT0,IERR,RX,RY,MAXBUF)
+     *            AS,AS,AS,NP,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
+C Fj
       call maprof_time_stop(TM_CALAX3_COM)
       IF(IERR.NE.0) THEN
           WRITE(IUT0,*)

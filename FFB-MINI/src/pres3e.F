@@ -9,7 +9,10 @@
      *                  IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *                  LPFIX,LFIX3D,FXYZ,WRK01,WRK02,WRK03,WRK04,
      *                  WRK05,WRK06,WRK07,WRK08,WRK09,B,
-     *                  PRCM,APRCM,RX,RY,MWRK,WRKN,
+C Fj
+C     *                  PRCM,APRCM,RX,RY,MWRK,WRKN,
+     *                  PRCM,APRCM,rx_desc,ry_desc,MWRK,WRKN,
+C Fj
      *                  IUT0,IERR)
 #include "timing.h"
       IMPLICIT NONE
@@ -49,6 +52,9 @@ CCC [WORK]
       REAL*4    PRCM(MRCM,NE),APRCM(MRCM,NE)
       INTEGER*4 MWRK
       REAL*4    WRKN(MWRK,9)
+C Fj
+      INTEGER*8 rx_desc,ry_desc
+C Fj
 C      
 C     [IN:MID NODE COLORING]
 C
