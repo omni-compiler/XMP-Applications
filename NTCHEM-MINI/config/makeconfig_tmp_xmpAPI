@@ -1,0 +1,80 @@
+#
+           NTQC_TOP = /home/tago.kazuma/data/20210301/XMP-Applications/NTCHEM-MINI
+          LAPACKLIB = -llapack
+            BLASLIB = -lblas
+           ATLASLIB = 
+           HOSTTYPE = linux64_xmp_api_omp_gfortran
+
+                BIN = /home/tago.kazuma/data/20210301/XMP-Applications/NTCHEM-MINI/bin
+                LIB = /home/tago.kazuma/data/20210301/XMP-Applications/NTCHEM-MINI/lib
+            INCLUDE = /home/tago.kazuma/data/20210301/XMP-Applications/NTCHEM-MINI/include
+              TESTS = /home/tago.kazuma/data/20210301/XMP-Applications/NTCHEM-MINI/tests
+            SCRATCH = /home/tago.kazuma/scr/ntchem
+           LOCALBIN = .
+           LOCALLIB = .
+           LOCALINC = .
+           PARALLEL = mpiomp
+           MPIHOME=/usr/local/openmpi-2.1.1.gnu
+           #MPIHOME=/usr/local/openmpi-1.8.1.gnu
+# XMP-API
+           USE_XMP_API = yes
+# TODO
+           OMNI_HOME=/data/nfsWORK4/omni_gnu
+           OMNI_INC=$(OMNI_HOME)/include
+           OMNI_LIB=-L/data/nfsWORK4/omni_gnu/lib -lxmp -std=gnu99 -lm -fopenmp
+
+
+     LDFLAGS_NOMAIN = 
+
+             TARGET = LINUX64
+
+             DMACRO = -UDEBUG
+#            DMACRO+=-DSUPPORT_R16
+#            DMACRO+=-DHAVE_ERF
+
+                INC = -I$(INCLUDE) -I$(LOCALINC) -I$(MPIHOME)/include -I$(OMNI_INC)
+                MOD = -J$(LOCALINC) 
+	     INCMOD = $(INC) $(MOD)
+
+#          FCONVERT = 
+	    
+               F77C = mpif90
+           F77FLAGS = -cpp -fopenmp $(DMACRO) $(INCMOD) -m64 -O2 -std=legacy -DNOQUAD
+      F77FLAGSNOOPT = $(DMACRO) $(INCMOD) -m64 -std=legacy -DNOQUAD -Wuninitialized -Wall -Wunderflow -fbounds-check
+
+               F90C = mpif90
+           F90FLAGS = -cpp -fopenmp $(DMACRO) $(INCMOD) -m64 -O2 -std=legacy -DNOQUAD $(OMNI_LIB)  -I$(OMNI_INC)
+      F90FLAGSNOOPT = $(DMACRO) $(INCMOD) -m64 -std=legacy -Wuninitialized -Wall -Wunderflow -fbounds-check -DNOQUAD
+
+          MODSUFFIX = mod
+
+                 CC = gcc
+             CFLAGS = $(INC) -O3
+
+	        CXX = g++
+           CXXFLAGS = $(INC) -O3
+             CXXLIB = -lstdc++
+
+           MPIFLAGS =  -UMPIINT8
+         MPILDFLAGS =
+
+           OMPFLAGS = -fopenmp
+         OMPLDFLAGS = -fopenmp
+
+#                LD = xmpf90 -fc=gfortran
+                 LD = mpif90
+            LDFLAGS = -L$(LIB) $(MPILIB)  -I$(OMNI_INC)
+
+                 AR = ar
+            ARFLAGS = cr
+             RANLIB = ranlib
+
+               MAKE = make
+
+              SHELL = /bin/sh
+                 MV = /bin/mv -f
+                 RM = /bin/rm -f
+                 CP = /bin/cp -f
+              MKDIR = /bin/mkdir
+                 LN = /bin/ln
+
