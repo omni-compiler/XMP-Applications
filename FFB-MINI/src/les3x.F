@@ -17,6 +17,7 @@ C======================================================================C
 C*    PROGRAM LES3X
       SUBROUTINE LES3X(FILEIN)
       use xmp_api
+      use mpi
 #include "timing.h"
 !#include "xmp_coarray.h"
       IMPLICIT NONE 
@@ -337,7 +338,8 @@ CC Fj start 202103
       INTEGER*8 :: rx_desc, ry_desc
       INTEGER*8, DIMENSION(2) :: rx_lb, rx_ub, ry_lb, ry_ub
       INTEGER*4 :: img_dims(1)
-      INTEGER*4 status
+      INTEGER*4 :: status
+C      INTEGER :: ierr, nnn, me
 CC Fj end 202103
       REAL*8,ALLOCATABLE::
      *       DWRK01(:,:),DWRK02(:),DWRK03(:,:,:),
@@ -751,13 +753,20 @@ C            <<<<< QUERY EXECUTION MODE AND DOMAIN NUMBER >>>>>
 C
 C
 C
+C Fj start 202103
+C      call mpi_init(ierr)
+C      call mpi_comm_size(mpi_comm_world,nnn,ierr)
+C      call mpi_comm_rank(mpi_comm_world,me,ierr)
+C Fj end 202103
+C
 C     NDOM = 0
       CALL DDINIT(NPART,IPART)
-C     IF(IPART.GE.1) NDOM = 1
 C
 C Fj start 202103
       call xmp_api_init
 C Fj end 202103
+C
+C     IF(IPART.GE.1) NDOM = 1
 C
       IF(IPART.GE.2) THEN
           IUT6 = IUTLG
@@ -2205,6 +2214,8 @@ C Fj start 202103
       call xmp_coarray_deallocate(ry_desc, status)
 C
       call xmp_api_finalize
+C
+      call mpi_finalize(ierr)
 C Fj end 202103
 C
       STOP

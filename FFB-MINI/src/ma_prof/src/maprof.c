@@ -351,6 +351,10 @@ void maprof_set_num_threads(int n)
 {
   N_threads = n;
 }
+void maprof_set_num_threads_(int n)
+{
+  maprof_set_num_threads(n);
+}
 
 void maprof_flush_stdout_()
 {
