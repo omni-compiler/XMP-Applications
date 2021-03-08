@@ -4,6 +4,15 @@
 #
 include ../../config/makeconfig.xmp
 
+ifeq ($(USE_XMP_API),yes)
+UTIL_INITMPI=xmpAPI_util_initmpi
+UTIL_FINMPI=xmpAPI_util_finmpi
+else
+UTIL_INITMPI=util_initmpi
+UTIL_FINMPI=util_finmpi
+endif
+
+
 objects_common = \
 util_linout.o \
 util_matout.o \
@@ -13,8 +22,8 @@ util_lowtrmzero.o \
 
 objects_mpi = \
 util_abortmpi.o \
-util_initmpi.o \
-util_finmpi.o \
+$(UTIL_INITMPI).o \
+$(UTIL_FINMPI).o \
 
 objec77 = \
 
