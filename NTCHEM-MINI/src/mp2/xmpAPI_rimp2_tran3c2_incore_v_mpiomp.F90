@@ -179,7 +179,7 @@
       T2BufSend_ub(2) = MXNBF_RI_MyRank
       T2BufSend_ub(3) = MXNActO
       call xmp_new_local_array(T2BufSend_local_desc,8,3,T2BufSend_lb, &
-       T2BufSend_ub,T2BufSend)
+       T2BufSend_ub,loc(T2BufSend))
       ! TODO:chack unnecessary?
       !call xmp_coarray_bind(T2BufSend_local_desc,T2BufSend)
 
@@ -294,9 +294,7 @@
             IdxBF_RI_MyRank_lb(1) = 1
             IdxBF_RI_MyRank_ub(1) = NBF_RI
             call xmp_new_local_array(IdxBF_RI_MyRank_local_desc,4,1,IdxBF_RI_MyRank_lb, &
-             IdxBF_RI_MyRank_ub,IdxBF_RI_MyRank)
-            ! TODO:chack unnecessary?
-            !call xmp_coarray_bind(IdxBF_RI_MyRank_local_desc,IdxBF_RI_MyRank)
+             IdxBF_RI_MyRank_ub,loc(IdxBF_RI_MyRank))
 
             call xmp_new_array_section(IdxBF_RI_MyRank_local_sec,1)
             call xmp_new_array_section(IdxBF_RI_Irank_sec,1)
@@ -485,12 +483,14 @@
 !
       !DEALLOCATE(T2BufSend)
 !      call xmp_coarray_deallocate(T2BufSend_local_desc,status)
+      call xmp_free_local_array(T2BufSend_local_desc)
 
       !DEALLOCATE(T2BufRecv)
       call xmp_coarray_deallocate(T2BufRecv_desc,status)
 
       !DEALLOCATE(IdxBF_RI_MyRank)
 !      call xmp_coarray_deallocate(IdxBF_RI_MyRank_local_desc,status)
+      call xmp_free_local_array(IdxBF_RI_MyRank_local_desc)
 
       !DEALLOCATE(IdxBF_RI_Irank)
       call xmp_coarray_deallocate(IdxBF_RI_Irank_desc,status)
