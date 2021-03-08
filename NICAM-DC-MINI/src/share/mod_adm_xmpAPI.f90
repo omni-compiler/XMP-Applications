@@ -27,11 +27,14 @@ module mod_adm
   !++ used modules
   !
   !-----------------------------------------------------------------------------
-  implicit none
-  private
   !--- 2020 Fujitsu
+  !implicit none
+  !private
   !use mod_coarray
   use xmp_api
+  use mpi
+  implicit none
+  private
   !--- 2020 Fujitsu end
   !-----------------------------------------------------------------------------
   !

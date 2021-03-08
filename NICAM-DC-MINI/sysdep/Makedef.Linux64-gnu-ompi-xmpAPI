@@ -3,8 +3,10 @@
 #
 
 ##### for computation
+OMNI_HOME=$(shell xmpcc --show-env | grep OMNI_HOME | sed -e 's/OMNI_HOME=//' -e 's/"//g')
 
-FFLAGS_FAST = -O2 -m64
+FFLAGS_FAST = -O2 -m64 \
+		-I$(OMNI_HOME)/include
 
 FFLAGS_DEBUG = -O0 -m64                                                     \
                -std=f2003 -pedantic-errors -fimplicit-none -fmodule-private \
@@ -12,10 +14,11 @@ FFLAGS_DEBUG = -O0 -m64                                                     \
                -ffpe-trap=invalid,zero,overflow -finit-integer=-32768 \
                -finit-real=nan -finit-logical=false -finit-character=9 \
                -Wall -Wextra -Wcharacter-truncation -Wunderflow \
-               -g -fbacktrace -fbounds-check -fall-intrinsics
+               -g -fbacktrace -fbounds-check -fall-intrinsics \
+		-I$(OMNI_HOME)/include
 
 FC     = mpif90
-FFLAGS = -cpp --Wn -fconvert=big-endian $(FFLAGS_FAST)
+FFLAGS = -cpp -fconvert=big-endian $(FFLAGS_FAST)
 #FFLAGS = $(FFLAGS_DEBUG)
 FFLAGS += -x f95-cpp-input
 
@@ -29,6 +32,7 @@ LD     = $(FC)
 # to avoid "-x f95-cpp-input" option
 LFLAGS = $(FFLAGS_FAST)
 #LFLAGS = $(FFLAGS_DEBUG)
+LFLAGS += -L$(OMNI_HOME)/lib -lxmp
 
 ##### for frontend
 INSTALL = install
