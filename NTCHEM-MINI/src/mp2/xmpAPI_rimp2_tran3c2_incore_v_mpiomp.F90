@@ -8,6 +8,7 @@
      &   NBF_RI_MyRank, IdxBF_RI_MyRank
       USE MP2_Constant_Module, ONLY : Zero, One
       USE MPI_Module, ONLY : MPI_COMM_MO, NProcs, MyRank, NProcsMO, MyRankMO, NProcsMat, MyRankMat
+      USE XMP_API
 !
       IMPLICIT NONE
 !
@@ -32,7 +33,11 @@
       REAL(8) :: TimeBgn, TimeEnd, WTimeBgn, WTimeEnd
 !coarray
 !     INTEGER, ALLOCATABLE :: IdxBF_RI_Irank(:)
-      INTEGER, ALLOCATABLE :: IdxBF_RI_Irank(:)[:]
+!      INTEGER, ALLOCATABLE :: IdxBF_RI_Irank(:)[:]
+      INTEGER, pointer :: IdxBF_RI_Irank(:) => null()
+      INTEGER(8) :: IdxBF_RI_Irank_desc
+      integer(8), dimension(1) :: IdxBF_RI_Irank_lb,IdxBF_RI_Irank_ub
+      integer(8) :: IdxBF_RI_Irank_sec
 !!
       INTEGER, ALLOCATABLE :: istat1(:), istat2(:), istat3(:), istat4(:)
 #ifdef USE_GPU
@@ -49,7 +54,32 @@
 #endif
 !coarray
 !     REAL(8), ALLOCATABLE :: T2BufSend(:,:,:), T2BufRecv(:,:,:)
-      REAL(8), ALLOCATABLE :: T2BufSend(:,:,:), T2BufRecv(:,:,:)[:]
+!      REAL(8), ALLOCATABLE :: T2BufSend(:,:,:), T2BufRecv(:,:,:)[:]
+      REAL(8), ALLOCATABLE :: T2BufSend(:,:,:) 
+!local xmp-api
+      ! xmp_array_section_t
+      integer(8) :: T2BufSend_local_sec
+      ! xmp_desc_t
+      integer(8) :: T2BufSend_local_desc
+      ! array size
+      integer(8),dimension(3) :: T2BufSend_lb, T2BufSend_ub
+
+      REAL(8), pointer ::  T2BufRecv(:,:,:) => null()
+      INTEGER(8) :: T2BufRecv_desc
+      integer(8), dimension(3) :: T2BufRecv_lb,T2BufRecv_ub
+      integer(8) :: T2BufRecv_sec
+! local xmp-api
+      ! xmp_array_section_t
+      integer(8) :: IdxBF_RI_MyRank_local_sec
+      ! xmp_desc_t
+      integer(8) :: IdxBF_RI_MyRank_local_desc
+      ! xmp_array_section_t
+      !integer(8) :: IdxBF_RI_MyRank_local
+      integer(8),dimension(1) :: IdxBF_RI_MyRank_lb, IdxBF_RI_MyRank_ub
+
+      integer(4) status
+      integer(4) ::  img_dims(1)
+
 !!
 !
       REAL(8) :: Time_T2C, Time_T3, WTime_T2C, WTime_T3
@@ -127,7 +157,14 @@
       ALLOCATE(T2Int(NBF_RI,MXNActO,LenOccBat, Num_Buf))
 !coarray
 !     ALLOCATE(IdxBF_RI_Irank(MXNBF_RI_MyRank))
-      ALLOCATE(IdxBF_RI_Irank(MXNBF_RI_MyRank)[*])
+!      ALLOCATE(IdxBF_RI_Irank(MXNBF_RI_MyRank)[*])
+
+      IdxBF_RI_Irank_lb(1) = 1
+      IdxBF_RI_Irank_ub(1) = MXNBF_RI_MyRank
+      call xmp_new_coarray(IdxBF_RI_Irank_desc,4,1,IdxBF_RI_Irank_lb, &
+      IdxBF_RI_Irank_ub,1,img_dims)
+      call xmp_coarray_bind(IdxBF_RI_Irank_desc,IdxBF_RI_Irank)
+
 !!
       ALLOCATE(istat1(MPI_STATUS_SIZE))
       ALLOCATE(istat2(MPI_STATUS_SIZE))
@@ -135,9 +172,29 @@
       ALLOCATE(istat4(MPI_STATUS_SIZE))
 
       ALLOCATE(T2BufSend(MXNActO,MXNBF_RI_MyRank,LenOccBat))
+      T2BufSend_lb(1) = 1
+      T2BufSend_lb(2) = 1
+      T2BufSend_lb(3) = 1
+      T2BufSend_ub(1) = LenOccBat
+      T2BufSend_ub(2) = MXNBF_RI_MyRank
+      T2BufSend_ub(3) = MXNActO
+      call xmp_new_local_array(T2BufSend_local_desc,8,3,T2BufSend_lb, &
+       T2BufSend_ub,T2BufSend)
+      ! TODO:chack unnecessary?
+      !call xmp_coarray_bind(T2BufSend_local_desc,T2BufSend)
+
+
 !coarray
 !     ALLOCATE(T2BufRecv(MXNActO,MXNBF_RI_MyRank,LenOccBat))
-      ALLOCATE(T2BufRecv(MXNActO,MXNBF_RI_MyRank,LenOccBat)[*])
+!      ALLOCATE(T2BufRecv(MXNActO,MXNBF_RI_MyRank,LenOccBat)[*])
+      T2BufRecv_lb(1)=1
+      T2BufRecv_ub(1)=LenOccBat
+      T2BufRecv_lb(2)=1
+      T2BufRecv_ub(2)=MXNBF_RI_MyRank
+      T2BufRecv_lb(3)=1
+      T2BufRecv_ub(3)=MXNActO
+      call xmp_new_coarray(T2BufRecv_desc,8,3,T2BufRecv_lb,T2BufRecv_ub,1,img_dims)
+      call xmp_coarray_bind(T2BufRecv_desc,T2BufRecv)
 !!
 !
       ! test
@@ -183,7 +240,8 @@
 
       ! test
 !      CALL MPI_Barrier( MPI_COMM_MO, ierr )
-      sync all
+!      sync all
+      call xmp_sync_all(status)
 !
 !
 !MPI Parallel
@@ -220,7 +278,8 @@
                END DO
             END DO
 !
-            sync all
+!            sync all
+            call xmp_sync_all(status)
             WTimeBgn = MPI_WTIME()
             CALL CPU_TIME(TimeBgn)
 
@@ -231,9 +290,32 @@
 !    &         MPI_COMM_MO, ireq(1), IErr)
 !           CALL MPI_Wait(ireq(1), istat1, IErr)
 !           CALL MPI_Wait(ireq(2), istat2, IErr)
-            IdxBF_RI_Irank(1:NBF_RI_MyRank(MyRankMO))[Iranksend+1] = &
-            IdxBF_RI_MyRank(1:NBF_RI_MyRank(MyRankMO))
-            sync all
+
+            IdxBF_RI_MyRank_lb(1) = 1
+            IdxBF_RI_MyRank_ub(1) = NBF_RI
+            call xmp_new_local_array(IdxBF_RI_MyRank_local_desc,4,1,IdxBF_RI_MyRank_lb, &
+             IdxBF_RI_MyRank_ub,IdxBF_RI_MyRank)
+            ! TODO:chack unnecessary?
+            !call xmp_coarray_bind(IdxBF_RI_MyRank_local_desc,IdxBF_RI_MyRank)
+
+            call xmp_new_array_section(IdxBF_RI_MyRank_local_sec,1)
+            call xmp_new_array_section(IdxBF_RI_Irank_sec,1)
+
+            call xmp_array_section_set_triplet(IdxBF_RI_MyRank_local_sec, &
+             1,int(1,kind=8),int(NBF_RI_MyRank(MyRankMO),kind=8),1,status)
+            call xmp_array_section_set_triplet(IdxBF_RI_Irank_sec, &
+             1,int(1,kind=8),int(NBF_RI_MyRank(MyRankMO),kind=8),1,status)
+            img_dims(1) = Iranksend+1
+
+!            IdxBF_RI_Irank(1:NBF_RI_MyRank(MyRankMO))[Iranksend+1] = &
+!            IdxBF_RI_MyRank(1:NBF_RI_MyRank(MyRankMO))
+            call xmp_coarray_put_local(img_dims,IdxBF_RI_Irank_desc,IdxBF_RI_Irank_sec, &
+             IdxBF_RI_MyRank_local_desc,IdxBF_RI_MyRank_local_sec,status) 
+!            sync all
+            call xmp_sync_all(status)
+
+            call xmp_free_array_section(IdxBF_RI_Irank_sec)
+            call xmp_free_array_section(IdxBF_RI_MyRank_local_sec)
 !!
 
 !coarray
@@ -241,10 +323,36 @@
 !           CALL MPI_ISend(T2BufSend, NT2BufSize, MPI_DOUBLE_PRECISION, Iranksend, 1, MPI_COMM_MO, ireq(3), IErr)
 !           CALL MPI_Wait(ireq(3), istat3, IErr)
 !           CALL MPI_Wait(ireq(4), istat4, IErr)
-            T2BufRecv(:,:,:)[Iranksend+1] = T2BufSend(:,:,:)
-            sync all
-!!
 
+            call xmp_new_array_section(T2BufRecv_sec,3)
+            call xmp_new_array_section(T2BufSend_local_sec,3)
+            
+            call xmp_array_section_set_triplet(T2BufSend_local_sec, &
+             1,int(1,kind=8),int(LenOccBat,kind=8),1,status)
+            call xmp_array_section_set_triplet(T2BufSend_local_sec, &
+             2,int(1,kind=8),int(MXNBF_RI_MyRank,kind=8),1,status)
+            call xmp_array_section_set_triplet(T2BufSend_local_sec, &
+             3,int(1,kind=8),int(MXNActO,kind=8),1,status)
+
+            call xmp_array_section_set_triplet(T2BufRecv_sec, &
+             1,int(1,kind=8),int(LenOccBat,kind=8),1,status)
+            call xmp_array_section_set_triplet(T2BufRecv_sec, &
+             2,int(1,kind=8),int(MXNBF_RI_MyRank,kind=8),1,status)
+            call xmp_array_section_set_triplet(T2BufRecv_sec, &
+             3,int(1,kind=8),int(MXNActO,kind=8),1,status)
+
+            !T2BufRecv(:,:,:)[Iranksend+1] = T2BufSend(:,:,:)
+            !sync all
+            img_dims(1) = Iranksend+1
+            call xmp_coarray_put_local(img_dims, &
+             T2BufRecv_desc, T2BufRecv_sec, &
+             T2BufSend_local_desc, T2BufSend_local_sec,status) 
+!            sync all
+            call xmp_sync_all(status)
+
+            call xmp_free_array_section(T2BufSend_local_sec)
+            call xmp_free_array_section(T2BufRecv_sec)
+!!
             CALL CPU_TIME(TimeEnd)
             WTimeEnd = MPI_WTIME()
             Time_T2C = Time_T2C + TimeEnd - TimeBgn
@@ -265,7 +373,8 @@
             if ( mod(Irank_diff, 4) == 0 ) then
 !coarray
 !               CALL MPI_Barrier( MPI_COMM_MO, ierr )
-               sync all
+!               sync all
+               call xmp_sync_all(status)
 !!
             endif
 
@@ -374,14 +483,21 @@
 !
 !     o deallocate memory
 !
-      DEALLOCATE(T2BufSend)
-      DEALLOCATE(T2BufRecv)
-!
+      !DEALLOCATE(T2BufSend)
+!      call xmp_coarray_deallocate(T2BufSend_local_desc,status)
+
+      !DEALLOCATE(T2BufRecv)
+      call xmp_coarray_deallocate(T2BufRecv_desc,status)
+
+      !DEALLOCATE(IdxBF_RI_MyRank)
+!      call xmp_coarray_deallocate(IdxBF_RI_MyRank_local_desc,status)
+
+      !DEALLOCATE(IdxBF_RI_Irank)
+      call xmp_coarray_deallocate(IdxBF_RI_Irank_desc,status)
+
       DEALLOCATE(RI2cInv)
       DEALLOCATE(T2Int)
-      DEALLOCATE(IdxBF_RI_MyRank)
       DEALLOCATE(NBF_RI_MyRank)
-      DEALLOCATE(IdxBF_RI_Irank)
       DEALLOCATE(istat1)
       DEALLOCATE(istat2)
       DEALLOCATE(istat3)

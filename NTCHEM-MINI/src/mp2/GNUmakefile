@@ -147,7 +147,7 @@ program : $(modules) $(objects)
         ../util_lib/libutil.a \
 	../parallel_mod/*.o \
 	$(OMPLDFLAGS) $(MPILDFLAGS) $(NVLIB) \
-	$(LAPACKLIB) $(BLASLIB) $(ATLASLIB) \
+	$(LAPACKLIB) $(BLASLIB) $(ATLASLIB) $(OMNI_LIB) \
 	-o $(program)
 
 mvbin :

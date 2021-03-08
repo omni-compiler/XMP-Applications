@@ -232,7 +232,8 @@
 !     CALL MPI_Allreduce(RWork1, RIInt2c, NBC_RI, MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_MAT, IErr)
 !coarray
       RIInt2c(1:NBC_RI) = RWork1(1:NBC_RI)
-      call co_sum(RIInt2c(1:NBC_RI))
+!      call co_sum(RIInt2c(1:NBC_RI))
+      CALL MPI_Allreduce(RWork1, RIInt2c, NBC_RI, MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, IErr)
 !!
       DEALLOCATE(RWork1)
       CALL CPU_TIME(TimeEnd)

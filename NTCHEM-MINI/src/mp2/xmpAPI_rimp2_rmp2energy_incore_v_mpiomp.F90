@@ -103,6 +103,7 @@
       integer bufsize
       integer, save :: jsta
       integer(4) :: status
+      integer(4) :: img_dims(1)
 !!
 
       Time_T3C = Zero
@@ -151,7 +152,8 @@
 !coarray
 !     CALL MPI_Allreduce( nGrp, nGrpMax, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr )
       nGrpMax = nGrp
-      call co_max(nGrpMax)
+      !call co_max(nGrpMax)
+      CALL MPI_Allreduce( nGrp, nGrpMax, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr )
 !!
       nGrp = nGrpMax
 
@@ -435,18 +437,22 @@
                  call xmp_new_coarray(rbuf_desc,8,1,rbuf_lb,rbuf_ub,1,img_dims)
                  call xmp_coarray_bind(rbuf_desc,rbuf)
 
-                 call xmp_new_array_section(sbuf_sec,1)
-                 call xmp_new_array_section(rbuf_sec,1)
 
                  jsta = commIndexEach(commPhase)
                  sbuf(1:bufsize) = SendBuf(1:bufsize,jsta)
                  !rbuf(1:bufsize)[Jranksend_1+1] = sbuf(1:bufsize)
                  img_dims(1) = Jranksend_1+1
-                 call xmp_coarray_put(img_dims,rbuf_desc,rbuf_sec,sbuf_desc,sbuf_sec)
 
-                 call xmp_free_array_sections(sbuf_sec)
-                 call xmp_free_array_sections(rbuf_sec)
+                 call xmp_new_array_section(sbuf_sec,1)
+                 call xmp_new_array_section(rbuf_sec,1)
 
+                 call xmp_array_section_set_triplet(rbuf_sec,1,int(1,kind=8),int(bufsize,kind=8),1,status)
+                 call xmp_array_section_set_triplet(sbuf_sec,1,int(1,kind=8),int(bufsize,kind=8),1,status)
+
+                 call xmp_coarray_put(img_dims,rbuf_desc,rbuf_sec,sbuf_desc,sbuf_sec,status)
+
+                 call xmp_free_array_section(sbuf_sec)
+                 call xmp_free_array_section(rbuf_sec)
 !!
                endif
                CALL CPU_TIME(TimeEnd)
@@ -609,11 +615,13 @@
 !                       if (allocated(sbuf)) deallocate(sbuf)
 !                       if (allocated(rbuf)) deallocate(rbuf)
 ! TODO: check
-                       if (allocated(sbuf)) then
-                         call xmp_coarray_deallocate(sbuf,status)
+                       if (associated(sbuf)) then
+                         !deallocate(sbuf)
+                         call xmp_coarray_deallocate(sbuf_desc,status)
                        endif
-                       if (allocated(rbuf)) then
-                         call xmp_coarray_deallocate(rbuf,status)
+                       if (associated(rbuf)) then
+                         !deallocate(rbuf)
+                         call xmp_coarray_deallocate(rbuf_desc,status)
                        endif
 
 !!
@@ -641,13 +649,18 @@
                        call xmp_new_coarray(rbuf_desc,8,1,rbuf_lb,rbuf_ub,1,img_dims)
                        call xmp_coarray_bind(rbuf_desc,rbuf)
 
+                       call xmp_new_array_section(sbuf_sec,1)
+                       call xmp_new_array_section(rbuf_sec,1)
+                       call xmp_array_section_set_triplet(rbuf_sec,1,int(1,kind=8),int(bufsize,kind=8),1,status)
+                       call xmp_array_section_set_triplet(sbuf_sec,1,int(1,kind=8),int(bufsize,kind=8),1,status)
+
                        jsta = commIndexEach(commPhase)
                        sbuf(1:bufsize) = SendBuf(1:bufsize,jsta)
 !                       rbuf(1:bufsize)[Jranksend_1+1] = sbuf(1:bufsize)
-                       call xmp_coarray_put(img_dims,rbuf_desc,rbuf_sec,sbuf_desc,sbuf_sec)
+                       call xmp_coarray_put(img_dims,rbuf_desc,rbuf_sec,sbuf_desc,sbuf_sec,status)
 
-                       call xmp_free_array_sections(sbuf_sec)
-                       call xmp_free_array_sections(rbuf_sec)
+                       call xmp_free_array_section(sbuf_sec)
+                       call xmp_free_array_section(rbuf_sec)
 !!
                      endif
                      CALL CPU_TIME(TimeEnd)
@@ -818,8 +831,10 @@
 !     CALL MPI_Allreduce(E2TP, E2T, 1, MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, IErr)
       E2S = E2SP
       E2T = E2TP
-      call co_sum(E2S)
-      call co_sum(E2T)
+!      call co_sum(E2S)
+!      call co_sum(E2T)
+      CALL MPI_Allreduce(E2SP, E2S, 1, MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, IErr)
+      CALL MPI_Allreduce(E2TP, E2T, 1, MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, IErr)
 !!
       CALL CPU_TIME(TimeEnd)
       WTimeEnd = MPI_WTIME()
