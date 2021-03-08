@@ -175,9 +175,9 @@
       T2BufSend_lb(1) = 1
       T2BufSend_lb(2) = 1
       T2BufSend_lb(3) = 1
-      T2BufSend_ub(1) = LenOccBat
+      T2BufSend_ub(1) = MXNActO
       T2BufSend_ub(2) = MXNBF_RI_MyRank
-      T2BufSend_ub(3) = MXNActO
+      T2BufSend_ub(3) = LenOccBat
       call xmp_new_local_array(T2BufSend_local_desc,8,3,T2BufSend_lb, &
        T2BufSend_ub,loc(T2BufSend))
       ! TODO:chack unnecessary?
@@ -188,11 +188,11 @@
 !     ALLOCATE(T2BufRecv(MXNActO,MXNBF_RI_MyRank,LenOccBat))
 !      ALLOCATE(T2BufRecv(MXNActO,MXNBF_RI_MyRank,LenOccBat)[*])
       T2BufRecv_lb(1)=1
-      T2BufRecv_ub(1)=LenOccBat
       T2BufRecv_lb(2)=1
-      T2BufRecv_ub(2)=MXNBF_RI_MyRank
       T2BufRecv_lb(3)=1
-      T2BufRecv_ub(3)=MXNActO
+      T2BufRecv_ub(1)=MXNActO
+      T2BufRecv_ub(2)=MXNBF_RI_MyRank
+      T2BufRecv_ub(3)=LenOccBat
       call xmp_new_coarray(T2BufRecv_desc,8,3,T2BufRecv_lb,T2BufRecv_ub,1,img_dims)
       call xmp_coarray_bind(T2BufRecv_desc,T2BufRecv)
 !!
