@@ -175,24 +175,32 @@
       T2BufSend_lb(1) = 1
       T2BufSend_lb(2) = 1
       T2BufSend_lb(3) = 1
-      T2BufSend_ub(1) = LenOccBat
+      T2BufSend_ub(1) = MXNActO
       T2BufSend_ub(2) = MXNBF_RI_MyRank
-      T2BufSend_ub(3) = MXNActO
+      T2BufSend_ub(3) = LenOccBat
       call xmp_new_local_array(T2BufSend_local_desc,8,3,T2BufSend_lb, &
        T2BufSend_ub,loc(T2BufSend))
-      ! TODO:chack unnecessary?
-      !call xmp_coarray_bind(T2BufSend_local_desc,T2BufSend)
 
+      IdxBF_RI_MyRank_lb(1) = 1
+      IdxBF_RI_MyRank_ub(1) = NBF_RI
+      call xmp_new_local_array(IdxBF_RI_MyRank_local_desc,4,1,IdxBF_RI_MyRank_lb, &
+       IdxBF_RI_MyRank_ub,loc(IdxBF_RI_MyRank))
+
+      call xmp_new_array_section(IdxBF_RI_MyRank_local_sec,1)
+      call xmp_new_array_section(IdxBF_RI_Irank_sec,1)
+      call xmp_new_array_section(T2BufRecv_sec,3)
+      call xmp_new_array_section(T2BufSend_local_sec,3)
+            
 
 !coarray
 !     ALLOCATE(T2BufRecv(MXNActO,MXNBF_RI_MyRank,LenOccBat))
 !      ALLOCATE(T2BufRecv(MXNActO,MXNBF_RI_MyRank,LenOccBat)[*])
       T2BufRecv_lb(1)=1
-      T2BufRecv_ub(1)=LenOccBat
       T2BufRecv_lb(2)=1
-      T2BufRecv_ub(2)=MXNBF_RI_MyRank
       T2BufRecv_lb(3)=1
-      T2BufRecv_ub(3)=MXNActO
+      T2BufRecv_ub(1)=MXNActO
+      T2BufRecv_ub(2)=MXNBF_RI_MyRank
+      T2BufRecv_ub(3)=LenOccBat
       call xmp_new_coarray(T2BufRecv_desc,8,3,T2BufRecv_lb,T2BufRecv_ub,1,img_dims)
       call xmp_coarray_bind(T2BufRecv_desc,T2BufRecv)
 !!
@@ -283,22 +291,6 @@
             WTimeBgn = MPI_WTIME()
             CALL CPU_TIME(TimeBgn)
 
-!coarray
-!           CALL MPI_IRecv(IdxBF_RI_Irank,  NBF_RI_MyRank(Irankrecv), MPI_INTEGER, Irankrecv, 0, &
-!    &         MPI_COMM_MO, ireq(2), IErr)
-!           CALL MPI_ISend(IdxBF_RI_MyRank, NBF_RI_MyRank(MyRankMO), MPI_INTEGER, Iranksend, 0, &
-!    &         MPI_COMM_MO, ireq(1), IErr)
-!           CALL MPI_Wait(ireq(1), istat1, IErr)
-!           CALL MPI_Wait(ireq(2), istat2, IErr)
-
-            IdxBF_RI_MyRank_lb(1) = 1
-            IdxBF_RI_MyRank_ub(1) = NBF_RI
-            call xmp_new_local_array(IdxBF_RI_MyRank_local_desc,4,1,IdxBF_RI_MyRank_lb, &
-             IdxBF_RI_MyRank_ub,loc(IdxBF_RI_MyRank))
-
-            call xmp_new_array_section(IdxBF_RI_MyRank_local_sec,1)
-            call xmp_new_array_section(IdxBF_RI_Irank_sec,1)
-
             call xmp_array_section_set_triplet(IdxBF_RI_MyRank_local_sec, &
              1,int(1,kind=8),int(NBF_RI_MyRank(MyRankMO),kind=8),1,status)
             call xmp_array_section_set_triplet(IdxBF_RI_Irank_sec, &
@@ -311,9 +303,6 @@
              IdxBF_RI_MyRank_local_desc,IdxBF_RI_MyRank_local_sec,status) 
 !            sync all
             call xmp_sync_all(status)
-
-            call xmp_free_array_section(IdxBF_RI_Irank_sec)
-            call xmp_free_array_section(IdxBF_RI_MyRank_local_sec)
 !!
 
 !coarray
@@ -322,9 +311,6 @@
 !           CALL MPI_Wait(ireq(3), istat3, IErr)
 !           CALL MPI_Wait(ireq(4), istat4, IErr)
 
-            call xmp_new_array_section(T2BufRecv_sec,3)
-            call xmp_new_array_section(T2BufSend_local_sec,3)
-            
             call xmp_array_section_set_triplet(T2BufSend_local_sec, &
              1,int(1,kind=8),int(LenOccBat,kind=8),1,status)
             call xmp_array_section_set_triplet(T2BufSend_local_sec, &
@@ -348,8 +334,6 @@
 !            sync all
             call xmp_sync_all(status)
 
-            call xmp_free_array_section(T2BufSend_local_sec)
-            call xmp_free_array_section(T2BufRecv_sec)
 !!
             CALL CPU_TIME(TimeEnd)
             WTimeEnd = MPI_WTIME()
@@ -478,6 +462,15 @@
          PRINT '(" ..... WALL time (2/3 tran3c2 comm) :", F12.2)', WTime_T2C
          PRINT '(" ..... WALL time (3/3 tran3c2 tran) :", F12.2)', WTime_T3
       END IF
+
+
+      ! allocate section
+      call xmp_free_array_section(IdxBF_RI_Irank_sec)
+      call xmp_free_array_section(IdxBF_RI_MyRank_local_sec)
+      call xmp_free_array_section(T2BufSend_local_sec)
+      call xmp_free_array_section(T2BufRecv_sec)
+
+
 !
 !     o deallocate memory
 !

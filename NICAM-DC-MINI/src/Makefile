@@ -19,6 +19,18 @@ VPATH  = share:nhm/share:nhm/dynamics:nhm/forcing:nhm
 mod_misc := mod_misc
 #	endif
 
+ifneq (,$(findstring xmpAPI,$(NICAM_SYS)))
+	mod_adm = mod_adm_xmpAPI
+	mod_comm = mod_comm_xmpAPI
+	mod_debug = mod_debug_xmpAPI
+	mod_grd = mod_grd_xmpAPI
+else
+	mod_adm = mod_adm
+	mod_comm = mod_comm
+	mod_debug = mod_debug
+	mod_grd = mod_grd
+endif
+
 PRJ1 = driver-dc
 #	PRJ2 = mkmnginfo
 #	PRJ3 = mkrawgrid
@@ -50,16 +62,16 @@ maketool: $(LIBDIR)/$(LIBNAME)
 
 MODS =	\
 	mod_coarray.o	\
-	mod_adm.o	\
+	$(mod_adm).o	\
 	$(mod_misc).o	\
-	mod_debug.o	\
+	$(mod_debug).o	\
 	mod_cnst.o	\
 	mod_fio.o	\
 	mod_calendar.o	\
 	fio.o	\
 	fiof.o	\
-	mod_comm.o	\
-	mod_grd.o	\
+	$(mod_comm).o	\
+	$(mod_grd).o	\
 	mod_gmtr.o	\
 	mod_oprt.o	\
 	mod_vmtr.o	\
@@ -95,7 +107,7 @@ MODS =	\
 
 
 $(PRJ1): prg_$(PRJ1).o $(LIBDIR)/$(LIBNAME)
-	$(LD) $(LFLAGS) -o $@ $^
+	$(LD) -o $@ $^ $(LFLAGS)
 
 prg_$(PRJ1).o : prg_$(PRJ1).f90 $(LIBNAME)
 
@@ -109,47 +121,47 @@ $(LIBNAME): $(MODS)
 
 mod_coarray.o	: mod_coarray.f90
 $(mod_misc).o	: $(mod_misc).f90
-mod_adm.o	: mod_adm.f90 $(mod_misc).o
-mod_debug.o	: mod_debug.f90 mod_adm.o $(mod_misc).o
-mod_cnst.o	: mod_cnst.f90 mod_adm.o
-mod_calendar.o	: mod_calendar.f90 mod_adm.o
+$(mod_adm).o	: $(mod_adm).f90 $(mod_misc).o
+$(mod_debug).o	: $(mod_debug).f90 $(mod_adm).o $(mod_misc).o
+mod_cnst.o	: mod_cnst.f90 $(mod_adm).o
+mod_calendar.o	: mod_calendar.f90 $(mod_adm).o
 fio.o	: fio.c fio.h fio_def.h
 fiof.o	: fiof.c fiof.h fio.h fio_def.h
-mod_fio.o	: mod_fio.f90 mod_adm.o mod_calendar.o mod_cnst.o fio.o fiof.o mod_debug.o
-mod_comm.o	: mod_comm.f90 mod_adm.o mod_cnst.o mod_debug.o
-mod_grd.o	: mod_grd.f90 mod_adm.o mod_cnst.o mod_comm.o $(mod_misc).o mod_fio.o mod_coarray.o
-mod_gmtr.o	: mod_gmtr.f90 mod_adm.o mod_comm.o $(mod_misc).o mod_grd.o mod_cnst.o
-mod_oprt.o	: mod_oprt.f90 mod_adm.o mod_gmtr.o mod_grd.o mod_comm.o mod_cnst.o
-mod_vmtr.o	: mod_vmtr.f90 mod_adm.o mod_grd.o mod_comm.o mod_gmtr.o mod_oprt.o mod_cnst.o
-mod_time.o	: mod_time.f90 mod_adm.o mod_calendar.o
-mod_latlon.o	: mod_latlon.f90 mod_adm.o mod_cnst.o $(mod_misc).o mod_grd.o mod_oprt.o mod_comm.o mod_gmtr.o
-mod_gtl.o	: mod_gtl.f90 mod_adm.o mod_comm.o mod_gmtr.o mod_vmtr.o mod_cnst.o $(mod_misc).o mod_grd.o
-mod_vintrpl.o	: mod_vintrpl.f90 mod_adm.o mod_grd.o mod_cnst.o
-mod_oprt3d.o	: mod_oprt3d.f90 mod_adm.o mod_grd.o mod_gmtr.o mod_vmtr.o
-mod_chemvar.o	: mod_chemvar.f90 mod_adm.o
-mod_runconf.o	: mod_runconf.f90 mod_adm.o mod_cnst.o mod_chemvar.o
-mod_thrmdyn.o	: mod_thrmdyn.f90 mod_adm.o mod_cnst.o mod_runconf.o
-mod_bndcnd.o	: mod_bndcnd.f90 mod_adm.o mod_cnst.o mod_grd.o mod_runconf.o
-mod_cnvvar.o	: mod_cnvvar.f90 mod_adm.o mod_grd.o mod_thrmdyn.o mod_runconf.o mod_bndcnd.o mod_vmtr.o
-mod_sfcvar.o	: mod_sfcvar.f90 mod_adm.o mod_runconf.o mod_comm.o
-mod_prgvar.o	: mod_prgvar.f90 mod_adm.o mod_runconf.o mod_comm.o mod_dycoretest.o
-mod_history.o	: mod_history.f90 mod_adm.o mod_time.o mod_runconf.o mod_grd.o mod_cnst.o mod_calendar.o mod_fio.o mod_comm.o mod_gtl.o mod_vintrpl.o $(mod_misc).o mod_cnvvar.o mod_thrmdyn.o mod_vmtr.o mod_sfcvar.o mod_prgvar.o
-mod_bsstate.o	: mod_bsstate.f90 mod_adm.o mod_cnst.o mod_grd.o $(mod_misc).o mod_runconf.o mod_vintrpl.o mod_bndcnd.o mod_thrmdyn.o
-mod_diagvar.o	: mod_diagvar.f90 mod_adm.o mod_comm.o $(mod_misc).o mod_gtl.o mod_runconf.o mod_fio.o mod_time.o mod_grd.o
-mod_history_vars.o	: mod_history_vars.f90 mod_history.o mod_adm.o mod_runconf.o mod_gmtr.o mod_gtl.o mod_vmtr.o mod_prgvar.o mod_sfcvar.o mod_bsstate.o mod_cnvvar.o mod_thrmdyn.o mod_cnst.o mod_bndcnd.o mod_diagvar.o mod_grd.o
-mod_embudget.o	: mod_embudget.f90 mod_adm.o $(mod_misc).o mod_time.o mod_sfcvar.o mod_cnst.o mod_grd.o mod_vmtr.o mod_gtl.o mod_runconf.o mod_cnvvar.o mod_bsstate.o mod_thrmdyn.o mod_prgvar.o
+mod_fio.o	: mod_fio.f90 $(mod_adm).o mod_calendar.o mod_cnst.o fio.o fiof.o $(mod_debug).o
+$(mod_comm).o	: $(mod_comm).f90 $(mod_adm).o mod_cnst.o $(mod_debug).o
+$(mod_grd).o	: $(mod_grd).f90 $(mod_adm).o mod_cnst.o $(mod_comm).o $(mod_misc).o mod_fio.o mod_coarray.o
+mod_gmtr.o	: mod_gmtr.f90 $(mod_adm).o $(mod_comm).o $(mod_misc).o $(mod_grd).o mod_cnst.o
+mod_oprt.o	: mod_oprt.f90 $(mod_adm).o mod_gmtr.o $(mod_grd).o $(mod_comm).o mod_cnst.o
+mod_vmtr.o	: mod_vmtr.f90 $(mod_adm).o $(mod_grd).o $(mod_comm).o mod_gmtr.o mod_oprt.o mod_cnst.o
+mod_time.o	: mod_time.f90 $(mod_adm).o mod_calendar.o
+mod_latlon.o	: mod_latlon.f90 $(mod_adm).o mod_cnst.o $(mod_misc).o $(mod_grd).o mod_oprt.o $(mod_comm).o mod_gmtr.o
+mod_gtl.o	: mod_gtl.f90 $(mod_adm).o $(mod_comm).o mod_gmtr.o mod_vmtr.o mod_cnst.o $(mod_misc).o $(mod_grd).o
+mod_vintrpl.o	: mod_vintrpl.f90 $(mod_adm).o $(mod_grd).o mod_cnst.o
+mod_oprt3d.o	: mod_oprt3d.f90 $(mod_adm).o $(mod_grd).o mod_gmtr.o mod_vmtr.o
+mod_chemvar.o	: mod_chemvar.f90 $(mod_adm).o
+mod_runconf.o	: mod_runconf.f90 $(mod_adm).o mod_cnst.o mod_chemvar.o
+mod_thrmdyn.o	: mod_thrmdyn.f90 $(mod_adm).o mod_cnst.o mod_runconf.o
+mod_bndcnd.o	: mod_bndcnd.f90 $(mod_adm).o mod_cnst.o $(mod_grd).o mod_runconf.o
+mod_cnvvar.o	: mod_cnvvar.f90 $(mod_adm).o $(mod_grd).o mod_thrmdyn.o mod_runconf.o mod_bndcnd.o mod_vmtr.o
+mod_sfcvar.o	: mod_sfcvar.f90 $(mod_adm).o mod_runconf.o $(mod_comm).o
+mod_prgvar.o	: mod_prgvar.f90 $(mod_adm).o mod_runconf.o $(mod_comm).o mod_dycoretest.o
+mod_history.o	: mod_history.f90 $(mod_adm).o mod_time.o mod_runconf.o $(mod_grd).o mod_cnst.o mod_calendar.o mod_fio.o $(mod_comm).o mod_gtl.o mod_vintrpl.o $(mod_misc).o mod_cnvvar.o mod_thrmdyn.o mod_vmtr.o mod_sfcvar.o mod_prgvar.o
+mod_bsstate.o	: mod_bsstate.f90 $(mod_adm).o mod_cnst.o $(mod_grd).o $(mod_misc).o mod_runconf.o mod_vintrpl.o mod_bndcnd.o mod_thrmdyn.o
+mod_diagvar.o	: mod_diagvar.f90 $(mod_adm).o $(mod_comm).o $(mod_misc).o mod_gtl.o mod_runconf.o mod_fio.o mod_time.o $(mod_grd).o
+mod_history_vars.o	: mod_history_vars.f90 mod_history.o $(mod_adm).o mod_runconf.o mod_gmtr.o mod_gtl.o mod_vmtr.o mod_prgvar.o mod_sfcvar.o mod_bsstate.o mod_cnvvar.o mod_thrmdyn.o mod_cnst.o mod_bndcnd.o mod_diagvar.o $(mod_grd).o
+mod_embudget.o	: mod_embudget.f90 $(mod_adm).o $(mod_misc).o mod_time.o mod_sfcvar.o mod_cnst.o $(mod_grd).o mod_vmtr.o mod_gtl.o mod_runconf.o mod_cnvvar.o mod_bsstate.o mod_thrmdyn.o mod_prgvar.o
 mod_dcmip.o     : mod_dcmip.f90
-mod_dycoretest.o	: mod_dycoretest.f90 mod_adm.o mod_runconf.o $(mod_misc).o mod_vmtr.o mod_fio.o mod_time.o mod_cnvvar.o mod_vintrpl.o mod_comm.o mod_cnst.o mod_thrmdyn.o mod_dcmip.o mod_vmtr.o mod_src.o
-mod_trcadv_thuburn.o	: mod_trcadv_thuburn.f90 mod_adm.o mod_cnst.o mod_comm.o mod_grd.o mod_gmtr.o mod_vmtr.o
-mod_src.o	: mod_src.f90 mod_adm.o mod_grd.o mod_vmtr.o mod_oprt.o mod_cnst.o mod_runconf.o mod_gtl.o
-mod_numfilter.o	: mod_numfilter.f90 mod_adm.o mod_time.o mod_grd.o mod_cnst.o mod_gtl.o mod_gmtr.o mod_oprt.o mod_oprt3d.o mod_comm.o mod_src.o mod_vmtr.o mod_runconf.o mod_bsstate.o
+mod_dycoretest.o	: mod_dycoretest.f90 $(mod_adm).o mod_runconf.o $(mod_misc).o mod_vmtr.o mod_fio.o mod_time.o mod_cnvvar.o mod_vintrpl.o $(mod_comm).o mod_cnst.o mod_thrmdyn.o mod_dcmip.o mod_vmtr.o mod_src.o
+mod_trcadv_thuburn.o	: mod_trcadv_thuburn.f90 $(mod_adm).o mod_cnst.o $(mod_comm).o $(mod_grd).o mod_gmtr.o mod_vmtr.o
+mod_src.o	: mod_src.f90 $(mod_adm).o $(mod_grd).o mod_vmtr.o mod_oprt.o mod_cnst.o mod_runconf.o mod_gtl.o
+mod_numfilter.o	: mod_numfilter.f90 $(mod_adm).o mod_time.o $(mod_grd).o mod_cnst.o mod_gtl.o mod_gmtr.o mod_oprt.o mod_oprt3d.o $(mod_comm).o mod_src.o mod_vmtr.o mod_runconf.o mod_bsstate.o
 mod_af_trcadv.o	: mod_af_trcadv.f90
-mod_af_heldsuarez.o	: mod_af_heldsuarez.f90 mod_adm.o mod_cnst.o
-mod_forcing_driver.o	: mod_forcing_driver.f90 mod_adm.o mod_grd.o mod_gmtr.o mod_vmtr.o mod_time.o mod_runconf.o mod_cnst.o mod_cnvvar.o mod_prgvar.o mod_sfcvar.o mod_thrmdyn.o mod_gtl.o mod_diagvar.o mod_bsstate.o mod_bndcnd.o $(mod_misc).o mod_af_heldsuarez.o mod_history.o mod_af_trcadv.o
-mod_vi.o	: mod_vi.f90 mod_adm.o mod_comm.o mod_time.o mod_cnst.o mod_grd.o mod_oprt.o mod_vmtr.o mod_runconf.o mod_bndcnd.o mod_numfilter.o mod_src.o mod_cnvvar.o mod_bsstate.o
-mod_ndg.o	: mod_ndg.f90 mod_adm.o $(mod_misc).o mod_time.o mod_calendar.o mod_grd.o mod_cnst.o mod_vmtr.o mod_history.o mod_gmtr.o mod_oprt.o mod_runconf.o mod_gtl.o mod_comm.o
-mod_tb_smg.o	: mod_tb_smg.f90 mod_adm.o mod_vmtr.o mod_history.o mod_gmtr.o mod_grd.o mod_cnst.o mod_runconf.o mod_oprt.o mod_comm.o mod_bsstate.o mod_time.o
-mod_dynstep.o	: mod_dynstep.f90 mod_adm.o mod_cnst.o mod_time.o mod_grd.o mod_vmtr.o mod_runconf.o mod_bsstate.o mod_bndcnd.o mod_prgvar.o mod_diagvar.o mod_thrmdyn.o mod_numfilter.o mod_vi.o mod_src.o mod_trcadv_thuburn.o mod_ndg.o mod_tb_smg.o mod_oprt.o mod_debug.o
+mod_af_heldsuarez.o	: mod_af_heldsuarez.f90 $(mod_adm).o mod_cnst.o
+mod_forcing_driver.o	: mod_forcing_driver.f90 $(mod_adm).o $(mod_grd).o mod_gmtr.o mod_vmtr.o mod_time.o mod_runconf.o mod_cnst.o mod_cnvvar.o mod_prgvar.o mod_sfcvar.o mod_thrmdyn.o mod_gtl.o mod_diagvar.o mod_bsstate.o mod_bndcnd.o $(mod_misc).o mod_af_heldsuarez.o mod_history.o mod_af_trcadv.o
+mod_vi.o	: mod_vi.f90 $(mod_adm).o $(mod_comm).o mod_time.o mod_cnst.o $(mod_grd).o mod_oprt.o mod_vmtr.o mod_runconf.o mod_bndcnd.o mod_numfilter.o mod_src.o mod_cnvvar.o mod_bsstate.o
+mod_ndg.o	: mod_ndg.f90 $(mod_adm).o $(mod_misc).o mod_time.o mod_calendar.o $(mod_grd).o mod_cnst.o mod_vmtr.o mod_history.o mod_gmtr.o mod_oprt.o mod_runconf.o mod_gtl.o $(mod_comm).o
+mod_tb_smg.o	: mod_tb_smg.f90 $(mod_adm).o mod_vmtr.o mod_history.o mod_gmtr.o $(mod_grd).o mod_cnst.o mod_runconf.o mod_oprt.o $(mod_comm).o mod_bsstate.o mod_time.o
+mod_dynstep.o	: mod_dynstep.f90 $(mod_adm).o mod_cnst.o mod_time.o $(mod_grd).o mod_vmtr.o mod_runconf.o mod_bsstate.o mod_bndcnd.o mod_prgvar.o mod_diagvar.o mod_thrmdyn.o mod_numfilter.o mod_vi.o mod_src.o mod_trcadv_thuburn.o mod_ndg.o mod_tb_smg.o mod_oprt.o $(mod_debug).o
 
 
 .SUFFIXES: .o .f90 .c

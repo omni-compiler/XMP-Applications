@@ -2001,7 +2001,7 @@ contains
     !--- 2020 Fujitsu
     sendbuf_l_lb(1) = 1; sendbuf_l_ub(1) = maxdatasize_s
     sendbuf_l_lb(2) = 1; sendbuf_l_ub(2) = somax(halomax)
-    call xmp_new_local_array(sendbuf_l_desc, 8, 2, sendbuf_l_lb, sendbuf_l_ub, sendbuf)
+    call xmp_new_local_array(sendbuf_l_desc, 8, 2, sendbuf_l_lb, sendbuf_l_ub, loc(sendbuf))
     !--- 2020 Fujitsu end
     recvbuf(:,:)=0
     sendbuf(:,:)=0
@@ -2708,7 +2708,7 @@ contains
     !real(8),allocatable :: caf_recvbuf(:,:)[:]
     integer bufsize1,bufsize2
     integer , POINTER :: tbl ( : ) => null ( )
-    integer , POINTER :: caf_recvbuf ( : , : ) => null ( )
+    real(8) , POINTER :: caf_recvbuf ( : , : ) => null ( )
     integer(8) :: tbl_desc, caf_recvbuf_desc
     integer(8) :: tbl_lb(1),tbl_ub(1), caf_recvbuf_lb(2), caf_recvbuf_ub(2)
     integer(8) :: tbl_sec, caf_recvbuf_sec
@@ -2723,7 +2723,7 @@ contains
 
     if ( opt_comm_barrier ) then
        call DEBUG_rapstart('Node imbalance adjustment')
-!coarray       call MPI_BARRIER( ADM_comm_run_world, ierr )
+       !coarray       call MPI_BARRIER( ADM_comm_run_world, ierr )
        !--- 2020 Fujitsu
        !sync all
        call xmp_sync_all(ierr)
@@ -2738,15 +2738,17 @@ contains
     !
     comm_call_count=comm_call_count+1
     !
-!coarray    t(0)=mpi_wtime()
-    t(0) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(0)=mpi_wtime()
+    !t(0) = xmp_wtime()
+    !--- 2020 Fujitsu end
     !
     shp=shape(var)
     kmax = shp(2)
     !
     if (present(trn)) then
        varmax=0
-!cdir novector
+       !cdir novector
        do n=1,shp(4)
           if(trn(n)) then
              varmax=varmax+1
@@ -2755,7 +2757,7 @@ contains
        enddo
     else
        varmax=shp(4)
-!cdir novector
+       !cdir novector
        do n=1,varmax
           clist(n)=n
        enddo
@@ -2781,36 +2783,42 @@ contains
           write(ADM_LOG_FID,*)  'cmax=', cmax, 'max_varmax*ADM_kall=', max_varmax*ADM_kall
           call ADM_proc_stop
        end if
-!       equiv_varmax = real( varmax*kmax )/real( ADM_kall ) ! assuming variables are all 3-Dimension
-!       diag_varmax  = max( equiv_varmax, diag_varmax )     ! diagnose max value
-!       write(ADM_LOG_FID,'(a)'  )   ' *** max_varmax, varmax, kmax, equivalent varmax, diagnosed max_varmax '
-!       write(ADM_LOG_FID,'(5x, 3i8, 2f18.1)') max_varmax, varmax, kmax, equiv_varmax, diag_varmax
+       !       equiv_varmax = real( varmax*kmax )/real( ADM_kall ) ! assuming variables are all 3-Dimension
+       !       diag_varmax  = max( equiv_varmax, diag_varmax )     ! diagnose max value
+       !       write(ADM_LOG_FID,'(a)'  )   ' *** max_varmax, varmax, kmax, equivalent varmax, diagnosed max_varmax '
+       !       write(ADM_LOG_FID,'(5x, 3i8, 2f18.1)') max_varmax, varmax, kmax, equiv_varmax, diag_varmax
        ! ->
     end if
     !
-!coarray    t(1)=mpi_wtime()
-    t(1) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(1)=mpi_wtime()
+    !t(1) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_pre=time_pre+(t(1)-t(0))
     !call mpi_barrier(ADM_comm_run_world,ierr)
-!coarray    t(2)=mpi_wtime()
-    t(2) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(2)=mpi_wtime()
+    !t(2) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_bar1=time_bar1+(t(2)-t(1))
-!coarray
+    !coarray
     !--- 2020 Fujitsu
     !allocate(tbl(num_images())[*])
     tbl_lb(1) = 1; tbl_ub(1) = ADM_prc_all
     call xmp_new_coarray(tbl_desc, 4, 1, tbl_lb, tbl_ub, 1, img_dims)
     call xmp_coarray_bind(tbl_desc, tbl)
-    !call co_max(maxdatasiaze_r)
-    call MPI_Allreduce(maxdatasiaze_r, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
-    maxdatasiaze_r = max_tmp
-    !--- 2020 Fujitsu end
+
+    !call co_max(maxdatasize_r)
+    call MPI_Allreduce(maxdatasize_r, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
+    maxdatasize_r = max_tmp
+
     bufsize1 = maxdatasize_r
     bufsize2 = romax(halomax)
-    !--- 2020 Fujitsu
+
     !call co_max(bufsize2)
     call MPI_Allreduce(bufsize2, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
     bufsize2 = max_tmp
+
     !allocate(caf_recvbuf(bufsize1,bufsize2)[*])
     caf_recvbuf_lb(1) = 1; caf_recvbuf_ub(1) = bufsize1
     caf_recvbuf_lb(2) = 1; caf_recvbuf_ub(2) = bufsize2
@@ -2822,10 +2830,10 @@ contains
     ! call mpi_isend
     !-----------------------------------------
 
-!!    comm_dbg_recvbuf(:,:,:)=CNST_UNDEF
-!!    comm_dbg_sendbuf(:,:,:)=CNST_UNDEF
-!!    comm_dbg_recvbuf(:,:,1)=recvbuf(:,:)
-!!    comm_dbg_sendbuf(:,:,1)=sendbuf(:,:)
+    !!    comm_dbg_recvbuf(:,:,:)=CNST_UNDEF
+    !!    comm_dbg_sendbuf(:,:,:)=CNST_UNDEF
+    !!    comm_dbg_recvbuf(:,:,1)=recvbuf(:,:)
+    !!    comm_dbg_sendbuf(:,:,1)=sendbuf(:,:)
 
     if (opt_comm_dbg) then !iga
        sendbuf(:,:)= dbg_sendbuf_init
@@ -2844,15 +2852,15 @@ contains
           endif
        endif
        !
-!coarray
-!       call mpi_irecv(recvbuf(1,ro)              &
-!            ,rsize(ro,halo)*cmax        &
-!            ,mpi_double_precision       &
-!            ,sourcerank(ro,halo)        &
-!            ,recvtag(ro,halo)           &
-!            ,ADM_comm_run_world         &
-!            ,areq(ro)                   &
-!            ,ierr)
+       !coarray
+       !       call mpi_irecv(recvbuf(1,ro)              &
+       !            ,rsize(ro,halo)*cmax        &
+       !            ,mpi_double_precision       &
+       !            ,sourcerank(ro,halo)        &
+       !            ,recvtag(ro,halo)           &
+       !            ,ADM_comm_run_world         &
+       !            ,areq(ro)                   &
+       !            ,ierr)
        tbl(sourcerank(ro,halo)+1) = ro
 
        !
@@ -2872,8 +2880,10 @@ contains
        endif
     enddo
 
-!coarray    t(3)=mpi_wtime()
-    t(3) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(3)=mpi_wtime()
+    !t(3) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_recv=time_recv+(t(3)-t(2))
     !-----------------------------------------
     !  var -> sendbuf 
@@ -2886,27 +2896,29 @@ contains
 
 
 
-!coarray       t(4)=mpi_wtime()
-       t(4) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(4)=mpi_wtime()
+       !t(4) = xmp_wtime()
+       !--- 2020 Fujitsu end
        do ns=1,nsmax(so,halo)
           ss=sendinfo(SIZE_COMM,ns,so,halo)  
           sl=sendinfo(LRGNID_COMM,ns,so,halo)  
           sb=sendinfo(BASE_COMM,ns,so,halo)*cmax
-!=org=!cdir novector
-!=org=          do n=1,ss
-!=org=!cdir unroll=3
-!=org=             do m=1,varmax
-!=org=!!cdir shortloop
-!=org=                do k=1,kmax
-!=org=                   sendbuf(k+(m-1)*kmax+(n-1)*cmax+sb,so) &
-!=org=                        =var(sendlist(n,ns,so,halo),k,sl,clist(m))
-!=org=                enddo
-!=org=             enddo
-!=org=!             if (ADM_prc_me==1) write(ADM_log_fid,*) 'n',n,sendlist(n,ns,so,halo)
-!=org=          enddo
+          !=org=!cdir novector
+          !=org=          do n=1,ss
+          !=org=!cdir unroll=3
+          !=org=             do m=1,varmax
+          !=org=!!cdir shortloop
+          !=org=                do k=1,kmax
+          !=org=                   sendbuf(k+(m-1)*kmax+(n-1)*cmax+sb,so) &
+          !=org=                        =var(sendlist(n,ns,so,halo),k,sl,clist(m))
+          !=org=                enddo
+          !=org=             enddo
+          !=org=!             if (ADM_prc_me==1) write(ADM_log_fid,*) 'n',n,sendlist(n,ns,so,halo)
+          !=org=          enddo
 
           do m=1,varmax
-!cdir outerunroll=8
+             !cdir outerunroll=8
              do k=1,kmax
                 do n=1,ss
                    sendbuf(n+(k-1)*ss+(m-1)*ss*kmax+sb,so) &
@@ -2914,7 +2926,7 @@ contains
                 enddo
              enddo
           enddo
-          
+
 
        enddo
        !-----------------------------------------
@@ -2926,19 +2938,19 @@ contains
           ss=sendinfo_pl(SIZE_COMM,ns,so,halo)  
           sl=sendinfo_pl(LRGNID_COMM,ns,so,halo)  
           sb=sendinfo_pl(BASE_COMM,ns,so,halo)*cmax
-!=org=!cdir novector
-!=org=          do n=1,ss
-!=org=!cdir unroll=3
-!=org=             do m=1,varmax
-!=org=!!cdir shortloop
-!=org=                do k=1,kmax
-!=org=                   sendbuf(k+(m-1)*kmax+(n-1)*cmax+sb,so) &
-!=org=                        =var_pl(sendlist_pl(n,ns,so,halo),k,sl,clist(m))
-!=org=                enddo
-!=org=             enddo
-!=org=          enddo
+          !=org=!cdir novector
+          !=org=          do n=1,ss
+          !=org=!cdir unroll=3
+          !=org=             do m=1,varmax
+          !=org=!!cdir shortloop
+          !=org=                do k=1,kmax
+          !=org=                   sendbuf(k+(m-1)*kmax+(n-1)*cmax+sb,so) &
+          !=org=                        =var_pl(sendlist_pl(n,ns,so,halo),k,sl,clist(m))
+          !=org=                enddo
+          !=org=             enddo
+          !=org=          enddo
           do m=1,varmax
-!cdir outerunroll=8
+             !cdir outerunroll=8
              do k=1,kmax
                 do n=1,ss
                    sendbuf(n+(k-1)*ss+(m-1)*ss*kmax+sb,so) &
@@ -2946,14 +2958,16 @@ contains
                 enddo
              enddo
           enddo
- 
+
        enddo
-!coarray       t(5)=mpi_wtime()
-       t(5) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(5)=mpi_wtime()
+       !t(5) = xmp_wtime()
+       !--- 2020 Fujitsu end
        time_sbuf=time_sbuf+(t(5)-t(4))
 
 
-!       write(ADM_log_fid,*) 'send count=',i_dbg,'prc=',adm_prc_me
+       !       write(ADM_log_fid,*) 'send count=',i_dbg,'prc=',adm_prc_me
        !-----------------------------------------
        !
        !-----------------------------------------
@@ -2966,30 +2980,31 @@ contains
           endif
        endif
 
-!       write(*,*) 'me=',ADM_prc_me,'sendtag',sendtag(:,:)
-!       write(*,*) 'sendbuf',sendbuf(:,:)
-!       write(*,*) 'me=',ADM_prc_me,'destrank',destrank(:,:)
+       !       write(*,*) 'me=',ADM_prc_me,'sendtag',sendtag(:,:)
+       !       write(*,*) 'sendbuf',sendbuf(:,:)
+       !       write(*,*) 'me=',ADM_prc_me,'destrank',destrank(:,:)
 
-!coarray
-!       call Mpi_isend(sendbuf(1,so)              &
-!            ,ssize(so,halo)*cmax        &
-!            ,mpi_double_precision       &
-!            ,destrank(so,halo)          &
-!            ,sendtag(so,halo)           &
-!            ,ADM_comm_run_world             &
-!            ,areq(so+romax(halo))       &
-!            ,ierr)
+       !coarray
+       !       call Mpi_isend(sendbuf(1,so)              &
+       !            ,ssize(so,halo)*cmax        &
+       !            ,mpi_double_precision       &
+       !            ,destrank(so,halo)          &
+       !            ,sendtag(so,halo)           &
+       !            ,ADM_comm_run_world             &
+       !            ,areq(so+romax(halo))       &
+       !            ,ierr)
        !--- 2020 Fujitsu
        !dst_img = tbl(this_image())[destrank(so,halo)+1]
        img_dims(1) = destrank(so,halo)+1
-       call xmp_array_section_set_triplet(tbl_sec, 1, destrank(so,halo)+1, destrank(so,halo)+1, 1, ierr)
+       call xmp_array_section_set_triplet(tbl_sec, 1, int(ADM_prc_me,kind=8), int(ADM_prc_me,kind=8), 1, ierr)
        call xmp_coarray_get_scalar(img_dims, tbl_desc, tbl_sec, dst_img, ierr)
+
        !caf_recvbuf(1:ssize(so,halo)*cmax,dst_img)[destrank(so,halo)+1] &
        !  = sendbuf(1:ssize(so,halo)*cmax,so)
-       call xmp_array_section_set_triplet(caf_recvbuf_sec, 1, 1, ssize(so,halo)*cmax, 1, ierr)
-       call xmp_array_section_set_triplet(caf_recvbuf_sec, 2, dst_img, dst_img, 1, ierr)
-       call xmp_array_section_set_triplet(sendbuf_l_sec, 1, 1, ssize(so,halo)*cmax, 1, ierr)
-       call xmp_array_section_set_triplet(sendbuf_l_sec, 2, so, so, 1, ierr)
+       call xmp_array_section_set_triplet(caf_recvbuf_sec, 1, int(1,kind=8), int(ssize(so,halo)*cmax,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(caf_recvbuf_sec, 2, int(dst_img,kind=8), int(dst_img,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(sendbuf_l_sec, 1, int(1,kind=8), int(ssize(so,halo)*cmax,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(sendbuf_l_sec, 2, int(so,kind=8), int(so,kind=8), 1, ierr)
        call xmp_coarray_put_local(img_dims, caf_recvbuf_desc, caf_recvbuf_sec, sendbuf_l_desc, sendbuf_l_sec, ierr) 
        !--- 2020 Fujitsu
 
@@ -3009,16 +3024,20 @@ contains
        endif
 
 
-!coarray       t(6)=mpi_wtime()
-       t(6) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(6)=mpi_wtime()
+       !t(6) = xmp_wtime()
+       !--- 2020 Fujitsu end
        time_send=time_send+(t(6)-t(5))
        size_total=size_total+ssize(so,halo)*cmax
        comm_count=comm_count+1
     enddo !loop so
     !-----------------------------------------
     !
-!coarray    t(7)=mpi_wtime()
-    t(7) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(7)=mpi_wtime()
+    !t(7) = xmp_wtime()
+    !--- 2020 Fujitsu end
     !---------------------------------------------------
     !  var -> var (region to region copy in same rank)
     !---------------------------------------------------
@@ -3026,19 +3045,19 @@ contains
        cs=copyinfo_r2r(SIZE_COPY,nc,halo)
        cl=copyinfo_r2r(LRGNID_COPY,nc,halo)
        scl=copyinfo_r2r(SRC_LRGNID_COPY,nc,halo)
-!=org=!cdir novector
-!=org=       do n=1,cs
-!=org=!cdir unroll=3
-!=org=          do m=1,varmax
-!=org=!!cdir shortloop
-!=org=             do k=1,kmax
-!=org=                var(recvlist_r2r(n,nc,halo),k,cl ,clist(m)) &
-!=org=                     =var(sendlist_r2r(n,nc,halo),k,scl,clist(m))
-!=org=             enddo
-!=org=          enddo
-!=org=       enddo
+       !=org=!cdir novector
+       !=org=       do n=1,cs
+       !=org=!cdir unroll=3
+       !=org=          do m=1,varmax
+       !=org=!!cdir shortloop
+       !=org=             do k=1,kmax
+       !=org=                var(recvlist_r2r(n,nc,halo),k,cl ,clist(m)) &
+       !=org=                     =var(sendlist_r2r(n,nc,halo),k,scl,clist(m))
+       !=org=             enddo
+       !=org=          enddo
+       !=org=       enddo
        do m=1,varmax
-!cdir outerunroll=8
+          !cdir outerunroll=8
           do k=1,kmax
              do n=1,cs
                 var(recvlist_r2r(n,nc,halo),k,cl ,clist(m)) &
@@ -3046,7 +3065,7 @@ contains
              enddo
           enddo
        enddo
- 
+
     enddo
     !------------------------------------------
     !
@@ -3057,19 +3076,19 @@ contains
        cs=copyinfo_r2p(SIZE_COPY,nc,halo)
        cl=copyinfo_r2p(LRGNID_COPY,nc,halo)
        scl=copyinfo_r2p(SRC_LRGNID_COPY,nc,halo)
-!=org=!cdir novector
-!=org=       do n=1,cs
-!=org=!cdir unroll=3
-!=org=          do m=1,varmax
-!=org=!!cdir shortloop
-!=org=             do k=1,kmax
-!=org=                var_pl(recvlist_r2p(n,nc,halo),k,cl,clist(m)) &
-!=org=                     =var(sendlist_r2p(n,nc,halo),k,scl,clist(m))
-!=org=             enddo
-!=org=          enddo
-!=org=       enddo
+       !=org=!cdir novector
+       !=org=       do n=1,cs
+       !=org=!cdir unroll=3
+       !=org=          do m=1,varmax
+       !=org=!!cdir shortloop
+       !=org=             do k=1,kmax
+       !=org=                var_pl(recvlist_r2p(n,nc,halo),k,cl,clist(m)) &
+       !=org=                     =var(sendlist_r2p(n,nc,halo),k,scl,clist(m))
+       !=org=             enddo
+       !=org=          enddo
+       !=org=       enddo
        do m=1,varmax
-!cdir outerunroll=8
+          !cdir outerunroll=8
           do k=1,kmax
              do n=1,cs
                 var_pl(recvlist_r2p(n,nc,halo),k,cl,clist(m)) &
@@ -3077,7 +3096,7 @@ contains
              enddo
           enddo
        enddo
- 
+
     enddo
     !-----------------------------------------
     !
@@ -3088,19 +3107,19 @@ contains
        cs=copyinfo_p2r(SIZE_COPY,nc,halo)
        cl=copyinfo_p2r(LRGNID_COPY,nc,halo)
        scl=copyinfo_p2r(SRC_LRGNID_COPY,nc,halo)
-!=org=!cdir novector
-!=org=       do n=1,cs
-!=org=!cdir unroll=3
-!=org=          do m=1,varmax
-!=org=!!cdir shortloop
-!=org=             do k=1,kmax
-!=org=                var(recvlist_p2r(n,nc,halo),k,cl,clist(m)) &
-!=org=                     =var_pl(sendlist_p2r(n,nc,halo),k,scl,clist(m))
-!=org=             enddo
-!=org=          enddo
-!=org=       enddo
+       !=org=!cdir novector
+       !=org=       do n=1,cs
+       !=org=!cdir unroll=3
+       !=org=          do m=1,varmax
+       !=org=!!cdir shortloop
+       !=org=             do k=1,kmax
+       !=org=                var(recvlist_p2r(n,nc,halo),k,cl,clist(m)) &
+       !=org=                     =var_pl(sendlist_p2r(n,nc,halo),k,scl,clist(m))
+       !=org=             enddo
+       !=org=          enddo
+       !=org=       enddo
        do m=1,varmax
-!cdir outerunroll=8
+          !cdir outerunroll=8
           do k=1,kmax
              do n=1,cs
                 var(recvlist_p2r(n,nc,halo),k,cl,clist(m)) &
@@ -3108,16 +3127,18 @@ contains
              enddo
           enddo
        enddo
- 
+
     enddo
     !-----------------------------------------
     !
     !-----------------------------------------
-!coarray    t(8)=mpi_wtime()
-    t(8) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(8)=mpi_wtime()
+    !t(8) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_copy=time_copy+(t(8)-t(7))
     acount=romax(halo)+somax(halo)
-!coarray    call mpi_waitall(acount,areq,stat,ierr)
+    !coarray    call mpi_waitall(acount,areq,stat,ierr)
     !--- 2020 Fujitsu
     !sync all
     call xmp_sync_all(ierr)
@@ -3128,8 +3149,10 @@ contains
        end do
     end do
 
-!coarray    t(9)=mpi_wtime()
-    t(9) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(9)=mpi_wtime()
+    !t(9) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_wait=time_wait+(t(9)-t(8))
 
     if (opt_comm_dbg) then  !================== dbg start
@@ -3137,7 +3160,7 @@ contains
           write(ADM_log_fid,*) 'mpi_wait info start=='
           write(ADM_log_fid,*) 'ierr=',ierr
           write(ADM_log_fid,*) 'acount=',acount
-!           write(ADM_log_fid,*) 'stat=',stat(:,1:acount)
+          !           write(ADM_log_fid,*) 'stat=',stat(:,1:acount)
           write(ADM_log_fid,*) 'areq=',areq(1:acount)
           write(ADM_log_fid,*) 'mpi_wait info end=='
        endif
@@ -3175,11 +3198,11 @@ contains
           write(ADM_log_fid,*) 'areq after irecv:',dbg_areq_save(1:acount,1)
           write(ADM_log_fid,*) 'areq after isend',dbg_areq_save(1:acount,2)
           write(ADM_log_fid,*) 'areq after waitall',dbg_areq_save(1:acount,3)
-!          write(ADM_log_fid,*) 'areq after barrier',dbg_areq_save(1:acount,4)
+          !          write(ADM_log_fid,*) 'areq after barrier',dbg_areq_save(1:acount,4)
 
           write(ADM_log_fid,*) 'ierr of mpi_waitall=',ierr
           write(ADM_log_fid,*) 'acount of mpi_waitall=',acount
-!           write(ADM_log_fid,*) 'stat of mpi_waitall=',stat(:,1:acount)
+          !           write(ADM_log_fid,*) 'stat of mpi_waitall=',stat(:,1:acount)
 
        endif
        dbg_tcount=dbg_tcount+1
@@ -3187,7 +3210,7 @@ contains
 
 
     if  (opt_comm_barrier) then
-!coarray       call mpi_barrier(ADM_comm_run_world,ierr)
+       !coarray       call mpi_barrier(ADM_comm_run_world,ierr)
        !--- 2020 Fujitsu
        !sync all
        call xmp_sync_all(ierr)
@@ -3197,15 +3220,15 @@ contains
           write(ADM_log_fid,*) 'ierr=',ierr
           write(ADM_log_fid,*) 'mpi_barrier info end=='
        endif
-!       if (opt_comm_dbg) then
-!          dbg_areq_save(:,4)=areq(:)
-!       endif
+       !       if (opt_comm_dbg) then
+       !          dbg_areq_save(:,4)=areq(:)
+       !       endif
     endif
 
 
     !-----------------------------------------
     !
-!    i_dbg=0 !iga
+    !    i_dbg=0 !iga
     do ro=1,romax(halo)
        !-----------------------------------------
        !  recvbuf -> var ( recieve in region )
@@ -3214,29 +3237,29 @@ contains
           rs=recvinfo(SIZE_COMM,nr,ro,halo)
           rl=recvinfo(LRGNID_COMM,nr,ro,halo)
           rb=recvinfo(BASE_COMM,nr,ro,halo)*cmax
-!=org=!cdir novector
-!=org=          do n=1,rs
-!=org=!cdir unroll=3
-!=org=             do m=1,varmax
-!=org=!!cdir shortloop
-!=org=                do k=1,kmax
-!=org=                   var(recvlist(n,nr,ro,halo),k,rl,clist(m)) &
-!=org=                        =recvbuf(k+(m-1)*kmax+(n-1)*cmax+rb,ro)
-!=org=                enddo
-!=org=             enddo
-!=org=!             if (ADM_prc_me==2) write(ADM_log_fid,*) 'ro,n,nr,',ro,n,nr,recvlist(n,nr,ro,halo)
-!=org=          enddo
+          !=org=!cdir novector
+          !=org=          do n=1,rs
+          !=org=!cdir unroll=3
+          !=org=             do m=1,varmax
+          !=org=!!cdir shortloop
+          !=org=                do k=1,kmax
+          !=org=                   var(recvlist(n,nr,ro,halo),k,rl,clist(m)) &
+          !=org=                        =recvbuf(k+(m-1)*kmax+(n-1)*cmax+rb,ro)
+          !=org=                enddo
+          !=org=             enddo
+          !=org=!             if (ADM_prc_me==2) write(ADM_log_fid,*) 'ro,n,nr,',ro,n,nr,recvlist(n,nr,ro,halo)
+          !=org=          enddo
           do m=1,varmax
-!cdir outerunroll=8
+             !cdir outerunroll=8
              do k=1,kmax
                 do n=1,rs
                    var(recvlist(n,nr,ro,halo),k,rl,clist(m)) &
                         =recvbuf(n+(k-1)*rs+(m-1)*rs*kmax+rb,ro)
                 enddo
              enddo
-!             if (ADM_prc_me==2) write(ADM_log_fid,*) 'ro,n,nr,',ro,n,nr,recvlist(n,nr,ro,halo)
+             !             if (ADM_prc_me==2) write(ADM_log_fid,*) 'ro,n,nr,',ro,n,nr,recvlist(n,nr,ro,halo)
           enddo
-!          i_dbg=i_dbg+max(rs,0)
+          !          i_dbg=i_dbg+max(rs,0)
        enddo
 
        !-----------------------------------------
@@ -3248,19 +3271,19 @@ contains
           rs=recvinfo_pl(SIZE_COMM,nr,ro,halo)
           rl=recvinfo_pl(LRGNID_COMM,nr,ro,halo)
           rb=recvinfo_pl(BASE_COMM,nr,ro,halo)*cmax
-!=org=!cdir novector
-!=org=          do n=1,rs
-!=org=!cdir unroll=3
-!=org=             do m=1,varmax
-!=org=!!cdir shortloop
-!=org=                do k=1,kmax
-!=org=                   var_pl(recvlist_pl(n,nr,ro,halo),k,rl,clist(m)) &
-!=org=                        =recvbuf(k+(m-1)*kmax+(n-1)*cmax+rb,ro) 
-!=org=                enddo
-!=org=             enddo
-!=org=          enddo
+          !=org=!cdir novector
+          !=org=          do n=1,rs
+          !=org=!cdir unroll=3
+          !=org=             do m=1,varmax
+          !=org=!!cdir shortloop
+          !=org=                do k=1,kmax
+          !=org=                   var_pl(recvlist_pl(n,nr,ro,halo),k,rl,clist(m)) &
+          !=org=                        =recvbuf(k+(m-1)*kmax+(n-1)*cmax+rb,ro) 
+          !=org=                enddo
+          !=org=             enddo
+          !=org=          enddo
           do m=1,varmax
-!cdir outerunroll=8
+             !cdir outerunroll=8
              do k=1,kmax
                 do n=1,rs
                    var_pl(recvlist_pl(n,nr,ro,halo),k,rl,clist(m)) &
@@ -3268,14 +3291,16 @@ contains
                 enddo
              enddo
           enddo
- 
+
        enddo
     enddo !loop ro
-!coarray    t(10)=mpi_wtime()
-    t(10) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(10)=mpi_wtime()
+    !t(10) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_rbuf=time_rbuf+(t(10)-t(9))
 
-!    write(ADM_log_fid,*) 'recv count=',i_dbg,'prc=',adm_prc_me
+    !    write(ADM_log_fid,*) 'recv count=',i_dbg,'prc=',adm_prc_me
 
     !-----------------------------------------
     !
@@ -3286,20 +3311,20 @@ contains
        cs=copyinfo_sgp(SIZE_COPY,nc,halo)
        cl=copyinfo_sgp(LRGNID_COPY,nc,halo)
        scl=copyinfo_sgp(SRC_LRGNID_COPY,nc,halo)
-!=org=!cdir novector
-!=org=       do n=1,cs
-!=org=!cdir unroll=3
-!=org=          do m=1,varmax
-!=org=!!cdir shortloop
-!=org=             do k=1,kmax
-!=org=                var(recvlist_sgp(n,nc,halo),k,cl ,clist(m)) &
-!=org=                     =var(sendlist_sgp(n,nc,halo),k,scl,clist(m))
-!=org=             enddo
-!=org=          enddo
-!=org=       enddo
+       !=org=!cdir novector
+       !=org=       do n=1,cs
+       !=org=!cdir unroll=3
+       !=org=          do m=1,varmax
+       !=org=!!cdir shortloop
+       !=org=             do k=1,kmax
+       !=org=                var(recvlist_sgp(n,nc,halo),k,cl ,clist(m)) &
+       !=org=                     =var(sendlist_sgp(n,nc,halo),k,scl,clist(m))
+       !=org=             enddo
+       !=org=          enddo
+       !=org=       enddo
 
        do m=1,varmax
-!cdir outerunroll=8
+          !cdir outerunroll=8
           do k=1,kmax
              do n=1,cs
                 var(recvlist_sgp(n,nc,halo),k,cl ,clist(m)) &
@@ -3307,18 +3332,30 @@ contains
              enddo
           enddo
        enddo
- 
+
     enddo
-!coarray    t(11)=mpi_wtime()
-    t(11) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(11)=mpi_wtime()
+    !t(11) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_copy_sgp=time_copy_sgp+(t(11)-t(10))
     !!
     !call mpi_barrier(ADM_comm_run_world,ierr)
-!coarray    t(12)=mpi_wtime()
-    t(12) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(12)=mpi_wtime()
+    !t(12) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_bar2=time_bar2+(t(12)-t(11))
     time_total=time_total+(t(12)-t(0))
 
+    !--- 2020 Fujitsu
+    call xmp_free_array_section(tbl_sec)
+    call xmp_free_array_section(caf_recvbuf_sec)
+    call xmp_free_array_section(sendbuf_l_sec)
+
+    call xmp_coarray_deallocate(tbl_desc, ierr)
+    call xmp_coarray_deallocate(caf_recvbuf_desc, ierr)
+    !--- 2020 Fujitsu end
     call DEBUG_rapend('COMM data_transfer')
 
   end subroutine COMM_data_transfer
@@ -3330,24 +3367,24 @@ contains
        knum,   &
        nnum    )
     use mod_adm, only: &
-       ADM_COMM_RUN_WORLD, &
-       ADM_prc_tab,        &
-       ADM_rgn2prc,        &
-       ADM_prc_me,         &
-       ADM_NPL,            &
-       ADM_SPL,            &
-       ADM_prc_npl,        &
-       ADM_prc_spl,        &
-       ADM_rgnid_npl_mng,  &
-       ADM_rgnid_spl_mng,  &
-       ADM_gall,           &
-       ADM_gall_pl,        &
-       ADM_lall,           &
-       ADM_lall_pl,        &
-       ADM_gall_1d,        &
-       ADM_gmin,           &
-       ADM_gmax,           &
-       ADM_GSLF_PL
+         ADM_COMM_RUN_WORLD, &
+         ADM_prc_tab,        &
+         ADM_rgn2prc,        &
+         ADM_prc_me,         &
+         ADM_NPL,            &
+         ADM_SPL,            &
+         ADM_prc_npl,        &
+         ADM_prc_spl,        &
+         ADM_rgnid_npl_mng,  &
+         ADM_rgnid_spl_mng,  &
+         ADM_gall,           &
+         ADM_gall_pl,        &
+         ADM_lall,           &
+         ADM_lall_pl,        &
+         ADM_gall_1d,        &
+         ADM_gmin,           &
+         ADM_gmax,           &
+         ADM_GSLF_PL
     implicit none
 
     integer, intent(in)    :: knum
@@ -3357,22 +3394,26 @@ contains
 
     real(8) :: v_npl_send(knum,nnum)
     real(8) :: v_spl_send(knum,nnum)
+    !--- 2020 Fujitsu
+    integer(8) :: v_npl_send_l_desc
+    integer(8) :: v_spl_send_l_desc
+    !--- 2020 Fujitsu end
     real(8) :: v_npl_recv(knum,nnum)
     real(8) :: v_spl_recv(knum,nnum)
-!coarray
+    !coarray
     !--- 2020 Fujitsu
     !real(8),allocatable :: v_npl_recvc(:,:)[:]
     !real(8),allocatable :: v_spl_recvc(:,:)[:]
-    integer , POINTER :: v_npl_recvc ( : , : ) => null ( )
-    integer , POINTER :: v_spl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_npl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_spl_recvc ( : , : ) => null ( )
     integer(8) :: v_npl_recvc_desc, v_spl_recvc_desc
-    integer(8) :: v_npl_recvc_lb(2), v_npl_recvc_ub(2), v_spl_recvc_lb(2), v_spl_recvc_ub(2)
-    integer(8) :: v_npl_recvc_sec, v_spl_recvc_sec
+    integer(8) :: v_npl_lb(2), v_npl_ub(2), v_spl_lb(2), v_spl_ub(2)
+    integer(8) :: v_npl_sec, v_spl_sec
     integer(4) :: img_dims(1)
     !--- 2020 Fujitsu end
 
     integer :: ireq(4)
-!     integer :: istat(MPI_STATUS_SIZE)
+    !     integer :: istat(MPI_STATUS_SIZE)
 
     integer :: ierr
     integer :: k, l, n, rgnid
@@ -3382,18 +3423,22 @@ contains
     !---------------------------------------------------------------------------
     !--- 2020 Fujitsu    
     !allocate(v_npl_recvc(knum,nnum)[*])
-    v_npl_recvc_lb(1) = 1; v_npl_recvc_ub(1) = knum
-    v_npl_recvc_lb(2) = 1; v_npl_recvc_ub(2) = nnum
-    call xmp_new_coarray(v_npl_recvc_desc, 8, 2, v_npl_recvc_lb, v_npl_recvc_ub, 1, img_dims)
+    v_npl_lb(1) = 1; v_npl_ub(1) = knum
+    v_npl_lb(2) = 1; v_npl_ub(2) = nnum
+    call xmp_new_coarray(v_npl_recvc_desc, 8, 2, v_npl_lb, v_npl_ub, 1, img_dims)
     call xmp_coarray_bind(v_npl_recvc_desc, v_npl_recvc)
+
     !allocate(v_spl_recvc(knum,nnum)[*])
-    v_spl_recvc_lb(1) = 1; v_spl_recvc_ub(1) = knum
-    v_spl_recvc_lb(2) = 1; v_spl_recvc_ub(2) = nnum
-    call xmp_new_coarray(v_spl_recvc_desc, 8, 2, v_spl_recvc_lb, v_spl_recvc_ub, 1, img_dims)
+    v_spl_lb(1) = 1; v_spl_ub(1) = knum
+    v_spl_lb(2) = 1; v_spl_ub(2) = nnum
+    call xmp_new_coarray(v_spl_recvc_desc, 8, 2, v_spl_lb, v_spl_ub, 1, img_dims)
     call xmp_coarray_bind(v_spl_recvc_desc, v_spl_recvc)
 
-    call xmp_new_array_section(v_npl_recvc_sec, 2)
-    call xmp_new_array_section(v_spl_recvc_sec, 2)
+    call xmp_new_array_section(v_npl_sec, 2)
+    call xmp_new_array_section(v_spl_sec, 2)
+
+    call xmp_new_local_array(v_npl_send_l_desc, 8, 2, v_npl_lb, v_npl_ub, loc(v_npl_send))
+    call xmp_new_local_array(v_spl_send_l_desc, 8, 2, v_spl_lb, v_spl_ub, loc(v_spl_send))
     !--- 2020 Fujitsu end
     v_npl_recvc = 0.d0
     v_spl_recvc = 0.d0
@@ -3402,59 +3447,68 @@ contains
 
        !--- recv pole value
        !--- north pole
-!coarray
-!       if ( ADM_prc_me == ADM_prc_npl ) then
-!          call MPI_IRECV( v_npl_recv,                       &
-!                          knum * nnum,                      &
-!                          MPI_DOUBLE_PRECISION,             &
-!                          ADM_rgn2prc(ADM_rgnid_npl_mng)-1, &
-!                          ADM_NPL,                          &
-!                          ADM_COMM_RUN_WORLD,               &
-!                          ireq(3),                          &
-!                          ierr                              )
-!       endif
+       !coarray
+       !       if ( ADM_prc_me == ADM_prc_npl ) then
+       !          call MPI_IRECV( v_npl_recv,                       &
+       !                          knum * nnum,                      &
+       !                          MPI_DOUBLE_PRECISION,             &
+       !                          ADM_rgn2prc(ADM_rgnid_npl_mng)-1, &
+       !                          ADM_NPL,                          &
+       !                          ADM_COMM_RUN_WORLD,               &
+       !                          ireq(3),                          &
+       !                          ierr                              )
+       !       endif
 
        !--- south pole
-!coarray
-!       if ( ADM_prc_me == ADM_prc_spl ) then
-!          call MPI_IRECV( v_spl_recv,                       &
-!                          knum * nnum,                      &
-!                          MPI_DOUBLE_PRECISION,             &
-!                          ADM_rgn2prc(ADM_rgnid_spl_mng)-1, &
-!                          ADM_SPL,                          &
-!                          ADM_COMM_RUN_WORLD,               &
-!                          ireq(4),                          &
-!                          ierr                              )
-!       endif
+       !coarray
+       !       if ( ADM_prc_me == ADM_prc_spl ) then
+       !          call MPI_IRECV( v_spl_recv,                       &
+       !                          knum * nnum,                      &
+       !                          MPI_DOUBLE_PRECISION,             &
+       !                          ADM_rgn2prc(ADM_rgnid_spl_mng)-1, &
+       !                          ADM_SPL,                          &
+       !                          ADM_COMM_RUN_WORLD,               &
+       !                          ireq(4),                          &
+       !                          ierr                              )
+       !       endif
 
        !--- send pole value
        do l = 1, ADM_lall
           rgnid = ADM_prc_tab(l,ADM_prc_me)
 
           !--- north pole
-          sync all
+          !--- 2020 Fujitsu
+          !sync all
+          call xmp_sync_all(ierr)
+          !--- 2020 Fujitsu end
           if ( rgnid == ADM_rgnid_npl_mng ) then
              do n = 1, nnum
-             do k = 1, knum
-                v_npl_send(k,n) = var(suf(ADM_gmin,ADM_gmax+1),k,l,n)
-             enddo
+                do k = 1, knum
+                   v_npl_send(k,n) = var(suf(ADM_gmin,ADM_gmax+1),k,l,n)
+                enddo
              enddo
 
-!coarray
-!             call MPI_ISEND( v_npl_send,           &
-!                             knum * nnum,          &
-!                             MPI_DOUBLE_PRECISION, &
-!                             ADM_prc_npl-1,        &
-!                             ADM_NPL,              &
-!                             ADM_COMM_RUN_WORLD,   &
-!                             ireq(1),              &
-!                             ierr                  )
+             !coarray
+             !             call MPI_ISEND( v_npl_send,           &
+             !                             knum * nnum,          &
+             !                             MPI_DOUBLE_PRECISION, &
+             !                             ADM_prc_npl-1,        &
+             !                             ADM_NPL,              &
+             !                             ADM_COMM_RUN_WORLD,   &
+             !                             ireq(1),              &
+             !                             ierr                  )
              !--- 2020 Fujitsu
              !v_npl_recvc(:,:)[ADM_prc_npl] = v_npl_send(:,:)
-             !XXXX
+             call xmp_array_section_set_triplet(v_npl_sec, 1, int(1,kind=8), int(knum,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(v_npl_sec, 2, int(1,kind=8), int(nnum,kind=8), 1, ierr)
+             img_dims(1) = ADM_prc_npl
+             call xmp_coarray_put_local(img_dims, v_npl_recvc_desc, v_npl_sec, v_npl_send_l_desc, v_npl_sec, ierr)
              !--- 2020 Fujitsu end
           endif
-          sync all
+          !--- 2020 Fujitsu
+          !sync all
+          call xmp_sync_all(ierr)
+          !--- 2020 Fujitsu end
 
           !--- south pole
           if ( rgnid == ADM_rgnid_spl_mng ) then
@@ -3473,9 +3527,18 @@ contains
 !                             ADM_COMM_RUN_WORLD,   &
 !                             ireq(2),              &
 !                             ierr                  )
-          v_spl_recvc(:,:)[ADM_prc_spl] = v_spl_send(:,:)
+             !--- 2020 Fujitsu
+             !v_spl_recvc(:,:)[ADM_prc_spl] = v_spl_send(:,:)
+             call xmp_array_section_set_triplet(v_spl_sec, 1, int(1,kind=8), int(knum,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(v_spl_sec, 2, int(1,kind=8), int(nnum,kind=8), 1, ierr)
+             img_dims(1) = ADM_prc_spl
+             call xmp_coarray_put_local(img_dims, v_spl_recvc_desc, v_spl_sec, v_spl_send_l_desc, v_spl_sec, ierr)             
+             !--- 2020 Fujitsu end
           endif
-          sync all
+          !--- 2020 Fujitsu
+          !sync all
+          call xmp_sync_all(ierr)
+          !--- 2020 Fujitsu end
 
        enddo
 
@@ -3513,7 +3576,19 @@ contains
        endif
 
     endif
-    sync all
+    !--- 2020 Fujitsu
+    !sync all
+    call xmp_sync_all(ierr)
+
+    call xmp_free_array_section(v_npl_sec)
+    call xmp_free_array_section(v_spl_sec)
+
+    call xmp_free_local_array(v_npl_send_l_desc)
+    call xmp_free_local_array(v_spl_send_l_desc)
+
+    call xmp_coarray_deallocate(v_npl_recvc_desc, ierr)
+    call xmp_coarray_deallocate(v_spl_recvc_desc, ierr)
+    !--- 2020 Fujitsu end
 
     return
   end subroutine COMM_data_transfer_rgn2pl
@@ -3562,11 +3637,23 @@ contains
     !
     real(8) :: v_npl_send(KNUM,NNUM)
     real(8) :: v_spl_send(KNUM,NNUM)
+    !--- 2020 Fujitsu
+    integer(8) :: v_npl_send_l_desc
+    integer(8) :: v_spl_send_l_desc
+    !--- 2020 Fujitsu end
     real(8) :: v_npl_recv(KNUM,NNUM)
     real(8) :: v_spl_recv(KNUM,NNUM)
 !coarray
-    real(8),allocatable :: v_npl_recvc(:,:)[:]
-    real(8),allocatable :: v_spl_recvc(:,:)[:]
+    !--- 2020 Fujitsu
+    !real(8),allocatable :: v_npl_recvc(:,:)[:]
+    !real(8),allocatable :: v_spl_recvc(:,:)[:]
+    real(8) , POINTER :: v_npl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_spl_recvc ( : , : ) => null ( )
+    integer(8) :: v_npl_recvc_desc, v_spl_recvc_desc
+    integer(8) :: v_npl_lb(2), v_npl_ub(2), v_spl_lb(2), v_spl_ub(2)
+    integer(8) :: v_npl_sec, v_spl_sec
+    integer(4) :: img_dims(1), ierr
+    !--- 2020 Fujitsu
 
     integer :: rgnid
     integer :: l
@@ -3575,15 +3662,30 @@ contains
     suf(i,j) = ADM_gall_1d * ((j)-1) + (i)
     !---------------------------------------------------------------------------
 !coarray
-    allocate(v_npl_recvc(KNUM,NNUM)[*])
-    allocate(v_spl_recvc(KNUM,NNUM)[*])
+    !--- 2020 Fujitsu
+    !allocate(v_npl_recvc(KNUM,NNUM)[*])
+    v_npl_lb(1) = 1; v_npl_ub(1) = knum
+    v_npl_lb(2) = 1; v_npl_ub(2) = nnum
+    call xmp_new_coarray(v_npl_recvc_desc, 8, 2, v_npl_lb, v_npl_ub, 1, img_dims)
+    call xmp_coarray_bind(v_npl_recvc_desc, v_npl_recvc)
+
+    !allocate(v_spl_recvc(KNUM,NNUM)[*])
+    v_spl_lb(1) = 1; v_spl_ub(1) = knum
+    v_spl_lb(2) = 1; v_spl_ub(2) = nnum
+    call xmp_new_coarray(v_spl_recvc_desc, 8, 2, v_spl_lb, v_spl_ub, 1, img_dims)
+    call xmp_coarray_bind(v_spl_recvc_desc, v_spl_recvc)
+
+    !--- 2020 Fujitsu end
     v_npl_recvc = 0.d0
     v_spl_recvc = 0.d0
 
     if ( opt_comm_barrier ) then
        call DEBUG_rapstart('Node imbalance adjustment')
 !coarray       call MPI_BARRIER( ADM_comm_run_world, ierr )
-    sync all
+       !--- 2020 Fujitsu
+       !sync all
+       call xmp_sync_all(ierr)
+       !--- 2020 Fujitsu end
        call DEBUG_rapend  ('Node imbalance adjustment')
     endif
 
@@ -3606,7 +3708,10 @@ contains
        do l = 1, ADM_lall
           rgnid = ADM_prc_tab(l,ADM_prc_me)
 
-          sync all
+          !--- 2020 Fujitsu
+          !sync all
+          call xmp_sync_all(ierr)
+          !--- 2020 Fujitsu end
           if ( rgnid == ADM_rgnid_npl_mng ) then !--- send north pole value
              v_npl_send(:,:) = var(suf(ADM_gmin,ADM_gmax+1),:,l,:)
 
@@ -3621,9 +3726,18 @@ contains
 !                             ierr                  ) !--- error id
 !
 !             call MPI_WAIT(ireq(1),istat,ierr)
-          v_npl_recvc(:,:)[ADM_prc_npl] = v_npl_send(:,:)
+             !--- 2020 Fujitsu
+             !v_npl_recvc(:,:)[ADM_prc_npl] = v_npl_send(:,:)
+             call xmp_array_section_set_triplet(v_npl_sec, 1, int(1,kind=8), int(knum,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(v_npl_sec, 2, int(1,kind=8), int(nnum,kind=8), 1, ierr)
+             img_dims(1) = ADM_prc_npl
+             call xmp_coarray_put_local(img_dims, v_npl_recvc_desc, v_npl_sec, v_npl_send_l_desc, v_npl_sec, ierr)
+             !--- 2020 Fujitsu end
           endif
-          sync all
+          !--- 2020 Fujitsu
+          !sync all
+          call xmp_sync_all(ierr)
+          !--- 2020 Fujitsu end
        enddo
 
        if ( ADM_prc_me == ADM_prc_npl ) then
@@ -3647,7 +3761,10 @@ contains
 
        do l = 1, ADM_lall
           rgnid = ADM_prc_tab(l,ADM_prc_me)
-          sync all
+          !--- 2020 Fujitsu
+          !sync all
+          call xmp_sync_all(ierr)
+          !--- 2020 Fujitsu end
           if ( rgnid == ADM_rgnid_spl_mng ) then !--- send south pole value
              v_spl_send(:,:) = var(suf(ADM_gmax+1,ADM_gmin),:,l,:)
 
@@ -3662,9 +3779,18 @@ contains
 !                             ierr                  ) !--- error id
 !
 !             call MPI_WAIT(ireq(2),istat,ierr)
-          v_spl_recvc(:,:)[ADM_prc_spl] = v_spl_send(:,:)
+             !--- 2020 Fujitsu
+             !v_spl_recvc(:,:)[ADM_prc_spl] = v_spl_send(:,:)
+             call xmp_array_section_set_triplet(v_spl_sec, 1, int(1,kind=8), int(knum,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(v_spl_sec, 2, int(1,kind=8), int(nnum,kind=8), 1, ierr)
+             img_dims(1) = ADM_prc_spl
+             call xmp_coarray_put_local(img_dims, v_spl_recvc_desc, v_spl_sec, v_spl_send_l_desc, v_spl_sec, ierr)
+             !--- 2020 Fujitsu end
           endif
-          sync all
+          !--- 2020 Fujitsu
+          !sync all
+          call xmp_sync_all(ierr)
+          !--- 2020 Fujitsu end
        enddo
 
        if ( ADM_prc_me == ADM_prc_spl ) then
@@ -3690,6 +3816,10 @@ contains
        var(suf(1,ADM_gall_1d),:,:,:) = var(suf(ADM_gmin,ADM_gmax+1),:,:,:)
     endif
 
+    !--- 2020 Fujitsu
+    call xmp_coarray_deallocate(v_npl_recvc_desc, ierr)
+    call xmp_coarray_deallocate(v_spl_recvc_desc, ierr)
+    !--- 2020 Fujitsu end
     call DEBUG_rapend('COMM var')
 
     return
@@ -3703,6 +3833,8 @@ contains
        hallo_num)                 !--- IN : number of hallo
     use mod_adm, only: &
        ADM_proc_stop,      & ! [add] C.Kodama 2011.04.26
+       ADM_prc_all,        & !--- 2020 Fujitsu ---
+       ADM_prc_me,         & !--- 2020 Fujitsu ---
        ADM_vlink_nmax,     &
        ADM_lall,           &
        ADM_comm_run_world, &
@@ -3737,17 +3869,34 @@ contains
   !=============================================================================
 !coarray
     integer dst_img
-    integer,allocatable :: tbl(:)[:]
-    real(8),allocatable :: caf_recvbuf(:,:)[:]
+    !--- 2020 Fujitsu
+    !integer,allocatable :: tbl(:)[:]
+    !real(8),allocatable :: caf_recvbuf(:,:)[:]
+    integer , POINTER :: tbl ( : ) => null ( )
+    real(8) , POINTER :: caf_recvbuf ( : , : ) => null ( )
+    integer(8) :: tbl_desc, caf_recvbuf_desc
+    integer(8) :: tbl_lb(1),tbl_ub(1), caf_recvbuf_lb(2), caf_recvbuf_ub(2)
+    integer(8) :: tbl_sec, caf_recvbuf_sec
+    integer(4) :: img_dims(1)
+    integer :: max_tmp
+    integer(8) :: sendbuf_l_sec ! for senbuf(:,:)
+
     integer bufsize1,bufsize2
+
+    call xmp_new_array_section(tbl_sec, 1)
+    call xmp_new_array_section(caf_recvbuf_sec, 2)
+    call xmp_new_array_section(sendbuf_l_sec, 2)
+    !--- 2020 Fujitsu end
 
     !
     ! --- pre-process
     !
     comm_call_count=comm_call_count+1
     !
-!coarray    t(0)=mpi_wtime()
-    t(0) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(0)=mpi_wtime()
+    !t(0) = xmp_wtime()
+    !--- 2020 Fujitsu end
     !
     shp=shape(var)
     kmax = shp(2)
@@ -3792,19 +3941,40 @@ contains
        ! ->
     end if
     !
-!coarray    t(1)=mpi_wtime()
-    t(1) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(1)=mpi_wtime()
+    !t(1) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_pre=time_pre+(t(1)-t(0))
-!coarray    t(2)=mpi_wtime()
-    t(2) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(2)=mpi_wtime()
+    !t(2) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_bar1=time_bar1+(t(2)-t(1))
 !coarray
-    allocate(tbl(num_images())[*])
-    call co_max(maxdatasize_r)
+    !--- 2020 Fujitsu
+    !allocate(tbl(num_images())[*])
+    tbl_lb(1) = 1; tbl_ub(1) = ADM_prc_all
+    call xmp_new_coarray(tbl_desc, 4, 1, tbl_lb, tbl_ub, 1, img_dims)
+    call xmp_coarray_bind(tbl_desc, tbl)
+
+    !call co_max(maxdatasize_r)
+    call MPI_Allreduce(maxdatasize_r, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
+    maxdatasize_r = max_tmp
+
     bufsize1 = maxdatasize_r
     bufsize2 = romax(halomax)
-    call co_max(bufsize2)
-    allocate(caf_recvbuf(bufsize1,bufsize2)[*])
+
+    !call co_max(bufsize2)
+    call MPI_Allreduce(bufsize2, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
+    bufsize2 = max_tmp
+
+    !allocate(caf_recvbuf(bufsize1,bufsize2)[*])
+    caf_recvbuf_lb(1) = 1; caf_recvbuf_ub(1) = bufsize1
+    caf_recvbuf_lb(2) = 1; caf_recvbuf_ub(2) = bufsize2
+    call xmp_new_coarray(caf_recvbuf_desc, 4, 2, caf_recvbuf_lb, caf_recvbuf_ub, 1, img_dims)
+    call xmp_coarray_bind(caf_recvbuf_desc, caf_recvbuf)    
+    !--- 2020 Fujitsu end
 
     !-----------------------------------------
     ! call mpi_isend
@@ -3855,8 +4025,10 @@ contains
        endif
     enddo
 
-!coarray    t(3)=mpi_wtime()
-    t(3) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(3)=mpi_wtime()
+    !t(3) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_recv=time_recv+(t(3)-t(2))
     !-----------------------------------------
     !  var -> sendbuf 
@@ -3865,8 +4037,10 @@ contains
 
 
 
-!coarray       t(4)=mpi_wtime()
-    t(4) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(4)=mpi_wtime()
+       !t(4) = xmp_wtime()
+       !--- 2020 Fujitsu end
        do ns=1,nsmax(so,halo)
           ss=sendinfo(SIZE_COMM,ns,so,halo)  
           sl=sendinfo(LRGNID_COMM,ns,so,halo)  
@@ -3884,8 +4058,10 @@ contains
 
        enddo
        !-----------------------------------------
-!coarray       t(5)=mpi_wtime()
-    t(5) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(5)=mpi_wtime()
+       !t(5) = xmp_wtime()
+       !--- 2020 Fujitsu end
        time_sbuf=time_sbuf+(t(5)-t(4))
 
 
@@ -3910,9 +4086,20 @@ contains
 !             ,ADM_comm_run_world             &
 !             ,areq(so+romax(halo))       &
 !             ,ierr)
-       dst_img = tbl(this_image())[destrank(so,halo)+1]
-       caf_recvbuf(1:ssize(so,halo)*cmax,dst_img)[destrank(so,halo)+1] &
-         = sendbuf(1:ssize(so,halo)*cmax,so)
+       !--- 2020 Fujitsu
+       !dst_img = tbl(this_image())[destrank(so,halo)+1]
+       img_dims(1) = destrank(so,halo)+1
+       call xmp_array_section_set_triplet(tbl_sec, 1, int(ADM_prc_me,kind=8), int(ADM_prc_me,kind=8), 1, ierr)
+       call xmp_coarray_get_scalar(img_dims, tbl_desc, tbl_sec, dst_img, ierr)
+       
+       !caf_recvbuf(1:ssize(so,halo)*cmax,dst_img)[destrank(so,halo)+1] &
+       !  = sendbuf(1:ssize(so,halo)*cmax,so)
+       call xmp_array_section_set_triplet(caf_recvbuf_sec, 1, int(1,kind=8), int(ssize(so,halo)*cmax,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(caf_recvbuf_sec, 2, int(dst_img,kind=8), int(dst_img,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(sendbuf_l_sec, 1, int(1,kind=8), int(ssize(so,halo)*cmax,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(sendbuf_l_sec, 2, int(so,kind=8), int(so,kind=8), 1, ierr)
+       call xmp_coarray_put_local(img_dims, caf_recvbuf_desc, caf_recvbuf_sec, sendbuf_l_desc, sendbuf_l_sec, ierr) 
+       !--- 2020 Fujitsu end
 
        if (opt_comm_dbg) then 
           if (ierr.ne.0) then
@@ -3930,16 +4117,20 @@ contains
        endif
 
 
-!coarray       t(6)=mpi_wtime()
-    t(6) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(6)=mpi_wtime()
+       !t(6) = xmp_wtime()
+       !--- 2020 Fujitsu end
        time_send=time_send+(t(6)-t(5))
        size_total=size_total+ssize(so,halo)*cmax
        comm_count=comm_count+1
     enddo !loop so
     !-----------------------------------------
     !
-!coarray    t(7)=mpi_wtime()
-    t(7) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(7)=mpi_wtime()
+    !t(7) = xmp_wtime()
+    !--- 2020 Fujitsu end
     !---------------------------------------------------
     !  var -> var (region to region copy in same rank)
     !---------------------------------------------------
@@ -3961,13 +4152,18 @@ contains
     !-----------------------------------------
     !
     !-----------------------------------------
-!coarray    t(8)=mpi_wtime()
-    t(8) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(8)=mpi_wtime()
+    !t(8) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_copy=time_copy+(t(8)-t(7))
     acount=romax(halo)+somax(halo)
 !coarray
 !    call mpi_waitall(acount,areq,stat,ierr)
-    sync all
+    !--- 2020 Fujitsu
+    !sync all
+    call xmp_sync_all(ierr)
+    !--- 2020 Fujitsu
 
     do ro=1,romax(halo)
        do n=1,rsize(ro,halo)*cmax
@@ -3975,8 +4171,10 @@ contains
        end do
     end do
 
-!coarray    t(9)=mpi_wtime()
-    t(9) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(9)=mpi_wtime()
+    !t(9) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_wait=time_wait+(t(9)-t(8))
 
     if (opt_comm_dbg) then  !================== dbg start
@@ -4034,7 +4232,10 @@ contains
 
     if  (opt_comm_barrier) then
 !coarray       call mpi_barrier(ADM_comm_run_world,ierr)
-    sync all
+       !--- 2020 Fujitsu
+       !sync all
+       call xmp_sync_all(ierr)
+       !--- 2020 Fujitsu end
        if (ierr.ne.0) then
           write(ADM_log_fid,*) 'mpi_barriert info start=='
           write(ADM_log_fid,*) 'ierr=',ierr
@@ -4064,8 +4265,10 @@ contains
           enddo
        enddo
     enddo !loop ro
-!coarray    t(10)=mpi_wtime()
-    t(10) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(10)=mpi_wtime()
+    !t(10) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_rbuf=time_rbuf+(t(10)-t(9))
 
     !-----------------------------------------
@@ -4088,16 +4291,29 @@ contains
        enddo
  
     enddo
-!coarray    t(11)=mpi_wtime()
-    t(11) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(11)=mpi_wtime()
+    !t(11) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_copy_sgp=time_copy_sgp+(t(11)-t(10))
     !!
     !call mpi_barrier(ADM_comm_run_world,ierr)
-!coarray    t(12)=mpi_wtime()
-    t(12) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(12)=mpi_wtime()
+    !t(12) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_bar2=time_bar2+(t(12)-t(11))
     time_total=time_total+(t(12)-t(0))
     !
+
+    !--- 2020 Fujitsu
+    call xmp_free_array_section(tbl_sec)
+    call xmp_free_array_section(caf_recvbuf_sec)
+    call xmp_free_array_section(sendbuf_l_sec)
+
+    call xmp_coarray_deallocate(tbl_desc, ierr)
+    call xmp_coarray_deallocate(caf_recvbuf_desc, ierr)
+    !--- 2020 Fujitsu end
   end subroutine COMM_data_transfer_nopl
 
 
@@ -4113,10 +4329,12 @@ contains
     real(8), intent(out) :: globalsum
 
 !coarray
-!    real(8) :: sendbuf(1)
-!    real(8) :: recvbuf(ADM_prc_all)
-!
-!    integer :: ierr
+    !--- 2020 Fujitsu
+    real(8) :: sendbuf(1)
+    real(8) :: recvbuf(ADM_prc_all)
+
+    integer :: ierr
+    !--- 2020 Fujitsu end
 
 !20180208    integer localVal
     !---------------------------------------------------------------------------
@@ -4124,23 +4342,25 @@ contains
 
     if ( COMM_pl ) then
 !coarray
-!       sendbuf(1) = localsum
-!
-!       call MPI_Allgather( sendbuf,              &
-!                           1,                    &
-!                           MPI_DOUBLE_PRECISION, &
-!                           recvbuf,              &
-!                           1,                    &
-!                           MPI_DOUBLE_PRECISION, &
-!                           ADM_COMM_RUN_WORLD,   &
-!                           ierr                  )
-!
-!       globalsum = sum( recvbuf(:) )
+       !--- 2020 Fujitsu
+       sendbuf(1) = localsum
+
+       call MPI_Allgather( sendbuf,              &
+                           1,                    &
+                           MPI_DOUBLE_PRECISION, &
+                           recvbuf,              &
+                           1,                    &
+                           MPI_DOUBLE_PRECISION, &
+                           ADM_COMM_RUN_WORLD,   &
+                           ierr                  )
+
+       globalsum = sum( recvbuf(:) )
 !20180208       localVal = localsum
 !20180208       call co_sum(localVal)
 !20180208       globalsum = localVal
-       globalsum = localsum
-       call co_sum(globalsum)
+       !globalsum = localsum
+       !call co_sum(globalsum)
+       !--- 2020 Fujitsu end
     else
        globalsum = localsum
     endif
@@ -4180,19 +4400,21 @@ contains
 
     if ( COMM_pl ) then
 !coarray
-!        call MPI_Allgatherv( MPI_IN_PLACE,         &
-!                             1,                    &
-!                             MPI_DOUBLE_PRECISION, &
-!                             gathersum(1,1),       &
-!                             rcounts,              &
-!                             displs,               &
-!                             MPI_DOUBLE_PRECISION, &
-!                             ADM_COMM_RUN_WORLD,   &
-!                             ierr                  )
-! 
-!        do k = 1, kall
-!           globalsum(k) = sum( gathersum(:,k) )
-!        enddo
+       !--- 2020 Fujitsu
+        call MPI_Allgatherv( MPI_IN_PLACE,         &
+                             1,                    &
+                             MPI_DOUBLE_PRECISION, &
+                             gathersum(1,1),       &
+                             rcounts,              &
+                             displs,               &
+                             MPI_DOUBLE_PRECISION, &
+                             ADM_COMM_RUN_WORLD,   &
+                             ierr                  )
+ 
+        do k = 1, kall
+           globalsum(k) = sum( gathersum(:,k) )
+        enddo
+        !--- 2020 Fujitsu end
     else
        do k = 1, kall
           globalsum = gathersum(ADM_prc_me,k)
@@ -4213,33 +4435,37 @@ contains
     real(8), intent(out) :: globalavg
 
 !coarray
-!    real(8) :: sendbuf(1)
-!    real(8) :: recvbuf(ADM_prc_all)
-!
-!    integer :: ierr
+    !--- 2020 Fujitsu
+    real(8) :: sendbuf(1)
+    real(8) :: recvbuf(ADM_prc_all)
+
+    integer :: ierr
+    !--- 2020 Fujitsu end
 !20180208
 !20180208    real(8) localVal
     !---------------------------------------------------------------------------
 
     if ( COMM_pl ) then
 !coarray
-!       sendbuf(1) = localavg
-!
-!       call MPI_Allgather( sendbuf,              &
-!                           1,                    &
-!                           MPI_DOUBLE_PRECISION, &
-!                           recvbuf,              &
-!                           1,                    &
-!                           MPI_DOUBLE_PRECISION, &
-!                           ADM_COMM_RUN_WORLD,   &
-!                           ierr                  )
-!
-!       globalavg = sum( recvbuf(:) ) / real(ADM_prc_all,kind=8)
+       !--- 2020 Fujitsu
+       sendbuf(1) = localavg
+
+       call MPI_Allgather( sendbuf,              &
+                           1,                    &
+                           MPI_DOUBLE_PRECISION, &
+                           recvbuf,              &
+                           1,                    &
+                           MPI_DOUBLE_PRECISION, &
+                           ADM_COMM_RUN_WORLD,   &
+                           ierr                  )
+
+       globalavg = sum( recvbuf(:) ) / real(ADM_prc_all,kind=8)
 !20280208       localVal = localavg
 !20280208       call co_sum(localVal)
 !20280208       globalavg = localVal
-       globalavg = localavg
-       call co_sum(globalavg)
+       !globalavg = localavg
+       !call co_sum(globalavg)
+       !--- 2020 Fujitsu end
 
        globalavg = globalavg / real(ADM_prc_all,kind=8)
     else
@@ -4254,41 +4480,47 @@ contains
   !-----------------------------------------------------------------------------
   subroutine COMM_Stat_max( localmax, globalmax )
 !coarray
-!    use mod_adm, only: &
-!       ADM_COMM_RUN_WORLD, &
-!       ADM_prc_all,        &
-!       ADM_prc_me
+    !--- 2020 Fujitsu
+    use mod_adm, only: &
+       ADM_COMM_RUN_WORLD, &
+       ADM_prc_all,        &
+       ADM_prc_me
+    !--- 2020 Fujitsu end
     implicit none
 
     real(8), intent(in)  :: localmax
     real(8), intent(out) :: globalmax
 
 !coarray
-!    real(8) :: sendbuf(1)
-!    real(8) :: recvbuf(ADM_prc_all)
-!
-!    integer :: ierr
+    !--- 2020 Fujitsu
+    real(8) :: sendbuf(1)
+    real(8) :: recvbuf(ADM_prc_all)
+
+    integer :: ierr
+    !--- 2020 Fujitsu end
 !20180208    real(8) localVal
     !---------------------------------------------------------------------------
 
 !coarray
-!     sendbuf(1) = localmax
-!
-!     call MPI_Allgather( sendbuf,              &
-!                         1,                    &
-!                         MPI_DOUBLE_PRECISION, &
-!                         recvbuf,              &
-!                         1,                    &
-!                         MPI_DOUBLE_PRECISION, &
-!                         ADM_COMM_RUN_WORLD,   &
-!                         ierr                  )
-!
-!     globalmax = maxval( recvbuf(:) )
+    !--- 2020 Fujitsu
+    sendbuf(1) = localmax
+
+    call MPI_Allgather( sendbuf,              &
+                        1,                    &
+                        MPI_DOUBLE_PRECISION, &
+                        recvbuf,              &
+                        1,                    &
+                        MPI_DOUBLE_PRECISION, &
+                        ADM_COMM_RUN_WORLD,   &
+                        ierr                  )
+
+    globalmax = maxval( recvbuf(:) )
 !20180208    localVal = localmax
 !20180208    call co_max(localVal)
 !20180208    globalmax = localVal 
-    globalmax = localmax
-    call co_max(globalmax)
+    !globalmax = localmax
+    !call co_max(globalmax)
+    !--- 2020 Fujitsu end
 
     !write(ADM_LOG_FID,*) 'COMM_Stat_max', sendbuf(1), recvbuf(:)
 
@@ -4298,42 +4530,48 @@ contains
   !-----------------------------------------------------------------------------
   subroutine COMM_Stat_min( localmin, globalmin )
 !coarray
-!    use mod_adm, only: &
-!       ADM_COMM_RUN_WORLD, &
-!       ADM_prc_all,        &
-!       ADM_prc_me
+    !--- 2020 Fujitsu
+    use mod_adm, only: &
+       ADM_COMM_RUN_WORLD, &
+       ADM_prc_all,        &
+       ADM_prc_me
+    !--- 2020 Fujitsu end
     implicit none
 
     real(8), intent(in)  :: localmin
     real(8), intent(out) :: globalmin
 
 !coarray
-!    real(8) :: sendbuf(1)
-!    real(8) :: recvbuf(ADM_prc_all)
-!
-!    integer :: ierr
+    !--- 2020 Fujitsu
+    real(8) :: sendbuf(1)
+    real(8) :: recvbuf(ADM_prc_all)
+
+    integer :: ierr
+    !--- 2020 Fujitsu end
 !20180208    real(8) localVal
     !---------------------------------------------------------------------------
 
 !coarray
-! sendbuf(1) = localmin
-!
-!     call MPI_Allgather( sendbuf,              &
-!                         1,                    &
-!                         MPI_DOUBLE_PRECISION, &
-!                         recvbuf,              &
-!                         1,                    &
-!                         MPI_DOUBLE_PRECISION, &
-!                         ADM_COMM_RUN_WORLD,   &
-!                         ierr                  )
-!
-!     globalmin = minval( recvbuf(:) )
+    !--- 2020 Fujitsu
+    sendbuf(1) = localmin
+
+    call MPI_Allgather( sendbuf,              &
+                        1,                    &
+                        MPI_DOUBLE_PRECISION, &
+                        recvbuf,              &
+                        1,                    &
+                        MPI_DOUBLE_PRECISION, &
+                        ADM_COMM_RUN_WORLD,   &
+                        ierr                  )
+
+    globalmin = minval( recvbuf(:) )
 !
 !20180208    localVal = localmin
 !20180208    call co_min(localVal)
 !20180208    globalmin = localVal
-    globalmin = localmin
-    call co_min(globalmin)
+    !globalmin = localmin
+    !call co_min(globalmin)
+    !--- 2020 Fujitsu end
 
     !write(ADM_LOG_FID,*) 'COMM_Stat_min', sendbuf(1), recvbuf(:)
 
