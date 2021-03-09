@@ -753,18 +753,12 @@ C            <<<<< QUERY EXECUTION MODE AND DOMAIN NUMBER >>>>>
 C
 C
 C
-C Fj start 202103
-C      call mpi_init(ierr)
-C      call mpi_comm_size(mpi_comm_world,nnn,ierr)
-C      call mpi_comm_rank(mpi_comm_world,me,ierr)
-C Fj end 202103
-C
 C     NDOM = 0
-      CALL DDINIT(NPART,IPART)
-C
 C Fj start 202103
       call xmp_api_init
 C Fj end 202103
+C
+      CALL DDINIT(NPART,IPART)
 C
 C     IF(IPART.GE.1) NDOM = 1
 C

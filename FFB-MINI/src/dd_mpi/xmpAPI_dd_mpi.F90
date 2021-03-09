@@ -367,7 +367,7 @@
       IMPLICIT REAL*4(A-H,O-Z)
 !
       INCLUDE 'mpif.h'
-      INCLUDE 'xmp_coarray.h'
+!      INCLUDE 'xmp_coarray.h'
 !C$XMP NODES PDDCOM2(*)
 !
 !
@@ -413,8 +413,10 @@
       CALL MPI_ALLREDUCE(SEND,RECV,1,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,IERR)
 #else
       RECV = SEND
-!      CALL MPI_ALLREDUCE(SEND,RECV,1,MPI_REAL ,MPI_SUM,MPI_COMM_WORLD,IERR)
-      CALL CO_SUM(SEND,RECV)
+! Fujitsu start 202103
+      CALL MPI_ALLREDUCE(SEND,RECV,1,MPI_REAL ,MPI_SUM,MPI_COMM_WORLD,IERR)
+!      CALL CO_SUM(SEND,RECV)
+! Fujitsu end 202103
 !C$XMP REDUCTION(+:RECV) on PDDCOM2
 !C$XMP BCAST (RECV) FROM PDDCOM2(1)
 
@@ -791,21 +793,43 @@
       END
 !
       SUBROUTINE DDCOMX(IPART,IDIM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,FX,FY,FZ,NP,IUT0,IERR,&
-                        BUFSND, BUFRCV, MAXBUF)
-      INCLUDE 'mpif.h'
-      INCLUDE 'xmp_coarray.h'
+                        snd_desc, rcv_desc, MAXBUF)
+!fj                        BUFSND, BUFRCV, MAXBUF)
+! Fujitsu start 202103
+      use xmp_api
+      use mpi
+! Fujitsu end 202103
+!      INCLUDE 'mpif.h'
+!      INCLUDE 'xmp_coarray.h'
       IMPLICIT REAL*4(A-H,O-Z)
 !CTTDEBG
       REAL*8 DFX(NP),DFY(NP),DFZ(NP)
 !CTTDEBG
       DIMENSION LDOM(NDOM),NBPDOM(NDOM),IPSLF(MBPDOM,NDOM),IPSND(MBPDOM,NDOM), FX(NP),FY(NP),FZ(NP)
-      DIMENSION BUFSND(MAXBUF)[*], BUFRCV(MAXBUF)[*]
+! Fujitsu start 202103
+!      DIMENSION BUFSND(MAXBUF)[*], BUFRCV(MAXBUF)[*]
+      REAL*4 , POINTER :: BUFSND ( : ) => null ( )
+      REAL*4 , POINTER :: BUFRCV ( : ) => null ( )
+      INTEGER*8 :: snd_desc, rcv_desc
+      INTEGER*8 :: snd_sec, rcv_sec
+      INTEGER*8, DIMENSION(1) :: snd_lb, snd_ub, rcv_lb, rcv_ub
+      INTEGER*8 :: st_desc, st_l_desc
+      INTEGER*8 :: st_sec, st_l_sec
+      INTEGER*8, DIMENSION(1) :: st_lb, st_ub, st_l_lb, st_l_ub
+      INTEGER*8 :: start1, end1, start2, end2
+      INTEGER*4 :: img_dims(1)
+      INTEGER*4 status
+! Fujitsu end 202103
 !
       PARAMETER ( MAXDOM = 10000 )
       INTEGER*4 MSGIDS(MAXDOM),MSGSTS(MPI_STATUS_SIZE,MAXDOM)
 !
       INTEGER MAX_RECV_LEN
-      INTEGER ,ALLOCATABLE :: START_R(:)[:]
+! Fujitsu start 202103
+!      INTEGER ,ALLOCATABLE :: START_R(:)[:]
+      INTEGER*4 , POINTER :: START_R ( : ) => null ( )
+      INTEGER*4 , POINTER :: start_rr_p ( : ) => null ( )
+! Fujitsu end 202103
 !      INTEGER ,ALLOCATABLE :: END_R(:)[:]
       INTEGER ,ALLOCATABLE :: START_S(:)
       INTEGER ,ALLOCATABLE :: END_S(:)
@@ -901,7 +925,31 @@
 !                            THE RESIDUALS FROM THE NEIGHBORING
 !                            SUB-DOMAINS
       CALL MPI_COMM_RANK(MPI_COMM_WORLD,ITASK,IERR)
-      allocate(START_R(1:NP)[*])
+! Fujitsu start 202103
+!      call xmp_api_init
+!
+!      write(*, '("DBG1 : snd_desc = ", i8)') snd_desc
+      snd_lb(1) = 1
+      snd_ub(1) = MAXBUF
+      rcv_lb(1) = 1
+      rcv_ub(1) = MAXBUF
+!      call xmp_new_coarray(snd_desc, 4, 1, snd_lb, snd_ub, 1, img_dims)
+!      call xmp_new_coarray(rcv_desc, 4, 1, rcv_lb, rcv_ub, 1, img_dims)
+!
+      call xmp_coarray_bind(snd_desc,BUFSND)
+      call xmp_coarray_bind(rcv_desc,BUFRCV)
+!
+!      allocate(START_R(1:NP)[*])
+      st_lb(1) = 1
+      st_ub(1) = NP
+      st_l_lb(1) = 1
+      st_l_ub(1) = 1
+      call xmp_new_coarray(st_desc, 4, 1, st_lb, st_ub, 1, img_dims)
+!      call xmp_new_local_array(st_l_desc, 4, 1, st_l_lb, st_l_ub)
+      call xmp_new_coarray(st_l_desc, 4, 1, st_l_lb, st_l_ub, 1, img_dims)
+      call xmp_coarray_bind(st_desc,START_R)
+      call xmp_coarray_bind(st_l_desc,start_rr_p)
+! Fujitsu end 202103
 !      allocate(END_R(1:NP)[*])
       allocate(START_S(1:NP))
       allocate(END_S(1:NP))
@@ -946,7 +994,10 @@
 !
 !      PRINT *,"NDOM:",NDOM
 !
-      ME=THIS_IMAGE()
+! Fujitsu start 202103
+!      ME=THIS_IMAGE()
+      ME=xmp_this_image()
+! Fujitsu end 202103
       START_DASH=0
       MAX_RECV_LEN = 0 
       NSTART = 1
@@ -1065,19 +1116,58 @@
   220 CONTINUE
 !
 !
-     SYNC ALL
-
+! Fujitsu start 202103
+!     SYNC ALL
+      call xmp_sync_all(status)
+!
+      call xmp_new_array_section(snd_sec,1)
+      call xmp_new_array_section(rcv_sec,1)
+      call xmp_new_array_section(st_sec,1)
+      call xmp_new_array_section(st_l_sec,1)
+! Fujitsu start 202103
+!
      DO IDOM = 1, NDOM
 !     PRINT *,ME,"->",LDOM(IDOM)," BUFRECV(",START_R(ME)[LDOM(IDOM)],":",END_R(ME)[LDOM(IDOM)],")[",LDOM(IDOM),"]=BUFSND(",START_S(LDOM(IDOM)),":",END_S(LDOM(IDOM)),")"
 !        BUFRCV(START_R(ME)[LDOM(IDOM)]:END_R(ME)[LDOM(IDOM)])[LDOM(IDOM)] = &
 !             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
-        START_RR = START_R(ME)[LDOM(IDOM)]
+! Fujitsu start 202103
+!        START_RR = START_R(ME)[LDOM(IDOM)]
+        start1 = ME
+        end1 = ME
+        start2 = 1
+        end2 = 1
+        call xmp_array_section_set_triplet(st_sec,1,start1,end1,1,status)
+        call xmp_array_section_set_triplet(st_l_sec,1,start2,end2,1,status)
+        img_dims(1) = LDOM(IDOM)
+        call xmp_coarray_get(img_dims,st_desc,st_sec, &
+                             st_l_desc,st_l_sec,status)
+        START_RR = start_rr_p(1)
+! Fujitsu end 202103
         END_RR = START_RR + (END_S(LDOM(IDOM)) - START_S(LDOM(IDOM)))
-        BUFRCV(START_RR:END_RR)[LDOM(IDOM)] = &
-             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
+! Fujitsu start 202103
+!      write(*, '("DBG2 : img_dims = ", i4, " ME = ", i4)') &
+!           img_dims(1), ME
+!      write(*, '("     : START_RR = ", i8, " END_RR = ", i8)') &
+!           START_RR, END_RR
+!        BUFRCV(START_RR:END_RR)[LDOM(IDOM)] = &
+!             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
+        start1 = START_RR
+        end1 = END_RR
+        call xmp_array_section_set_triplet(rcv_sec,1,start1,end1,1,status)
+        start1 = START_S(LDOM(IDOM))
+        end1 = END_S(LDOM(IDOM))
+        call xmp_array_section_set_triplet(snd_sec,1,start1,end1,1,status)
+        img_dims = LDOM(IDOM)
+        call xmp_coarray_put(img_dims,rcv_desc,rcv_sec,snd_desc,snd_sec,status);
+!      write(*, '("DBG3 : BUFSND = ", e12.6, " ", e12.6)') &
+!           BUFSND(START_RR), BUFSND(END_RR)
+! Fujitsu end 202103
      END DO
 
-     SYNC ALL
+! Fujitsu start 202103
+!     SYNC ALL
+      call xmp_sync_all(status)
+! Fujitsu end 202103
 
 !        SYNC ALL
 !       DO 231 IDOM = 1 , NDOM
@@ -1262,6 +1352,16 @@
       call stop_collection('ddcomx_C')
 #endif
 !CTTDEBG
+!
+! Fujitsu start 202103
+      call xmp_free_array_section(snd_sec)
+      call xmp_free_array_section(rcv_sec)
+!
+!      call xmp_coarray_deallocate(snd_desc, status)
+!      call xmp_coarray_deallocate(rcv_desc, status)
+!
+!      call xmp_api_finalize
+! Fujitsu end 202103
 !
 #ifdef USE_BARRIER      
       call MPI_BARRIER(MPI_COMM_WORLD, IERR)

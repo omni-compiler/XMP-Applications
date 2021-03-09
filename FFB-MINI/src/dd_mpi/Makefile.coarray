@@ -6,7 +6,7 @@ RANLIB ?= ranlib
 
 all: libdd_mpi.a
 
-OBJS = xmpAPI_dd_mpi.o ddcom4.o
+OBJS = dd_mpi.o ddcom4.o
 
 libdd_mpi.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
