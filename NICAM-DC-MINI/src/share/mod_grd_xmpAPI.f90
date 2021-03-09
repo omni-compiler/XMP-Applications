@@ -1045,7 +1045,7 @@ contains
     !--- 2020 Fujitsu
     !real(8) :: vrecv_plc(GRD_XDIR:GRD_ZDIR,5)[*] !! not used
     !real(8),allocatable :: vrecv_plA(:,:)[:]
-    integer , POINTER :: vrecv_plA ( : , : ) => null ( )
+    real(8) , POINTER :: vrecv_plA ( : , : ) => null ( )
     integer(8) :: vrecv_plA_desc
     integer(8) :: vrecv_plA_lb(2), vrecv_plA_ub(2)
     integer(8) :: vrecv_plA_sec

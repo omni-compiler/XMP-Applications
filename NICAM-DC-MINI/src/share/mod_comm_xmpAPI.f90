@@ -2708,7 +2708,7 @@ contains
     !real(8),allocatable :: caf_recvbuf(:,:)[:]
     integer bufsize1,bufsize2
     integer , POINTER :: tbl ( : ) => null ( )
-    integer , POINTER :: caf_recvbuf ( : , : ) => null ( )
+    real(8) , POINTER :: caf_recvbuf ( : , : ) => null ( )
     integer(8) :: tbl_desc, caf_recvbuf_desc
     integer(8) :: tbl_lb(1),tbl_ub(1), caf_recvbuf_lb(2), caf_recvbuf_ub(2)
     integer(8) :: tbl_sec, caf_recvbuf_sec
@@ -3404,8 +3404,8 @@ contains
     !--- 2020 Fujitsu
     !real(8),allocatable :: v_npl_recvc(:,:)[:]
     !real(8),allocatable :: v_spl_recvc(:,:)[:]
-    integer , POINTER :: v_npl_recvc ( : , : ) => null ( )
-    integer , POINTER :: v_spl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_npl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_spl_recvc ( : , : ) => null ( )
     integer(8) :: v_npl_recvc_desc, v_spl_recvc_desc
     integer(8) :: v_npl_lb(2), v_npl_ub(2), v_spl_lb(2), v_spl_ub(2)
     integer(8) :: v_npl_sec, v_spl_sec
@@ -3647,8 +3647,8 @@ contains
     !--- 2020 Fujitsu
     !real(8),allocatable :: v_npl_recvc(:,:)[:]
     !real(8),allocatable :: v_spl_recvc(:,:)[:]
-    integer , POINTER :: v_npl_recvc ( : , : ) => null ( )
-    integer , POINTER :: v_spl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_npl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_spl_recvc ( : , : ) => null ( )
     integer(8) :: v_npl_recvc_desc, v_spl_recvc_desc
     integer(8) :: v_npl_lb(2), v_npl_ub(2), v_spl_lb(2), v_spl_ub(2)
     integer(8) :: v_npl_sec, v_spl_sec
@@ -3873,7 +3873,7 @@ contains
     !integer,allocatable :: tbl(:)[:]
     !real(8),allocatable :: caf_recvbuf(:,:)[:]
     integer , POINTER :: tbl ( : ) => null ( )
-    integer , POINTER :: caf_recvbuf ( : , : ) => null ( )
+    real(8) , POINTER :: caf_recvbuf ( : , : ) => null ( )
     integer(8) :: tbl_desc, caf_recvbuf_desc
     integer(8) :: tbl_lb(1),tbl_ub(1), caf_recvbuf_lb(2), caf_recvbuf_ub(2)
     integer(8) :: tbl_sec, caf_recvbuf_sec

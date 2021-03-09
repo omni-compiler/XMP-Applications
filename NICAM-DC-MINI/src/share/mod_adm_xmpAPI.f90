@@ -396,7 +396,7 @@ contains
 
        !--- 2020 Fujitsu
        call xmp_api_init
-       call MPI_Init(ierr)
+       !!!call MPI_Init(ierr)
        call MPI_Comm_size(MPI_COMM_WORLD, ADM_prc_all, ierr)
        !ADM_prc_all = num_images()
 !coarray       call MPI_Comm_rank(MPI_COMM_WORLD, my_rank,     ierr)
@@ -433,7 +433,7 @@ contains
 !coarray    character(len=ADM_NSYS) :: request
     !--- 2020 Fujitsu
     !character(len=ADM_NSYS) :: request[*]
-    integer, pointer :: request(:) => null()
+    integer, POINTER :: request(:) => null()
     integer(8) :: request_desc
     integer(8), dimension(1) :: request_lb, request_ub
     integer(8) :: request_sec
