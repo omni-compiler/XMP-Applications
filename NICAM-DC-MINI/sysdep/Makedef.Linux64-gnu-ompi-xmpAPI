@@ -20,7 +20,7 @@ FFLAGS_DEBUG = -O0 -m64                                                     \
 FC     = mpif90
 FFLAGS = -cpp -fconvert=big-endian $(FFLAGS_FAST)
 #FFLAGS = $(FFLAGS_DEBUG)
-FFLAGS += -x f95-cpp-input
+FFLAGS += -x f95-cpp-input -fopenmp
 
 # if gcc < 4.5: -M, else if gcc >= 4.6: -J 
 MODDIROPT ?= -J
@@ -32,7 +32,7 @@ LD     = $(FC)
 # to avoid "-x f95-cpp-input" option
 LFLAGS = $(FFLAGS_FAST)
 #LFLAGS = $(FFLAGS_DEBUG)
-LFLAGS += -L$(OMNI_HOME)/lib -lxmp
+LFLAGS += -fopenmp -L$(OMNI_HOME)/lib -lxmp
 
 ##### for frontend
 INSTALL = install

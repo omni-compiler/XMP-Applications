@@ -1047,7 +1047,7 @@ contains
     !real(8),allocatable :: vrecv_plA(:,:)[:]
     integer , POINTER :: vrecv_plA ( : , : ) => null ( )
     integer(8) :: vrecv_plA_desc
-    integer(8) :: vrecv_plA_lb, vrecv_plA_ub
+    integer(8) :: vrecv_plA_lb(2), vrecv_plA_ub(2)
     integer(8) :: vrecv_plA_sec
     integer(4) :: img_dims(1)
     !--- 2020 Fujitsu end
@@ -1110,10 +1110,10 @@ contains
 !                             ierr                  )
              !--- 2020 Fujitsu
              !vrecv_plA(:,n)[ADM_prc_npl] = vsend_pl(:,n)
-             call xmp_array_section_set_triplet(vrecv_plA_sec, 1, GRD_XDIR, GRD_ZDIR, 1, ierr)
-             call xmp_array_section_set_triplet(vrecv_plA_sec, 2, n, n, 1, ierr)
-             call xmp_array_section_set_triplet(vsend_pl_l_sec, 1, GRD_XDIR, GRD_ZDIR, 1, ierr)
-             call xmp_array_section_set_triplet(vsend_pl_l_sec, 2, n, n, 1, ierr)
+             call xmp_array_section_set_triplet(vrecv_plA_sec, 1, int(GRD_XDIR,kind=8), int(GRD_ZDIR,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(vrecv_plA_sec, 2, int(n,kind=8), int(n,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(vsend_pl_l_sec, 1, int(GRD_XDIR,kind=8), int(GRD_ZDIR,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(vsend_pl_l_sec, 2, int(n,kind=8), int(n,kind=8), 1, ierr)
              img_dims(1) = ADM_prc_npl
              call xmp_coarray_put_local(img_dims, vrecv_plA_desc, vrecv_plA_sec, vsend_pl_l_desc, vsend_pl_l_sec, ierr)
              !--- 2020 Fujitsu end
@@ -1189,10 +1189,10 @@ contains
 !                             ierr                  )
              !--- 2020 Fujitsu
              !vrecv_plA(:,n)[ADM_prc_npl] = vsend_pl(:,n)
-             call xmp_array_section_set_triplet(vrecv_plA_sec, 1, GRD_XDIR, GRD_ZDIR, 1, ierr)
-             call xmp_array_section_set_triplet(vrecv_plA_sec, 2, n, n, 1, ierr)
-             call xmp_array_section_set_triplet(vsend_pl_l_sec, 1, GRD_XDIR, GRD_ZDIR, 1, ierr)
-             call xmp_array_section_set_triplet(vsend_pl_l_sec, 2, n, n, 1, ierr)
+             call xmp_array_section_set_triplet(vrecv_plA_sec, 1, int(GRD_XDIR,kind=8), int(GRD_ZDIR,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(vrecv_plA_sec, 2, int(n,kind=8), int(n,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(vsend_pl_l_sec, 1, int(GRD_XDIR,kind=8), int(GRD_ZDIR,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(vsend_pl_l_sec, 2, int(n,kind=8), int(n,kind=8), 1, ierr)
              img_dims(1) = ADM_prc_npl
              call xmp_coarray_put_local(img_dims, vrecv_plA_desc, vrecv_plA_sec, vsend_pl_l_desc, vsend_pl_l_sec, ierr)
              !--- 2020 Fujitsu end

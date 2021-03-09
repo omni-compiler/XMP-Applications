@@ -453,7 +453,8 @@ contains
        write(ADM_LOG_FID,*)
        write(ADM_LOG_FID,*) 'MPI process going to STOP...'
 
-       request='STOP'
+       !!!request='STOP'
+       request=1
 !coarray
 !        call MPI_BCAST( request,              & !--- starting address
 !                        ADM_NSYS,             & !--- number of array
@@ -466,7 +467,7 @@ contains
             if(ll /= ADM_prc_me) then
                !--- 2020 Fujitsu
                !request[ll] = request
-               call xmp_array_section_set_triplet(request_sec, 1, 1,ADM_NSYS,1, ierr)
+               call xmp_array_section_set_triplet(request_sec, 1, int(1,kind=8),int(ADM_NSYS,kind=8),1, ierr)
                img_dims(1) = ll
                call xmp_coarray_put(img_dims, request_desc,request_sec, request_desc,request_sec, ierr)
                !--- 2020 Fujitsu end

@@ -107,7 +107,7 @@ MODS =	\
 
 
 $(PRJ1): prg_$(PRJ1).o $(LIBDIR)/$(LIBNAME)
-	$(LD) $(LFLAGS) -o $@ $^
+	$(LD) -o $@ $^ $(LFLAGS)
 
 prg_$(PRJ1).o : prg_$(PRJ1).f90 $(LIBNAME)
 
