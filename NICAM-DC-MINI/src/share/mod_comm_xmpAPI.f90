@@ -1334,6 +1334,7 @@ contains
     do l=1,ADM_rgn_nmax
 !coarray
        !--- 2020 Fujitsu
+!print *, 'l=', l, ' COUNT=', max_comm_r2r*halomax, ' ROOT=', prc_tab_rev(ptr_prcid,l)-1, ' COMM=', ADM_comm_run_world
        call mpi_bcast(                  &
             rsize_r2r(1,1,l),            &
             max_comm_r2r*halomax,  &
