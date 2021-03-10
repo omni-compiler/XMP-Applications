@@ -816,7 +816,7 @@
       INTEGER*8 :: st_desc, st_l_desc
       INTEGER*8 :: st_sec, st_l_sec
       INTEGER*8, DIMENSION(1) :: st_lb, st_ub, st_l_lb, st_l_ub
-      INTEGER*8 :: start1, end1, start2, end2
+      INTEGER*8 :: start_pos, end_pos
       INTEGER*4 :: img_dims(1)
       INTEGER*4 status
 ! Fujitsu end 202103
@@ -1132,12 +1132,14 @@
 !             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
 ! Fujitsu start 202103
 !        START_RR = START_R(ME)[LDOM(IDOM)]
-        start1 = ME
-        end1 = ME
-        start2 = 1
-        end2 = 1
-        call xmp_array_section_set_triplet(st_sec,1,start1,end1,1,status)
-        call xmp_array_section_set_triplet(st_l_sec,1,start2,end2,1,status)
+        start_pos = ME
+        end_pos = ME
+        call xmp_array_section_set_triplet(st_sec,1, &
+                                start_pos,end_pos,1,status)
+        start_pos = 1
+        end_pos = 1
+        call xmp_array_section_set_triplet(st_l_sec,1, &
+                                start_pos,end_pos,1,status)
         img_dims(1) = LDOM(IDOM)
         call xmp_coarray_get(img_dims,st_desc,st_sec, &
                              st_l_desc,st_l_sec,status)
@@ -1145,22 +1147,30 @@
 ! Fujitsu end 202103
         END_RR = START_RR + (END_S(LDOM(IDOM)) - START_S(LDOM(IDOM)))
 ! Fujitsu start 202103
-!      write(*, '("DBG2 : img_dims = ", i4, " ME = ", i4)') &
-!           img_dims(1), ME
-!      write(*, '("     : START_RR = ", i8, " END_RR = ", i8)') &
-!           START_RR, END_RR
 !        BUFRCV(START_RR:END_RR)[LDOM(IDOM)] = &
 !             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
-        start1 = START_RR
-        end1 = END_RR
-        call xmp_array_section_set_triplet(rcv_sec,1,start1,end1,1,status)
-        start1 = START_S(LDOM(IDOM))
-        end1 = END_S(LDOM(IDOM))
-        call xmp_array_section_set_triplet(snd_sec,1,start1,end1,1,status)
+        start_pos = START_RR
+        end_pos = END_RR
+        call xmp_array_section_set_triplet(rcv_sec,1, &
+                                    start_pos,end_pos,1,status)
+        start_pos = START_S(LDOM(IDOM))
+        end_pos = END_S(LDOM(IDOM))
+        call xmp_array_section_set_triplet(snd_sec,1, &
+                                    start_pos,end_pos,1,status)
         img_dims = LDOM(IDOM)
-        call xmp_coarray_put(img_dims,rcv_desc,rcv_sec,snd_desc,snd_sec,status);
-!      write(*, '("DBG3 : BUFSND = ", e12.6, " ", e12.6)') &
+        call xmp_coarray_put(img_dims,rcv_desc,rcv_sec, &
+                             snd_desc,snd_sec,status);
+!      IF(IDOM .EQ. 1) THEN
+!      write(*, '("DBG2 : img_dims = ",i4," ME = ",i4," this_img = ",i4)') &
+!           img_dims(1), ME, xmp_this_image()
+!      write(*, '("     : START_RR = ",i16," END_RR = ",i16)') &
+!           START_RR, END_RR
+!!
+!      write(*, '("DBG3 : BUFSND = ", e12.6," ",e12.6)') &
 !           BUFSND(START_RR), BUFSND(END_RR)
+!      write(*, '("DBG3 : BUFSND = ", e12.6," ",e12.6)') &
+!           BUFSND(1), BUFSND(1)
+!      ENDIF
 ! Fujitsu end 202103
      END DO
 
@@ -1354,13 +1364,8 @@
 !CTTDEBG
 !
 ! Fujitsu start 202103
-      call xmp_free_array_section(snd_sec)
-      call xmp_free_array_section(rcv_sec)
-!
-!      call xmp_coarray_deallocate(snd_desc, status)
-!      call xmp_coarray_deallocate(rcv_desc, status)
-!
-!      call xmp_api_finalize
+!      call xmp_free_array_section(snd_sec)
+!      call xmp_free_array_section(rcv_sec)
 ! Fujitsu end 202103
 !
 #ifdef USE_BARRIER      

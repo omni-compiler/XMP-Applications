@@ -1,7 +1,10 @@
       SUBROUTINE BCGS3X(IMODE,IPART,NMAX,EPS,ME,N,NE,NP,
      *                  NPP,NCRS,IPCRS,AAAPC,B,S,NITR,RESR,
      *                  NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,NUMIP,
-     *                  WEIGHT,R0,RK,PK,APK,ATK,TK,S0,RX,RY,
+C Fj
+C     *                  WEIGHT,R0,RK,PK,APK,ATK,TK,S0,RX,RY,
+     *                  WEIGHT,R0,RK,PK,APK,ATK,TK,S0,rx_desc,ry_desc,
+C Fj
      *                  IUT0,IERR,
      *                  JUNROL,NPPMAX,NCRS2,TS,TACRS,ITPCRS)
 #include "timing.h"
@@ -31,6 +34,9 @@ C
 CCC  [WORK]    
       REAL*4    RX(0:N,ME),RY(0:N,ME),WEIGHT(NP),
      *          R0(NP),RK(NP),PK(NP),APK(NP),ATK(NP),TK(NP),S0(NP)
+C Fj
+      INTEGER*8 rx_desc,ry_desc
+C Fj
 C
 C     [FULL UNROLL]
       INTEGER*4 JUNROL
@@ -148,7 +154,10 @@ C                              12 WORDS BY LIST )
       call maprof_time_start(TM_CALAX3)
       CALL CALAX3(AAAPC, S, RK, NP, NE, NCRS, IPCRS, NPP,
      *            N,ME,IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *            RX,RY,IUT0,IERR,
+C Fj
+C     *            RX,RY,IUT0,IERR,
+     *            rx_desc,ry_desc,IUT0,IERR,
+C Fj
      *            JUNROL,NPPMAX,NCRS2,TS,TACRS,ITPCRS)
       call maprof_time_stop(TM_CALAX3)
 C
@@ -213,7 +222,10 @@ C                              12 WORDS BY LIST )
       call maprof_time_start(TM_CALAX3)
       CALL CALAX3(AAAPC, PK, APK, NP, NE, NCRS, IPCRS, NPP,
      *            N,ME,IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *            RX,RY,IUT0,IERR,
+C Fj
+C     *            RX,RY,IUT0,IERR,
+     *            rx_desc,ry_desc,IUT0,IERR,
+C Fj
      *            JUNROL,NPPMAX,NCRS2,TS,TACRS,ITPCRS)
       call maprof_time_stop(TM_CALAX3)
 C
@@ -271,7 +283,10 @@ C                              12 WORDS BY LIST )
       call maprof_time_start(TM_CALAX3)
       CALL CALAX3(AAAPC, TK, ATK, NP, NE, NCRS, IPCRS, NPP,
      *            N,ME,IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *            RX,RY,IUT0,IERR,
+C Fj
+C     *            RX,RY,IUT0,IERR,
+     *            rx_desc,ry_desc,IUT0,IERR,
+C Fj
      *            JUNROL,NPPMAX,NCRS2,TS,TACRS,ITPCRS)
       call maprof_time_stop(TM_CALAX3)
 C

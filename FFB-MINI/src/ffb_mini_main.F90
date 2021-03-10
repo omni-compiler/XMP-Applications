@@ -1,9 +1,7 @@
 program ffb_mini
-!Fj
-  use mpi
+  !use mpi
   use makemesh
-!Fj
-!  include "mpif.h"
+  include "mpif.h"
   !implicit none
 
   integer :: ierr
@@ -36,8 +34,7 @@ program ffb_mini
 
   intrinsic :: command_argument_count
 
-!Fj
-  call MPI_Init(ierr)
+  !call MPI_Init(ierr)
   call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
   call MPI_Comm_size(MPI_COMM_WORLD, nprocs, ierr)
 
@@ -117,9 +114,6 @@ program ffb_mini
   end if
 
   call LES3X(file_parm)
-
-!Fj
-!  call MPI_Finalize(ierr)
 
 contains
 
