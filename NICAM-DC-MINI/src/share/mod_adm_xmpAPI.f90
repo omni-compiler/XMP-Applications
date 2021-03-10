@@ -405,8 +405,10 @@ contains
        !--- 2020 Fujitsu end
 
 !coarray       call MPI_Comm_split(MPI_COMM_WORLD, 0, my_rank, ADM_COMM_RUN_WORLD,ierr)
-!coarray       ADM_COMM_RUN_WORLD = MPI_COMM_WORLD
-       ADM_COMM_RUN_WORLD = 1140850688
+       !--- 2020 Fujitsu
+       ADM_COMM_RUN_WORLD = MPI_COMM_WORLD
+       !ADM_COMM_RUN_WORLD = 1140850688
+       !--- 2020 Fujitsu end
 
        !--- 2020 Fujitsu
        !sync all

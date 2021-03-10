@@ -547,8 +547,8 @@ integer :: ierr
   !allocate(sbuff(id%ssize/16)[*])
   !allocate(rbuff(id%rsize/16)[*])
   !
-  integer, pointer :: sbuff(:) => null()
-  integer, pointer :: rbuff(:) => null()
+  complex(8), pointer :: sbuff(:) => null()
+  complex(8), pointer :: rbuff(:) => null()
   integer(8) :: s_desc, r_desc
   integer(8), dimension(1) :: s_lb,s_ub, r_lb, r_ub
   integer(4), dimension(1) :: img_dims
