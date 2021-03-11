@@ -18,10 +18,10 @@ C======================================================================C
      *                  NPCCL ,LPCCL1,LPCCL2,   
      *                  IPART ,MPINT ,NPINT ,LPINT1,LPINT2,LPINT3,
      *                  MDOM  ,NDOM  ,LDOM  ,NBPDOM,MBPDOM,IPSLF,IPSND,
-C Fj
+C Fujitsu start 202103
 C     *                  LPBTOA,IUT0,IUT6,IERR,RX,RY,
      *                  LPBTOA,IUT0,IUT6,IERR,rx_desc,ry_desc,
-C Fj
+C Fujitsu end 202103
      *                  MWRK,WRK1,WRK2,WRK3,WRK4,WRK5,WRK6,
      *                  IWRK,IWRK2)
       IMPLICIT NONE
@@ -39,9 +39,9 @@ C Fj
      *          LPCCL1(NPCCL),LPCCL2(NPCCL) ,
      *          WRK1(NE),WRK2(NE),WRK3(NE),WRK4(NP),WRK5(NP),WRK6(NP),
      *          IWRK(MWRK),IWRK2(2,MWRK),RX(0:N,NE),RY(0:N,NE)
-C Fj
+C Fujitsu start 202103
       INTEGER*8 :: rx_desc, ry_desc
-C Fj
+C Fujitsu end 202103
 C
       DIMENSION LPINT1(MPINT),LPINT2(MPINT),LPINT3(MPINT),
      1          LDOM  (MDOM) ,NBPDOM(MDOM) ,
@@ -304,7 +304,6 @@ C     *            IUT0,IERR,RX,RY,MAXBUF)
 C Fujitsu end 202103
       CALL ERRCHK(IUT6,IPART,1,IERR,IERRA)
       IF(IERRA.NE.0) THEN
-      write(IUT0,*) 'DBG : error'
           WRITE(IUT0,*)
           WRITE(IUT0,*) ERMSGC
           RETURN

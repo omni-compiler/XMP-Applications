@@ -1,10 +1,10 @@
       SUBROUTINE NODLEX
      *   (NODE,ME,NE,NP,N1,NEX,SN,
      *    IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-C Fj
+C Fujitsu start 202103
 C     *    VALELM,VALNOD,CM,IUT0,IERR,BUFSND,BUFRCV,MAXBUF)
      *    VALELM,VALNOD,CM,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
-C Fj
+C Fujitsu end 202103
 C
       IMPLICIT NONE
 C
@@ -17,9 +17,9 @@ C
       REAL*4 VALELM(NE),VALNOD(NP),CM(NP)
       INTEGER*4 IUT0,IERR,MAXBUF
       REAL*4 BUFSND(MAXBUF),BUFRCV(MAXBUF)
-C Fj
+C Fujitsu start 202103
       INTEGER*8 rx_desc,ry_desc
-C Fj
+C Fujitsu end 202103
 C
       CHARACTER*60 ERMSGC
      & /' ## SUBROUTINE NODLEX: FATAL      ERROR REPORT   ; RETURNED' /
@@ -59,10 +59,10 @@ C
       IDUM=1
       CALL DDCOMX(IPART,IDUM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
      &            VALNOD,VALNOD,VALNOD,NP,IUT0,IERR,
-C Fj
+C Fujitsu start 202103
 C     &            BUFSND,BUFRCV,MAXBUF) 
      &            rx_desc,ry_desc,MAXBUF) 
-C Fj
+C Fujitsu end 202103
       IF(IERR.NE.0) THEN
          WRITE(IUT0,*)
          WRITE(IUT0,*) ERMSGC

@@ -6,10 +6,10 @@
      *                  IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *                  FXYZ,WRK01,WRK02,WRK03,WRK04,
      *                  WRK05,WRK06,RRCM, W1RCM,W2RCM,PRCM,APRCM,
-C Fj
+C Fujitsu start 202103
 C     *                  RX,RY,MWRK,WRKN,
      *                  rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *                  IUT0,IERR)
 #include "timing.h"
       IMPLICIT NONE
@@ -50,9 +50,9 @@ CCC [WORK]
      *          WRK03(NE),WRK04(NE),WRK05(NE),WRK06(NE),
      *          RRCM(NE),PRCM(MRCM,NE),APRCM(MRCM,NE),
      *          W1RCM(NE),W2RCM(NE)
-C Fj
+C Fujitsu start 202103
       INTEGER*8 rx_desc,ry_desc
-C Fj
+C Fujitsu end 202103
       INTEGER*4 MWRK
       REAL*4    WRKN(MWRK,9)
 C
@@ -178,10 +178,10 @@ C
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-C Fj
+C Fujitsu start 202103
 C     *            FXYZ,RX,RY,MWRK,WRKN,
      *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C
@@ -267,10 +267,10 @@ C
      *            NITRB,RESB,W1RCM,
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            WRK01,WRK02,WRK03,WRK04,WRK05,WRK06,
-C Fj
+C Fujitsu start 202103
 C     *            FXYZ,RX,RY,MWRK,WRKN,
      *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *            IUT0,IERR)
       call maprof_time_stop(TM_BCGSXE)
       IF(IERR.NE.0) THEN
@@ -427,10 +427,10 @@ C
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-C Fj
+C Fujitsu start 202103
 C     *            FXYZ,RX,RY,MWRK,WRKN,
      *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C
@@ -491,10 +491,10 @@ C
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-C Fj
+C Fujitsu start 202103
 C     *            FXYZ,RX,RY,MWRK,WRKN,
      *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C

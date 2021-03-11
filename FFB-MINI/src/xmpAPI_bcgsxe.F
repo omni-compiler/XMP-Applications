@@ -4,11 +4,11 @@
      *                  B,NPFIX,LPFIX,
      *                  NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,NITR,RESR,S,
      *                  IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
-C Fj
+C Fujitsu start 202103
 C     *                  R0,RK,PK,APK,ATK,TK,FXYZ,RX,RY,MWRK,WRKN,
      *                  R0,RK,PK,APK,ATK,TK,FXYZ,rx_desc,ry_desc,MWRK,
      *                  WRKN,
-C Fj
+C Fujitsu end 202103
      *                  IUT0,IERR)
 #include "timing.h"
       IMPLICIT NONE
@@ -165,10 +165,10 @@ C                              WORDS BY LIST )
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-C Fj
+C Fujitsu start 202103
 C     *            FXYZ,RX,RY,MWRK,WRKN,
      *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C
@@ -236,10 +236,10 @@ C                              WORDS BY LIST )
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-C Fj
+C Fujitsu start 202103
 C     *            FXYZ,RX,RY,MWRK,WRKN,
      *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C
@@ -302,10 +302,10 @@ C                              12 WORDS BY LIST )
      *            IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *            NPFIX,LPFIX,
      *            NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-C Fj
+C Fujitsu start 202103
 C     *            FXYZ,RX,RY,MWRK,WRKN,
      *            FXYZ,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *            IUT0,IERR)
       call maprof_time_stop(TM_CALLAP)
 C

@@ -4,10 +4,10 @@
      *                  IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *                  NPFIX,LPFIX,
      *                  NPSYMT,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
-C Fj
+C Fujitsu start 202103
 C     *                  FXYZ,RX,RY,MWRK,WRKN,
      *                  FXYZ,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *                  IUT0,IERR)
 #include "timing.h"
       IMPLICIT NONE
@@ -45,9 +45,9 @@ CCC [OUTPUT]
 C
 CCC [WORK]    
       REAL*4    RX(0:N,ME),RY(0:N,ME)
-C Fj
+C Fujitsu start 202103
       INTEGER*8 rx_desc,ry_desc
-C Fj
+C Fujitsu end 202103
       INTEGER*4 MWRK
       REAL*4    WRKN(MWRK,9)
 C
@@ -242,10 +242,10 @@ C
       call maprof_time_start(TM_GRAD3X_COM)
       CALL DDCOMX(IPART,IDIM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
      *            WRKN(1,4),WRKN(1,5),WRKN(1,6),NP,IUT0,IERR,
-C Fj
+C Fujitsu start 202103
 C     *            RX,RY,MAXBUF)
      *            rx_desc,ry_desc,MAXBUF)
-C Fj
+C Fujitsu end 202103
       call maprof_time_stop(TM_GRAD3X_COM)
       IF(IERR.NE.0) THEN
           WRITE(IUT0,*)

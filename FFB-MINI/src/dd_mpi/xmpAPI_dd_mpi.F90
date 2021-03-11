@@ -928,7 +928,6 @@
 ! Fujitsu start 202103
 !      call xmp_api_init
 !
-!      write(*, '("DBG1 : snd_desc = ", i8)') snd_desc
       snd_lb(1) = 1
       snd_ub(1) = MAXBUF
       rcv_lb(1) = 1
@@ -1165,7 +1164,7 @@
 !           img_dims(1), ME, xmp_this_image()
 !      write(*, '("     : START_RR = ",i16," END_RR = ",i16)') &
 !           START_RR, END_RR
-!!
+!
 !      write(*, '("DBG3 : BUFSND = ", e12.6," ",e12.6)') &
 !           BUFSND(START_RR), BUFSND(END_RR)
 !      write(*, '("DBG3 : BUFSND = ", e12.6," ",e12.6)') &
@@ -1364,8 +1363,8 @@
 !CTTDEBG
 !
 ! Fujitsu start 202103
-!      call xmp_free_array_section(snd_sec)
-!      call xmp_free_array_section(rcv_sec)
+      call xmp_free_array_section(snd_sec)
+      call xmp_free_array_section(rcv_sec)
 ! Fujitsu end 202103
 !
 #ifdef USE_BARRIER      

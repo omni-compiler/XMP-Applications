@@ -10,10 +10,10 @@
      *                  MDOM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
      *                  UFIX,VFIX,WFIX,LPFRM,
      *                  CRD,LWRK01,LWRK02,WRK04,NDRFN,NDORG,NODEBK,
-C Fj
+C Fujitsu start 202103
 C     *                  RX,RY,NPB0, 
      *                  rx_desc,ry_desc,NPB0, 
-C Fj
+C Fujitsu end 202103
      *                  NPB1,LPB1,XPB1,YPB1,ZPB1,
      *                  NPB2,LPB2,XPB2,YPB2,ZPB2,
      *                  ITYPOR,ITYPRF,IUT6,IUT0,IERR)
@@ -77,9 +77,9 @@ C     [WORK]
       INTEGER*4 LPFRM(MP)
       REAL*8    CRD(MP*3)
       REAL*4    RX(ME*8),RY(ME*8)
-C Fj
+C Fujitsu start 202103
       INTEGER*8 :: rx_desc, ry_desc
-C Fj
+C Fujitsu end 202103
       INTEGER*4 NODED(8),LEACNV(ME)
       INTEGER*4 LWRK01(ME),LWRK02(MP)
       INTEGER*4 WRK04(MP),NDRFN(ME*8),NDORG(NE*8),NODEBK(8,NE)
@@ -201,10 +201,10 @@ CC
 C
          IDIM = 0
          CALL DDCOMX(IPART,IDIM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-C Fj
+C Fujitsu start 202103
 C     *               WRK04,WRK04,WRK04,NP,IUT0,IERR,RX,RY,MAXBUF)
      *               WRK04,WRK04,WRK04,NP,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
-C Fj
+C Fujitsu end 202103
          CALL ERRCHK(IUT6,IPART,1,IERR,IERRA)
          IF(IERRA.NE.0) THEN
             WRITE(IUT0,*)

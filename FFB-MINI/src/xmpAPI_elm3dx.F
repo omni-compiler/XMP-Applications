@@ -1,8 +1,14 @@
       SUBROUTINE ELM3DX(MGAUSS,IGAUSH,
      *                  MELM,N1,NE,NP,NEX,X,Y,Z,NODE,
-     *                  SNI,DNXI,DNYI,DNZI,SN,DNX,DNY,DNZ,
+C Fujitsu start 202103
+C     *                  SNI,DNXI,DNYI,DNZI,SN,DNX,DNY,DNZ,
+     *                  SNI,DNXI,DNYI,DNZI,SN,rx_desc,ry_desc,DNZ,
+C Fujitsu end 202103
      *                  E,EX,EY,EZ,EXX,EYY,EZZ,EXY,EXZ,EYZ,
      *                  NN,NC,PSI,PSIC,WW,IUT0,IERR)
+C Fujitsu end 202103
+      use xmp_api
+C Fujitsu end 202103
       IMPLICIT NONE
 C
       INTEGER MGAUSS,IGAUSH
@@ -11,7 +17,16 @@ C
       REAL*8  X, Y, Z
       INTEGER NODE
       REAL*4  SNI,DNXI,DNYI,DNZI
-      REAL*4  SN,DNX,DNY,DNZ,E,EX,EY,EZ,EXX,EYY,EZZ,EXY,EYZ,EXZ
+C Fujitsu start 202103
+C      REAL*4  SN,DNX,DNY,DNZ,E,EX,EY,EZ,EXX,EYY,EZZ,EXY,EYZ,EXZ
+      REAL*4  SN,DNZ,E,EX,EY,EZ,EXX,EYY,EZZ,EXY,EYZ,EXZ
+      REAL*4 , POINTER :: DNX ( : , : ) => null ( )
+      REAL*4 , POINTER :: DNY ( : , : ) => null ( )
+      INTEGER*8 :: rx_desc, ry_desc
+      INTEGER*8, DIMENSION(2) :: rx_lb, rx_ub, ry_lb, ry_ub
+      INTEGER*4 :: img_dims(1)
+      INTEGER*4 :: status
+C Fujitsu end 202103
       INTEGER IUT0,IERR
       REAL*8  NN,NC,PSI,PSIC,WW
 C
@@ -20,7 +35,10 @@ C
       DIMENSION X(NP),Y(NP),Z(NP)
       DIMENSION NODE(N1,NE+1),
      *          SNI( N1,NE+1),DNXI(N1,NE+1),DNYI(N1,NE+1),DNZI(N1,NE+1),
-     *          SN ( N1,NE+1),DNX (N1,NE+1),DNY (N1,NE+1),DNZ (N1,NE+1),
+C Fujitsu start 202103
+C     *          SN ( N1,NE+1),DNX (N1,NE+1),DNY (N1,NE+1),DNZ (N1,NE+1),
+     *          SN ( N1,NE+1),DNZ (N1,NE+1),
+C Fujitsu end 202103
      *          E  (MELM),
      *          EX (MELM),EY (MELM),EZ (MELM),
      *          EXX(MELM),EYY(MELM),EZZ(MELM),
@@ -87,6 +105,11 @@ C
 ******************
       INTEGER NEHEX,NHEX
       INTEGER IE,J
+C
+C Fujitsu start 202103
+      call xmp_coarray_bind(rx_desc,DNX)
+      call xmp_coarray_bind(ry_desc,DNY)
+C Fujitsu end 202103
 C
 ***** ALIAS *****
       NEHEX=NEX(4)

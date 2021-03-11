@@ -9,10 +9,10 @@
      *                  IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *                  LPFIX,LFIX3D,FXYZ,WRK01,WRK02,WRK03,WRK04,
      *                  WRK05,WRK06,WRK07,WRK08,WRK09,B,
-C Fj
+C Fujitsu start 202103
 C     *                  PRCM,APRCM,RX,RY,MWRK,WRKN,
      *                  PRCM,APRCM,rx_desc,ry_desc,MWRK,WRKN,
-C Fj
+C Fujitsu end 202103
      *                  IUT0,IERR)
 #include "timing.h"
       IMPLICIT NONE
@@ -52,9 +52,9 @@ CCC [WORK]
       REAL*4    PRCM(MRCM,NE),APRCM(MRCM,NE)
       INTEGER*4 MWRK
       REAL*4    WRKN(MWRK,9)
-C Fj
+C Fujitsu start 202103
       INTEGER*8 rx_desc,ry_desc
-C Fj
+C Fujitsu end 202103
 C      
 C     [IN:MID NODE COLORING]
 C
@@ -177,7 +177,10 @@ C
      *                NITR,RES,PE,
      *                IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *                WRK01,WRK02,WRK03,WRK04,WRK05,WRK06,
-     *                FXYZ,RX,RY,MWRK,WRKN,
+C Fujitsu start 202103
+C     *                FXYZ,RX,RY,MWRK,WRKN,
+     *                FXYZ,rx_desc,ry_desc,MWRK,WRKN,
+C Fujitsu end 202103
      *                IUT0,IERR)
           call maprof_time_stop(TM_BCGSXE)
       ELSE IF(ISOLP.EQ.2) THEN
@@ -190,7 +193,10 @@ C
      *                IPART,NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,
      *                FXYZ,WRK01,WRK02,WRK03,WRK04,
      *                WRK05,WRK06,WRK07,WRK08,WRK09,PRCM,APRCM,
-     *                RX,RY,MWRK,WRKN,
+C Fujitsu start 202103
+C     *                RX,RY,MWRK,WRKN,
+     *                rx_desc,ry_desc,MWRK,WRKN,
+C Fujitsu end 202103
      *                IUT0,IERR)
       ELSE
           IERR=1
@@ -203,7 +209,10 @@ C
 C
       CALL NODLEX(NODE,ME,NE,NP,N1,NEX,SN,
      *            IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *            PE,PN,CM,IUT0,IERR,RX,RY,MAXBUF)
+C Fujitsu start 202103
+C     *            PE,PN,CM,IUT0,IERR,RX,RY,MAXBUF)
+     *            PE,PN,CM,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
+C Fujitsu end 202103
 C  
 C
       RETURN
