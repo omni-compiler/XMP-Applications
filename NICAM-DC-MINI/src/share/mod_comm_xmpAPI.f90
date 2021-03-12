@@ -2823,7 +2823,7 @@ contains
     !allocate(caf_recvbuf(bufsize1,bufsize2)[*])
     caf_recvbuf_lb(1) = 1; caf_recvbuf_ub(1) = bufsize1
     caf_recvbuf_lb(2) = 1; caf_recvbuf_ub(2) = bufsize2
-    call xmp_new_coarray(caf_recvbuf_desc, 4, 2, caf_recvbuf_lb, caf_recvbuf_ub, 1, img_dims)
+    call xmp_new_coarray(caf_recvbuf_desc, 8, 2, caf_recvbuf_lb, caf_recvbuf_ub, 1, img_dims)
     call xmp_coarray_bind(caf_recvbuf_desc, caf_recvbuf)
     !--- 2020 Fujitsu end
 
@@ -3984,7 +3984,7 @@ contains
     !allocate(caf_recvbuf(bufsize1,bufsize2)[*])
     caf_recvbuf_lb(1) = 1; caf_recvbuf_ub(1) = bufsize1
     caf_recvbuf_lb(2) = 1; caf_recvbuf_ub(2) = bufsize2
-    call xmp_new_coarray(caf_recvbuf_desc, 4, 2, caf_recvbuf_lb, caf_recvbuf_ub, 1, img_dims)
+    call xmp_new_coarray(caf_recvbuf_desc, 8, 2, caf_recvbuf_lb, caf_recvbuf_ub, 1, img_dims)
     call xmp_coarray_bind(caf_recvbuf_desc, caf_recvbuf)    
     !--- 2020 Fujitsu end
 
