@@ -9,7 +9,7 @@ LDFLAGS=
 --lapack='-llapack' \
 --blas='-lblas' \
 --atlas= \
-linux64_xmp_omp_gfortran
+linux64_xmp_api_gfortran
 
 cd ./config
 ln -sf makeconfig makeconfig.xmp
