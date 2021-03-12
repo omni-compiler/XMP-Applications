@@ -3676,6 +3676,11 @@ contains
     call xmp_new_coarray(v_spl_recvc_desc, 8, 2, v_spl_lb, v_spl_ub, 1, img_dims)
     call xmp_coarray_bind(v_spl_recvc_desc, v_spl_recvc)
 
+    call xmp_new_array_section(v_npl_sec, 2)
+    call xmp_new_array_section(v_spl_sec, 2)
+
+    call xmp_new_local_array(v_npl_send_l_desc, 8, 2, v_npl_lb, v_npl_ub, loc(v_npl_send))
+    call xmp_new_local_array(v_spl_send_l_desc, 8, 2, v_spl_lb, v_spl_ub, loc(v_spl_send))
     !--- 2020 Fujitsu end
     v_npl_recvc = 0.d0
     v_spl_recvc = 0.d0
@@ -3818,6 +3823,12 @@ contains
     endif
 
     !--- 2020 Fujitsu
+    call xmp_free_array_section(v_npl_sec)
+    call xmp_free_array_section(v_spl_sec)
+
+    call xmp_free_local_array(v_npl_send_l_desc)
+    call xmp_free_local_array(v_spl_send_l_desc)
+
     call xmp_coarray_deallocate(v_npl_recvc_desc, ierr)
     call xmp_coarray_deallocate(v_spl_recvc_desc, ierr)
     !--- 2020 Fujitsu end
