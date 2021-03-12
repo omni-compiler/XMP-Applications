@@ -180,6 +180,7 @@
       T2BufSend_ub(3) = LenOccBat
       call xmp_new_local_array(T2BufSend_local_desc,8,3,T2BufSend_lb, &
        T2BufSend_ub,loc(T2BufSend))
+      call xmp_new_array_section(T2BufSend_local_sec,3)
 
       IdxBF_RI_MyRank_lb(1) = 1
       IdxBF_RI_MyRank_ub(1) = NBF_RI
@@ -188,8 +189,6 @@
 
       call xmp_new_array_section(IdxBF_RI_MyRank_local_sec,1)
       call xmp_new_array_section(IdxBF_RI_Irank_sec,1)
-      call xmp_new_array_section(T2BufRecv_sec,3)
-      call xmp_new_array_section(T2BufSend_local_sec,3)
             
 
 !coarray
@@ -203,6 +202,7 @@
       T2BufRecv_ub(3)=LenOccBat
       call xmp_new_coarray(T2BufRecv_desc,8,3,T2BufRecv_lb,T2BufRecv_ub,1,img_dims)
       call xmp_coarray_bind(T2BufRecv_desc,T2BufRecv)
+      call xmp_new_array_section(T2BufRecv_sec,3)
 !!
 !
       ! test
@@ -312,18 +312,18 @@
 !           CALL MPI_Wait(ireq(4), istat4, IErr)
 
             call xmp_array_section_set_triplet(T2BufSend_local_sec, &
-             1,int(1,kind=8),int(LenOccBat,kind=8),1,status)
+             1,int(1,kind=8),int(MXNActO,kind=8),1,status)
             call xmp_array_section_set_triplet(T2BufSend_local_sec, &
              2,int(1,kind=8),int(MXNBF_RI_MyRank,kind=8),1,status)
             call xmp_array_section_set_triplet(T2BufSend_local_sec, &
-             3,int(1,kind=8),int(MXNActO,kind=8),1,status)
+             3,int(1,kind=8),int(LenOccBat,kind=8),1,status)
 
             call xmp_array_section_set_triplet(T2BufRecv_sec, &
-             1,int(1,kind=8),int(LenOccBat,kind=8),1,status)
+             1,int(1,kind=8),int(MXNActO,kind=8),1,status)
             call xmp_array_section_set_triplet(T2BufRecv_sec, &
              2,int(1,kind=8),int(MXNBF_RI_MyRank,kind=8),1,status)
             call xmp_array_section_set_triplet(T2BufRecv_sec, &
-             3,int(1,kind=8),int(MXNActO,kind=8),1,status)
+             3,int(1,kind=8),int(LenOccBat,kind=8),1,status)
 
             !T2BufRecv(:,:,:)[Iranksend+1] = T2BufSend(:,:,:)
             !sync all
