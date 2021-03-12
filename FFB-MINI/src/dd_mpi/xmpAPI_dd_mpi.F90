@@ -813,9 +813,9 @@
       INTEGER*8 :: snd_desc, rcv_desc
       INTEGER*8 :: snd_sec, rcv_sec
       INTEGER*8, DIMENSION(1) :: snd_lb, snd_ub, rcv_lb, rcv_ub
-      INTEGER*8 :: st_desc, st_l_desc
-      INTEGER*8 :: st_sec, st_l_sec
-      INTEGER*8, DIMENSION(1) :: st_lb, st_ub, st_l_lb, st_l_ub
+      INTEGER*8 :: st_desc
+      INTEGER*8 :: st_sec
+      INTEGER*8, DIMENSION(1) :: st_lb, st_ub
       INTEGER*8 :: start_pos, end_pos
       INTEGER*4 :: img_dims(1)
       INTEGER*4 status
@@ -828,7 +828,6 @@
 ! Fujitsu start 202103
 !      INTEGER ,ALLOCATABLE :: START_R(:)[:]
       INTEGER*4 , POINTER :: START_R ( : ) => null ( )
-      INTEGER*4 , POINTER :: start_rr_p ( : ) => null ( )
 ! Fujitsu end 202103
 !      INTEGER ,ALLOCATABLE :: END_R(:)[:]
       INTEGER ,ALLOCATABLE :: START_S(:)
@@ -941,13 +940,8 @@
 !      allocate(START_R(1:NP)[*])
       st_lb(1) = 1
       st_ub(1) = NP
-      st_l_lb(1) = 1
-      st_l_ub(1) = 1
       call xmp_new_coarray(st_desc, 4, 1, st_lb, st_ub, 1, img_dims)
-!      call xmp_new_local_array(st_l_desc, 4, 1, st_l_lb, st_l_ub)
-      call xmp_new_coarray(st_l_desc, 4, 1, st_l_lb, st_l_ub, 1, img_dims)
       call xmp_coarray_bind(st_desc,START_R)
-      call xmp_coarray_bind(st_l_desc,start_rr_p)
 ! Fujitsu end 202103
 !      allocate(END_R(1:NP)[*])
       allocate(START_S(1:NP))
@@ -1122,7 +1116,6 @@
       call xmp_new_array_section(snd_sec,1)
       call xmp_new_array_section(rcv_sec,1)
       call xmp_new_array_section(st_sec,1)
-      call xmp_new_array_section(st_l_sec,1)
 ! Fujitsu start 202103
 !
      DO IDOM = 1, NDOM
@@ -1135,16 +1128,12 @@
         end_pos = ME
         call xmp_array_section_set_triplet(st_sec,1, &
                                 start_pos,end_pos,1,status)
-        start_pos = 1
-        end_pos = 1
-        call xmp_array_section_set_triplet(st_l_sec,1, &
-                                start_pos,end_pos,1,status)
         img_dims(1) = LDOM(IDOM)
-        call xmp_coarray_get(img_dims,st_desc,st_sec, &
-                             st_l_desc,st_l_sec,status)
-        START_RR = start_rr_p(1)
+        call xmp_coarray_get_scalar(img_dims,st_desc,st_sec, &
+                             START_RR,status);
 ! Fujitsu end 202103
         END_RR = START_RR + (END_S(LDOM(IDOM)) - START_S(LDOM(IDOM)))
+!
 ! Fujitsu start 202103
 !        BUFRCV(START_RR:END_RR)[LDOM(IDOM)] = &
 !             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
@@ -1159,17 +1148,6 @@
         img_dims = LDOM(IDOM)
         call xmp_coarray_put(img_dims,rcv_desc,rcv_sec, &
                              snd_desc,snd_sec,status);
-!      IF(IDOM .EQ. 1) THEN
-!      write(*, '("DBG2 : img_dims = ",i4," ME = ",i4," this_img = ",i4)') &
-!           img_dims(1), ME, xmp_this_image()
-!      write(*, '("     : START_RR = ",i16," END_RR = ",i16)') &
-!           START_RR, END_RR
-!
-!      write(*, '("DBG3 : BUFSND = ", e12.6," ",e12.6)') &
-!           BUFSND(START_RR), BUFSND(END_RR)
-!      write(*, '("DBG3 : BUFSND = ", e12.6," ",e12.6)') &
-!           BUFSND(1), BUFSND(1)
-!      ENDIF
 ! Fujitsu end 202103
      END DO
 
@@ -1365,6 +1343,9 @@
 ! Fujitsu start 202103
       call xmp_free_array_section(snd_sec)
       call xmp_free_array_section(rcv_sec)
+      call xmp_free_array_section(st_sec)
+!
+      call xmp_coarray_deallocate(st_desc, status)
 ! Fujitsu end 202103
 !
 #ifdef USE_BARRIER      
