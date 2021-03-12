@@ -15,7 +15,10 @@
      *  IPART,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
      *  LPFIX,LFIX3D,
      *  UG,VG,WG,WRK01,WRK02,WRK03,WRK04,A0,AR,RHSU,RHSV,RHSW,
-     *  RX,RY,
+C Fujitsu start 202103
+C     *  RX,RY,
+     *  rx_desc,ry_desc,
+C Fujitsu end 202103
      *  JUNROL,NPPMAX,NCRS2,TS,TACRS,ITPCRS,
      *  IUT0,IERR)
 C
@@ -46,6 +49,9 @@ C
      *          A,UG,VG,WG,UE,VE,WE,
      *          WRK01,WRK02,WRK03,WRK04,A0,AR,
      *          RHSU,RHSV,RHSW,APCRS
+C Fujitsu start 202103
+      INTEGER*8 rx_desc,ry_desc
+C Fujitsu end 202103
 C
 
 C
@@ -620,7 +626,10 @@ C
       IDUM=1
 C*    call maprof_time_start(TM_VEL3D1_COM)
       CALL DDCOMX(IPART,IDUM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *            AR,AR,AR,NP,IUT0,IERR,RX,RY,MAXBUF)
+C Fujitsu start 202103
+C     *            AR,AR,AR,NP,IUT0,IERR,RX,RY,MAXBUF)
+     *            AR,AR,AR,NP,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
+C Fujitsu end 202103
 C*    call maprof_time_stop(TM_VEL3D1_COM)
       IF(IERR.NE.0) THEN
           WRITE(IUT0,*)
@@ -643,7 +652,10 @@ C
       IDUM = 3
 C*    call maprof_time_start(TM_VEL3D1_COM)
       CALL DDCOMX(IPART,IDUM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *            RHSU,RHSV,RHSW,NP,IUT0,IERR,RX,RY,MAXBUF)
+C Fujitsu start 202103
+C     *            RHSU,RHSV,RHSW,NP,IUT0,IERR,RX,RY,MAXBUF)
+     *            RHSU,RHSV,RHSW,NP,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
+C Fujitsu end 202103
 C*    call maprof_time_stop(TM_VEL3D1_COM)
       IF(IERR.NE.0) THEN
           WRITE(IUT0,*)
@@ -707,21 +719,33 @@ C
       CALL BCGS3X(IBCGS,IPART,NMAX,EPS,ME,N,NE,NP,
      *            NPP,NCRS,IPCRS,APCRS,RHSU,U,NITRU,RESU,
      *            NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,NUMIP,
-     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,RX,RY,
+C Fujitsu start 202103
+C     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,RX,RY,
+     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,
+     *            rx_desc,ry_desc,
+C Fujitsu end 202103
      *            IUT0,IERR1,
      *            JUNROL,NPPMAX,NCRS2,TS,TACRS,ITPCRS)
       IF(NITRU.LT.NMAX) IRESU=1
       CALL BCGS3X(IBCGS,IPART,NMAX,EPS,ME,N,NE,NP,
      *            NPP,NCRS,IPCRS,APCRS,RHSV,V,NITRV,RESV,
      *            NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,NUMIP,
-     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,RX,RY,
+C Fujitsu start 202103
+C     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,RX,RY,
+     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,
+     *            rx_desc,ry_desc,
+C Fujitsu end 202103
      *            IUT0,IERR2,
      *            JUNROL,NPPMAX,NCRS2,TS,TACRS,ITPCRS)
       IF(NITRV.LT.NMAX) IRESV=1
       CALL BCGS3X(IBCGS,IPART,NMAX,EPS,ME,N,NE,NP,
      *            NPP,NCRS,IPCRS,APCRS,RHSW,W,NITRW,RESW,
      *            NDOM,MBPDOM,LDOM,NBPDOM,IPSLF,IPSND,NUMIP,
-     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,RX,RY,
+C Fujitsu start 202103
+C     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,RX,RY,
+     *            UG,VG,WG,WRK01,WRK02,WRK03,WRK04,WRK05,
+     *            rx_desc,ry_desc,
+C Fujitsu end 202103
      *            IUT0,IERR3,
      *            JUNROL,NPPMAX,NCRS2,TS,TACRS,ITPCRS)
       IF(NITRW.LT.NMAX) IRESW=1

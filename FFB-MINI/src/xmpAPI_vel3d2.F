@@ -8,7 +8,10 @@
      *                   NPWALL,LPWALL,UWALL,VWALL,WWALL,
      *                   NPSYMT,NPSYM2,LPSYMT,XPSYMT,YPSYMT,ZPSYMT,
      *                   IPART ,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
-     *                   RX,RY,MWRK,WRKN,FXYZ,UG,
+C Fujitsu start 202103
+C     *                   RX,RY,MWRK,WRKN,FXYZ,UG,
+     *                   rx_desc,ry_desc,MWRK,WRKN,FXYZ,UG,
+C Fujitsu end 202103
      *                   IUT0,IERR,
      *                   WRK02)
       IMPLICIT NONE
@@ -33,6 +36,9 @@ C
      *          UINLT,VINLT,WINLT,UWALL,VWALL,WWALL,
      *          XPSYMT,YPSYMT,ZPSYMT,
      *          RX,RY,FXYZ,UG
+C Fujitsu start 202103
+      INTEGER*8 rx_desc,ry_desc
+C Fujitsu end 202103
 C      
 C     [IN:MID NODE COLORING]
 C
@@ -289,7 +295,10 @@ C
       IDIM=3
       CALL DDCOMX(IPART,IDIM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
      *            WRKN(1,1),WRKN(1,2),WRKN(1,3),NP,IUT0,IERR,
-     *            RX,RY,MAXBUF)
+C Fujitsu start 202103
+C     *            RX,RY,MAXBUF)
+     *            rx_desc,ry_desc,MAXBUF)
+C Fujitsu end 202103
       IF(IERR.NE.0) THEN
           WRITE(IUT0,*)
           WRITE(IUT0,*) ERMSGC

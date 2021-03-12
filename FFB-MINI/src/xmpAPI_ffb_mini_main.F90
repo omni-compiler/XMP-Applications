@@ -1,7 +1,11 @@
 program ffb_mini
-  !use mpi
+! Fujitsu start 202103
+  use mpi
+! Fujitsu end 202103
   use makemesh
-  include "mpif.h"
+! Fujitsu start 202103
+!  include "mpif.h"
+! Fujitsu end 202103
   !implicit none
 
   integer :: ierr
@@ -34,7 +38,9 @@ program ffb_mini
 
   intrinsic :: command_argument_count
 
-  !call MPI_Init(ierr)
+! Fujitsu start 202103
+  call MPI_Init(ierr)
+! Fujitsu end 202103
   call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
   call MPI_Comm_size(MPI_COMM_WORLD, nprocs, ierr)
 

@@ -27,11 +27,14 @@ module mod_adm
   !++ used modules
   !
   !-----------------------------------------------------------------------------
-  implicit none
-  private
   !--- 2020 Fujitsu
+  !implicit none
+  !private
   !use mod_coarray
   use xmp_api
+  use mpi
+  implicit none
+  private
   !--- 2020 Fujitsu end
   !-----------------------------------------------------------------------------
   !
@@ -393,7 +396,7 @@ contains
 
        !--- 2020 Fujitsu
        call xmp_api_init
-       call MPI_Init(ierr)
+       !!!call MPI_Init(ierr)
        call MPI_Comm_size(MPI_COMM_WORLD, ADM_prc_all, ierr)
        !ADM_prc_all = num_images()
 !coarray       call MPI_Comm_rank(MPI_COMM_WORLD, my_rank,     ierr)
@@ -402,8 +405,10 @@ contains
        !--- 2020 Fujitsu end
 
 !coarray       call MPI_Comm_split(MPI_COMM_WORLD, 0, my_rank, ADM_COMM_RUN_WORLD,ierr)
-!coarray       ADM_COMM_RUN_WORLD = MPI_COMM_WORLD
-       ADM_COMM_RUN_WORLD = 1140850688
+       !--- 2020 Fujitsu
+       ADM_COMM_RUN_WORLD = MPI_COMM_WORLD
+       !ADM_COMM_RUN_WORLD = 1140850688
+       !--- 2020 Fujitsu end
 
        !--- 2020 Fujitsu
        !sync all
@@ -430,7 +435,7 @@ contains
 !coarray    character(len=ADM_NSYS) :: request
     !--- 2020 Fujitsu
     !character(len=ADM_NSYS) :: request[*]
-    integer, pointer :: request(:) => null()
+    integer, POINTER :: request(:) => null()
     integer(8) :: request_desc
     integer(8), dimension(1) :: request_lb, request_ub
     integer(8) :: request_sec
@@ -450,7 +455,8 @@ contains
        write(ADM_LOG_FID,*)
        write(ADM_LOG_FID,*) 'MPI process going to STOP...'
 
-       request='STOP'
+       !!!request='STOP'
+       request=1
 !coarray
 !        call MPI_BCAST( request,              & !--- starting address
 !                        ADM_NSYS,             & !--- number of array
@@ -463,7 +469,7 @@ contains
             if(ll /= ADM_prc_me) then
                !--- 2020 Fujitsu
                !request[ll] = request
-               call xmp_array_section_set_triplet(request_sec, 1, 1,ADM_NSYS,1, ierr)
+               call xmp_array_section_set_triplet(request_sec, 1, int(1,kind=8),int(ADM_NSYS,kind=8),1, ierr)
                img_dims(1) = ll
                call xmp_coarray_put(img_dims, request_desc,request_sec, request_desc,request_sec, ierr)
                !--- 2020 Fujitsu end

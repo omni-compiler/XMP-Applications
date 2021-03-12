@@ -1334,6 +1334,7 @@ contains
     do l=1,ADM_rgn_nmax
 !coarray
        !--- 2020 Fujitsu
+!print *, 'l=', l, ' COUNT=', max_comm_r2r*halomax, ' ROOT=', prc_tab_rev(ptr_prcid,l)-1, ' COMM=', ADM_comm_run_world
        call mpi_bcast(                  &
             rsize_r2r(1,1,l),            &
             max_comm_r2r*halomax,  &
@@ -2708,7 +2709,7 @@ contains
     !real(8),allocatable :: caf_recvbuf(:,:)[:]
     integer bufsize1,bufsize2
     integer , POINTER :: tbl ( : ) => null ( )
-    integer , POINTER :: caf_recvbuf ( : , : ) => null ( )
+    real(8) , POINTER :: caf_recvbuf ( : , : ) => null ( )
     integer(8) :: tbl_desc, caf_recvbuf_desc
     integer(8) :: tbl_lb(1),tbl_ub(1), caf_recvbuf_lb(2), caf_recvbuf_ub(2)
     integer(8) :: tbl_sec, caf_recvbuf_sec
@@ -2738,8 +2739,10 @@ contains
     !
     comm_call_count=comm_call_count+1
     !
-    !coarray    t(0)=mpi_wtime()
-    t(0) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(0)=mpi_wtime()
+    !t(0) = xmp_wtime()
+    !--- 2020 Fujitsu end
     !
     shp=shape(var)
     kmax = shp(2)
@@ -2788,12 +2791,16 @@ contains
        ! ->
     end if
     !
-    !coarray    t(1)=mpi_wtime()
-    t(1) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(1)=mpi_wtime()
+    !t(1) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_pre=time_pre+(t(1)-t(0))
     !call mpi_barrier(ADM_comm_run_world,ierr)
-    !coarray    t(2)=mpi_wtime()
-    t(2) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(2)=mpi_wtime()
+    !t(2) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_bar1=time_bar1+(t(2)-t(1))
     !coarray
     !--- 2020 Fujitsu
@@ -2802,9 +2809,9 @@ contains
     call xmp_new_coarray(tbl_desc, 4, 1, tbl_lb, tbl_ub, 1, img_dims)
     call xmp_coarray_bind(tbl_desc, tbl)
 
-    !call co_max(maxdatasiaze_r)
-    call MPI_Allreduce(maxdatasiaze_r, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
-    maxdatasiaze_r = max_tmp
+    !call co_max(maxdatasize_r)
+    call MPI_Allreduce(maxdatasize_r, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
+    maxdatasize_r = max_tmp
 
     bufsize1 = maxdatasize_r
     bufsize2 = romax(halomax)
@@ -2874,8 +2881,10 @@ contains
        endif
     enddo
 
-    !coarray    t(3)=mpi_wtime()
-    t(3) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(3)=mpi_wtime()
+    !t(3) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_recv=time_recv+(t(3)-t(2))
     !-----------------------------------------
     !  var -> sendbuf 
@@ -2888,8 +2897,10 @@ contains
 
 
 
-       !coarray       t(4)=mpi_wtime()
-       t(4) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(4)=mpi_wtime()
+       !t(4) = xmp_wtime()
+       !--- 2020 Fujitsu end
        do ns=1,nsmax(so,halo)
           ss=sendinfo(SIZE_COMM,ns,so,halo)  
           sl=sendinfo(LRGNID_COMM,ns,so,halo)  
@@ -2950,8 +2961,10 @@ contains
           enddo
 
        enddo
-       !coarray       t(5)=mpi_wtime()
-       t(5) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(5)=mpi_wtime()
+       !t(5) = xmp_wtime()
+       !--- 2020 Fujitsu end
        time_sbuf=time_sbuf+(t(5)-t(4))
 
 
@@ -2984,15 +2997,15 @@ contains
        !--- 2020 Fujitsu
        !dst_img = tbl(this_image())[destrank(so,halo)+1]
        img_dims(1) = destrank(so,halo)+1
-       call xmp_array_section_set_triplet(tbl_sec, 1, ADM_prc_me, ADM_prc_me, 1, ierr)
+       call xmp_array_section_set_triplet(tbl_sec, 1, int(ADM_prc_me,kind=8), int(ADM_prc_me,kind=8), 1, ierr)
        call xmp_coarray_get_scalar(img_dims, tbl_desc, tbl_sec, dst_img, ierr)
 
        !caf_recvbuf(1:ssize(so,halo)*cmax,dst_img)[destrank(so,halo)+1] &
        !  = sendbuf(1:ssize(so,halo)*cmax,so)
-       call xmp_array_section_set_triplet(caf_recvbuf_sec, 1, 1, ssize(so,halo)*cmax, 1, ierr)
-       call xmp_array_section_set_triplet(caf_recvbuf_sec, 2, dst_img, dst_img, 1, ierr)
-       call xmp_array_section_set_triplet(sendbuf_l_sec, 1, 1, ssize(so,halo)*cmax, 1, ierr)
-       call xmp_array_section_set_triplet(sendbuf_l_sec, 2, so, so, 1, ierr)
+       call xmp_array_section_set_triplet(caf_recvbuf_sec, 1, int(1,kind=8), int(ssize(so,halo)*cmax,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(caf_recvbuf_sec, 2, int(dst_img,kind=8), int(dst_img,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(sendbuf_l_sec, 1, int(1,kind=8), int(ssize(so,halo)*cmax,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(sendbuf_l_sec, 2, int(so,kind=8), int(so,kind=8), 1, ierr)
        call xmp_coarray_put_local(img_dims, caf_recvbuf_desc, caf_recvbuf_sec, sendbuf_l_desc, sendbuf_l_sec, ierr) 
        !--- 2020 Fujitsu
 
@@ -3012,16 +3025,20 @@ contains
        endif
 
 
-       !coarray       t(6)=mpi_wtime()
-       t(6) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(6)=mpi_wtime()
+       !t(6) = xmp_wtime()
+       !--- 2020 Fujitsu end
        time_send=time_send+(t(6)-t(5))
        size_total=size_total+ssize(so,halo)*cmax
        comm_count=comm_count+1
     enddo !loop so
     !-----------------------------------------
     !
-    !coarray    t(7)=mpi_wtime()
-    t(7) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(7)=mpi_wtime()
+    !t(7) = xmp_wtime()
+    !--- 2020 Fujitsu end
     !---------------------------------------------------
     !  var -> var (region to region copy in same rank)
     !---------------------------------------------------
@@ -3116,8 +3133,10 @@ contains
     !-----------------------------------------
     !
     !-----------------------------------------
-    !coarray    t(8)=mpi_wtime()
-    t(8) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(8)=mpi_wtime()
+    !t(8) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_copy=time_copy+(t(8)-t(7))
     acount=romax(halo)+somax(halo)
     !coarray    call mpi_waitall(acount,areq,stat,ierr)
@@ -3131,8 +3150,10 @@ contains
        end do
     end do
 
-    !coarray    t(9)=mpi_wtime()
-    t(9) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(9)=mpi_wtime()
+    !t(9) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_wait=time_wait+(t(9)-t(8))
 
     if (opt_comm_dbg) then  !================== dbg start
@@ -3274,8 +3295,10 @@ contains
 
        enddo
     enddo !loop ro
-    !coarray    t(10)=mpi_wtime()
-    t(10) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(10)=mpi_wtime()
+    !t(10) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_rbuf=time_rbuf+(t(10)-t(9))
 
     !    write(ADM_log_fid,*) 'recv count=',i_dbg,'prc=',adm_prc_me
@@ -3312,13 +3335,17 @@ contains
        enddo
 
     enddo
-    !coarray    t(11)=mpi_wtime()
-    t(11) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(11)=mpi_wtime()
+    !t(11) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_copy_sgp=time_copy_sgp+(t(11)-t(10))
     !!
     !call mpi_barrier(ADM_comm_run_world,ierr)
-    !coarray    t(12)=mpi_wtime()
-    t(12) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(12)=mpi_wtime()
+    !t(12) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_bar2=time_bar2+(t(12)-t(11))
     time_total=time_total+(t(12)-t(0))
 
@@ -3378,8 +3405,8 @@ contains
     !--- 2020 Fujitsu
     !real(8),allocatable :: v_npl_recvc(:,:)[:]
     !real(8),allocatable :: v_spl_recvc(:,:)[:]
-    integer , POINTER :: v_npl_recvc ( : , : ) => null ( )
-    integer , POINTER :: v_spl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_npl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_spl_recvc ( : , : ) => null ( )
     integer(8) :: v_npl_recvc_desc, v_spl_recvc_desc
     integer(8) :: v_npl_lb(2), v_npl_ub(2), v_spl_lb(2), v_spl_ub(2)
     integer(8) :: v_npl_sec, v_spl_sec
@@ -3411,8 +3438,8 @@ contains
     call xmp_new_array_section(v_npl_sec, 2)
     call xmp_new_array_section(v_spl_sec, 2)
 
-    call xmp_new_local_array(v_npl_send_l_desc, 8, 2, v_npl_lb, v_npl_ub, v_npl_send)
-    call xmp_new_local_array(v_spl_send_l_desc, 8, 2, v_spl_lb, v_spl_ub, v_spl_send)
+    call xmp_new_local_array(v_npl_send_l_desc, 8, 2, v_npl_lb, v_npl_ub, loc(v_npl_send))
+    call xmp_new_local_array(v_spl_send_l_desc, 8, 2, v_spl_lb, v_spl_ub, loc(v_spl_send))
     !--- 2020 Fujitsu end
     v_npl_recvc = 0.d0
     v_spl_recvc = 0.d0
@@ -3473,8 +3500,8 @@ contains
              !                             ierr                  )
              !--- 2020 Fujitsu
              !v_npl_recvc(:,:)[ADM_prc_npl] = v_npl_send(:,:)
-             call xmp_array_section_set_triplet(v_npl_sec, 1, 1, knum, 1, ierr)
-             call xmp_array_section_set_triplet(v_npl_sec, 2, 1, nnum, 1, ierr)
+             call xmp_array_section_set_triplet(v_npl_sec, 1, int(1,kind=8), int(knum,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(v_npl_sec, 2, int(1,kind=8), int(nnum,kind=8), 1, ierr)
              img_dims(1) = ADM_prc_npl
              call xmp_coarray_put_local(img_dims, v_npl_recvc_desc, v_npl_sec, v_npl_send_l_desc, v_npl_sec, ierr)
              !--- 2020 Fujitsu end
@@ -3503,8 +3530,8 @@ contains
 !                             ierr                  )
              !--- 2020 Fujitsu
              !v_spl_recvc(:,:)[ADM_prc_spl] = v_spl_send(:,:)
-             call xmp_array_section_set_triplet(v_spl_sec, 1, 1, knum, 1, ierr)
-             call xmp_array_section_set_triplet(v_spl_sec, 2, 1, nnum, 1, ierr)
+             call xmp_array_section_set_triplet(v_spl_sec, 1, int(1,kind=8), int(knum,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(v_spl_sec, 2, int(1,kind=8), int(nnum,kind=8), 1, ierr)
              img_dims(1) = ADM_prc_spl
              call xmp_coarray_put_local(img_dims, v_spl_recvc_desc, v_spl_sec, v_spl_send_l_desc, v_spl_sec, ierr)             
              !--- 2020 Fujitsu end
@@ -3621,8 +3648,8 @@ contains
     !--- 2020 Fujitsu
     !real(8),allocatable :: v_npl_recvc(:,:)[:]
     !real(8),allocatable :: v_spl_recvc(:,:)[:]
-    integer , POINTER :: v_npl_recvc ( : , : ) => null ( )
-    integer , POINTER :: v_spl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_npl_recvc ( : , : ) => null ( )
+    real(8) , POINTER :: v_spl_recvc ( : , : ) => null ( )
     integer(8) :: v_npl_recvc_desc, v_spl_recvc_desc
     integer(8) :: v_npl_lb(2), v_npl_ub(2), v_spl_lb(2), v_spl_ub(2)
     integer(8) :: v_npl_sec, v_spl_sec
@@ -3702,8 +3729,8 @@ contains
 !             call MPI_WAIT(ireq(1),istat,ierr)
              !--- 2020 Fujitsu
              !v_npl_recvc(:,:)[ADM_prc_npl] = v_npl_send(:,:)
-             call xmp_array_section_set_triplet(v_npl_sec, 1, 1, knum, 1, ierr)
-             call xmp_array_section_set_triplet(v_npl_sec, 2, 1, nnum, 1, ierr)
+             call xmp_array_section_set_triplet(v_npl_sec, 1, int(1,kind=8), int(knum,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(v_npl_sec, 2, int(1,kind=8), int(nnum,kind=8), 1, ierr)
              img_dims(1) = ADM_prc_npl
              call xmp_coarray_put_local(img_dims, v_npl_recvc_desc, v_npl_sec, v_npl_send_l_desc, v_npl_sec, ierr)
              !--- 2020 Fujitsu end
@@ -3755,8 +3782,8 @@ contains
 !             call MPI_WAIT(ireq(2),istat,ierr)
              !--- 2020 Fujitsu
              !v_spl_recvc(:,:)[ADM_prc_spl] = v_spl_send(:,:)
-             call xmp_array_section_set_triplet(v_spl_sec, 1, 1, knum, 1, ierr)
-             call xmp_array_section_set_triplet(v_spl_sec, 2, 1, nnum, 1, ierr)
+             call xmp_array_section_set_triplet(v_spl_sec, 1, int(1,kind=8), int(knum,kind=8), 1, ierr)
+             call xmp_array_section_set_triplet(v_spl_sec, 2, int(1,kind=8), int(nnum,kind=8), 1, ierr)
              img_dims(1) = ADM_prc_spl
              call xmp_coarray_put_local(img_dims, v_spl_recvc_desc, v_spl_sec, v_spl_send_l_desc, v_spl_sec, ierr)
              !--- 2020 Fujitsu end
@@ -3847,17 +3874,19 @@ contains
     !integer,allocatable :: tbl(:)[:]
     !real(8),allocatable :: caf_recvbuf(:,:)[:]
     integer , POINTER :: tbl ( : ) => null ( )
-    integer , POINTER :: caf_recvbuf ( : , : ) => null ( )
+    real(8) , POINTER :: caf_recvbuf ( : , : ) => null ( )
     integer(8) :: tbl_desc, caf_recvbuf_desc
     integer(8) :: tbl_lb(1),tbl_ub(1), caf_recvbuf_lb(2), caf_recvbuf_ub(2)
     integer(8) :: tbl_sec, caf_recvbuf_sec
     integer(4) :: img_dims(1)
     integer :: max_tmp
+    integer(8) :: sendbuf_l_sec ! for senbuf(:,:)
 
     integer bufsize1,bufsize2
 
     call xmp_new_array_section(tbl_sec, 1)
     call xmp_new_array_section(caf_recvbuf_sec, 2)
+    call xmp_new_array_section(sendbuf_l_sec, 2)
     !--- 2020 Fujitsu end
 
     !
@@ -3865,8 +3894,10 @@ contains
     !
     comm_call_count=comm_call_count+1
     !
-!coarray    t(0)=mpi_wtime()
-    t(0) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(0)=mpi_wtime()
+    !t(0) = xmp_wtime()
+    !--- 2020 Fujitsu end
     !
     shp=shape(var)
     kmax = shp(2)
@@ -3911,11 +3942,15 @@ contains
        ! ->
     end if
     !
-!coarray    t(1)=mpi_wtime()
-    t(1) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(1)=mpi_wtime()
+    !t(1) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_pre=time_pre+(t(1)-t(0))
-!coarray    t(2)=mpi_wtime()
-    t(2) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(2)=mpi_wtime()
+    !t(2) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_bar1=time_bar1+(t(2)-t(1))
 !coarray
     !--- 2020 Fujitsu
@@ -3925,8 +3960,8 @@ contains
     call xmp_coarray_bind(tbl_desc, tbl)
 
     !call co_max(maxdatasize_r)
-    call MPI_Allreduce(maxdatasiaze_r, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
-    maxdatasiaze_r = max_tmp
+    call MPI_Allreduce(maxdatasize_r, max_tmp, 1, MPI_INTEGER, MPI_MAX, MPI_COMM_WORLD, ierr)
+    maxdatasize_r = max_tmp
 
     bufsize1 = maxdatasize_r
     bufsize2 = romax(halomax)
@@ -3991,8 +4026,10 @@ contains
        endif
     enddo
 
-!coarray    t(3)=mpi_wtime()
-    t(3) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(3)=mpi_wtime()
+    !t(3) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_recv=time_recv+(t(3)-t(2))
     !-----------------------------------------
     !  var -> sendbuf 
@@ -4001,8 +4038,10 @@ contains
 
 
 
-!coarray       t(4)=mpi_wtime()
-       t(4) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(4)=mpi_wtime()
+       !t(4) = xmp_wtime()
+       !--- 2020 Fujitsu end
        do ns=1,nsmax(so,halo)
           ss=sendinfo(SIZE_COMM,ns,so,halo)  
           sl=sendinfo(LRGNID_COMM,ns,so,halo)  
@@ -4020,8 +4059,10 @@ contains
 
        enddo
        !-----------------------------------------
-!coarray       t(5)=mpi_wtime()
-       t(5) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(5)=mpi_wtime()
+       !t(5) = xmp_wtime()
+       !--- 2020 Fujitsu end
        time_sbuf=time_sbuf+(t(5)-t(4))
 
 
@@ -4049,15 +4090,15 @@ contains
        !--- 2020 Fujitsu
        !dst_img = tbl(this_image())[destrank(so,halo)+1]
        img_dims(1) = destrank(so,halo)+1
-       call xmp_array_section_set_triplet(tbl_sec, 1, ADM_prc_me, ADM_prc_me, 1, ierr)
+       call xmp_array_section_set_triplet(tbl_sec, 1, int(ADM_prc_me,kind=8), int(ADM_prc_me,kind=8), 1, ierr)
        call xmp_coarray_get_scalar(img_dims, tbl_desc, tbl_sec, dst_img, ierr)
        
        !caf_recvbuf(1:ssize(so,halo)*cmax,dst_img)[destrank(so,halo)+1] &
        !  = sendbuf(1:ssize(so,halo)*cmax,so)
-       call xmp_array_section_set_triplet(caf_recvbuf_sec, 1, 1, ssize(so,halo)*cmax, 1, ierr)
-       call xmp_array_section_set_triplet(caf_recvbuf_sec, 2, dst_img, dst_img, 1, ierr)
-       call xmp_array_section_set_triplet(sendbuf_l_sec, 1, 1, ssize(so,halo)*cmax, 1, ierr)
-       call xmp_array_section_set_triplet(sendbuf_l_sec, 2, so, so, 1, ierr)
+       call xmp_array_section_set_triplet(caf_recvbuf_sec, 1, int(1,kind=8), int(ssize(so,halo)*cmax,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(caf_recvbuf_sec, 2, int(dst_img,kind=8), int(dst_img,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(sendbuf_l_sec, 1, int(1,kind=8), int(ssize(so,halo)*cmax,kind=8), 1, ierr)
+       call xmp_array_section_set_triplet(sendbuf_l_sec, 2, int(so,kind=8), int(so,kind=8), 1, ierr)
        call xmp_coarray_put_local(img_dims, caf_recvbuf_desc, caf_recvbuf_sec, sendbuf_l_desc, sendbuf_l_sec, ierr) 
        !--- 2020 Fujitsu end
 
@@ -4077,16 +4118,20 @@ contains
        endif
 
 
-!coarray       t(6)=mpi_wtime()
-       t(6) = xmp_wtime()
+       !--- 2020 Fujitsu
+       t(6)=mpi_wtime()
+       !t(6) = xmp_wtime()
+       !--- 2020 Fujitsu end
        time_send=time_send+(t(6)-t(5))
        size_total=size_total+ssize(so,halo)*cmax
        comm_count=comm_count+1
     enddo !loop so
     !-----------------------------------------
     !
-!coarray    t(7)=mpi_wtime()
-    t(7) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(7)=mpi_wtime()
+    !t(7) = xmp_wtime()
+    !--- 2020 Fujitsu end
     !---------------------------------------------------
     !  var -> var (region to region copy in same rank)
     !---------------------------------------------------
@@ -4108,8 +4153,10 @@ contains
     !-----------------------------------------
     !
     !-----------------------------------------
-!coarray    t(8)=mpi_wtime()
-    t(8) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(8)=mpi_wtime()
+    !t(8) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_copy=time_copy+(t(8)-t(7))
     acount=romax(halo)+somax(halo)
 !coarray
@@ -4125,8 +4172,10 @@ contains
        end do
     end do
 
-!coarray    t(9)=mpi_wtime()
-    t(9) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(9)=mpi_wtime()
+    !t(9) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_wait=time_wait+(t(9)-t(8))
 
     if (opt_comm_dbg) then  !================== dbg start
@@ -4217,8 +4266,10 @@ contains
           enddo
        enddo
     enddo !loop ro
-!coarray    t(10)=mpi_wtime()
-    t(10) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(10)=mpi_wtime()
+    !t(10) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_rbuf=time_rbuf+(t(10)-t(9))
 
     !-----------------------------------------
@@ -4241,13 +4292,17 @@ contains
        enddo
  
     enddo
-!coarray    t(11)=mpi_wtime()
-    t(11) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(11)=mpi_wtime()
+    !t(11) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_copy_sgp=time_copy_sgp+(t(11)-t(10))
     !!
     !call mpi_barrier(ADM_comm_run_world,ierr)
-!coarray    t(12)=mpi_wtime()
-    t(12) = xmp_wtime()
+    !--- 2020 Fujitsu
+    t(12)=mpi_wtime()
+    !t(12) = xmp_wtime()
+    !--- 2020 Fujitsu end
     time_bar2=time_bar2+(t(12)-t(11))
     time_total=time_total+(t(12)-t(0))
     !
@@ -4255,6 +4310,7 @@ contains
     !--- 2020 Fujitsu
     call xmp_free_array_section(tbl_sec)
     call xmp_free_array_section(caf_recvbuf_sec)
+    call xmp_free_array_section(sendbuf_l_sec)
 
     call xmp_coarray_deallocate(tbl_desc, ierr)
     call xmp_coarray_deallocate(caf_recvbuf_desc, ierr)
@@ -4425,10 +4481,12 @@ contains
   !-----------------------------------------------------------------------------
   subroutine COMM_Stat_max( localmax, globalmax )
 !coarray
-!    use mod_adm, only: &
-!       ADM_COMM_RUN_WORLD, &
-!       ADM_prc_all,        &
-!       ADM_prc_me
+    !--- 2020 Fujitsu
+    use mod_adm, only: &
+       ADM_COMM_RUN_WORLD, &
+       ADM_prc_all,        &
+       ADM_prc_me
+    !--- 2020 Fujitsu end
     implicit none
 
     real(8), intent(in)  :: localmax
@@ -4473,10 +4531,12 @@ contains
   !-----------------------------------------------------------------------------
   subroutine COMM_Stat_min( localmin, globalmin )
 !coarray
-!    use mod_adm, only: &
-!       ADM_COMM_RUN_WORLD, &
-!       ADM_prc_all,        &
-!       ADM_prc_me
+    !--- 2020 Fujitsu
+    use mod_adm, only: &
+       ADM_COMM_RUN_WORLD, &
+       ADM_prc_all,        &
+       ADM_prc_me
+    !--- 2020 Fujitsu end
     implicit none
 
     real(8), intent(in)  :: localmin

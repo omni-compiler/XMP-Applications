@@ -18,8 +18,8 @@ module mod_debug
   !--- 2020 Fujitsu
   use mpi
   use xmp_api
+  !use mod_coarray
   !--- 2020 Fujitsu end
-  use mod_coarray
   use mod_adm, only: &
      ADM_LOG_FID, &
      ADM_NSYS,    &
@@ -322,8 +322,10 @@ contains
 
     id = DEBUG_rapid( rapname )
 
-!coarray    time = real(MPI_WTIME(), kind=8)
-    time = xmp_wtime()
+    !--- 2020 Fujitsu
+    time = real(MPI_WTIME(), kind=8)
+    !time = xmp_wtime()
+    !--- 2020 Fujitsu end
 
     DEBUG_raptstr(id) = time
     DEBUG_rapnstr(id) = DEBUG_rapnstr(id) + 1
@@ -348,8 +350,10 @@ call START_COLLECTION( rapname )
 
     id = DEBUG_rapid( rapname )
 
-!coarray    time = real(MPI_WTIME(), kind=8)
-    time = xmp_wtime()
+    !--- 2020 Fujitsu
+    time = real(MPI_WTIME(), kind=8)
+    !time = xmp_wtime()
+    !--- 2020 Fujitsu end
 
     DEBUG_rapttot(id) = DEBUG_rapttot(id) + ( time-DEBUG_raptstr(id) )
     DEBUG_rapnend(id) = DEBUG_rapnend(id) + 1
