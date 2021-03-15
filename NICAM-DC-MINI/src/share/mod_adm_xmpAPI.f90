@@ -435,10 +435,8 @@ contains
 !coarray    character(len=ADM_NSYS) :: request
     !--- 2020 Fujitsu
     !character(len=ADM_NSYS) :: request[*]
-    integer, POINTER :: request(:) => null()
+    character(len=ADM_NSYS), POINTER :: request => null()
     integer(8) :: request_desc
-    integer(8), dimension(1) :: request_lb, request_ub
-    integer(8) :: request_sec
     integer(4), dimension(1) :: img_dims
     !--- 2020 Fujitsu end
     integer                 :: ierr
@@ -446,17 +444,14 @@ contains
     !---------------------------------------------------------------------------
 
     !--- 2020 Fujitsu
-    request_lb(1) = 1; request_ub(1) = ADM_NSYS
-    call xmp_new_coarray(request_desc, 1, 1, request_lb, request_ub, 1, img_dims)
+    call xmp_new_coarray_mem(request_desc, ADM_NSYS, 1, img_dims)
     call xmp_coarray_bind(request_desc, request)
-    call xmp_new_array_section(request_sec, 1)
     !--- 2020 Fujitsu end
     if ( ADM_run_type == ADM_MULTI_PRC ) then
        write(ADM_LOG_FID,*)
        write(ADM_LOG_FID,*) 'MPI process going to STOP...'
 
-       !!!request='STOP'
-       request=1
+       request='STOP'
 !coarray
 !        call MPI_BCAST( request,              & !--- starting address
 !                        ADM_NSYS,             & !--- number of array
@@ -469,9 +464,8 @@ contains
             if(ll /= ADM_prc_me) then
                !--- 2020 Fujitsu
                !request[ll] = request
-               call xmp_array_section_set_triplet(request_sec, 1, int(1,kind=8),int(ADM_NSYS,kind=8),1, ierr)
                img_dims(1) = ll
-               call xmp_coarray_put(img_dims, request_desc,request_sec, request_desc,request_sec, ierr)
+               call xmp_coarray_mem_put(img_dims, request_desc, request, ADM_NSYS, ierr)
                !--- 2020 Fujitsu end
            endif
          end do
