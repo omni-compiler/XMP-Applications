@@ -61,8 +61,7 @@ cat << EOF1 > run.sh
 #
 ################################################################################
 #PJM --rsc-list "node=${NMPI}"
-#PJM --rsc-list "elapse=02:00:00"
-#PJM --mpi "use-rankdir"
+#PJM --rsc-list "elapse=01:00:00"
 #PJM -j
 #PJM -s
 #
@@ -70,7 +69,7 @@ export PARALLEL=8
 export OMP_NUM_THREADS=8
 
 # run
-${MPIEXEC} ./${BINNAME} || exit
+${MPIEXEC} ./${BINNAME} -Wl,-T || exit
 
 ################################################################################
 EOF1
