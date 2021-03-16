@@ -43,24 +43,23 @@ c----------------------------------------------------------------------
       end module
 c----------------------------------------------------------------------
       module trj_mpi
-      integer(4) ::  trj_mpi_img_dims(1)
       ! real(8),allocatable :: wkxyz(:,:)[:]
       real(8), POINTER :: wkxyz(:,:) => null ()
       integer(8) :: wkxyz_desc
-      integer(8) :: wkxyz_local_sec, wkxyz_remote_sec
+      integer(8) :: wkxyz_l_sec, wkxyz_r_sec
 
       real(8),allocatable :: wkv(:,:)
 !      ! integer(4),allocatable :: i2m(:), m2i(:)[:]
       integer(4),allocatable :: i2m(:)
       integer(4), POINTER :: m2i(:) => null ()
       integer(8) :: m2i_desc
-      integer(8) :: m2i_local_sec, m2i_remote_sec
+      integer(8) :: m2i_l_sec, m2i_r_sec
 
 !      !integer(4),allocatable :: tag(:,:,:),na_per_cell(:,:,:)[:]
       integer(4),allocatable :: tag(:,:,:)
       integer(4), POINTER :: na_per_cell(:,:,:) => null ()
       integer(8) :: na_per_cell_desc
-      integer(8) :: na_per_cell_local_sec, na_per_cell_remote_sec
+      integer(8) :: na_per_cell_l_sec, na_per_cell_r_sec
 
       integer(4) :: na1cell,na5cell,nadirect 
       integer(4) :: naline,narea 
@@ -346,7 +345,6 @@ c----------------------------------------------------------------------
       integer(8) :: rbuffm_sec, rbuffm_desc
       integer(8), dimension(2) :: rbuffm_lb, rbuffm_ub
 
-      integer :: img_dims(1)
       end module
 c----------------------------------------------------------------------
       module comm_bd
@@ -413,9 +411,6 @@ c----------------------------------------------------------------------
       integer(8) :: irsbuf_m_sec
       integer(8), dimension(1) :: irsbuf_m_lb, irsbuf_m_ub
 
-      integer(4), dimension(1) :: img_dims
-
-
       integer,allocatable :: ncatmw(:,:,:,:)
       end module
 c----------------------------------------------------------------------
@@ -429,6 +424,7 @@ c----------------------------------------------------------------------
       module mpivar
       implicit none
       integer(4) :: myrank=0, nprocs=1, mpiout=0
+      integer(4), dimension(1) :: img_dims
       end module
 !----------------------------------------------------------------------
       module ompvar

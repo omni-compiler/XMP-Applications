@@ -2110,7 +2110,6 @@ c----------------------------------------------------------------------
       integer(8) :: m2i_tmp_local_desc
       integer(8),dimension(1) :: m2i_tmp_lb,m2i_tmp_ub
 
-      integer(4) :: img_dims(1)
       integer(4) :: status
 
 
@@ -2124,24 +2123,28 @@ c----------------------------------------------------------------------
 !      allocate(rcvx(6,n)[*])
       ndis_lb(1) = 1
       ndis_ub(1) = np
+      call xmp_new_coarray(ndis_desc,4,1,ndis_lb,ndis_ub,1, img_dims)
+      call xmp_coarray_bind(ndis_desc,ndis)
+
       mdis_lb(1) = 1
       mdis_ub(1) = n
+      call xmp_new_coarray(mdis_desc,4,1,mdis_lb,mdis_ub,1, img_dims)
+      call xmp_coarray_bind(mdis_desc,mdis)
+
       rcvx_lb(1) = 1
       rcvx_lb(2) = 1
       rcvx_ub(1) = 6
       rcvx_ub(2) = n
-      call xmp_new_coarray(ndis_desc,4,1,ndis_lb,ndis_ub,1, img_dims)
-      call xmp_new_coarray(mdis_desc,4,1,mdis_lb,mdis_ub,1, img_dims)
       call xmp_new_coarray(rcvx_desc,8,2,rcvx_lb,rcvx_ub,1, img_dims)
-      call xmp_coarray_bind(ndis_desc,ndis)
-      call xmp_coarray_bind(mdis_desc,mdis)
       call xmp_coarray_bind(rcvx_desc,rcvx)
+      call xmp_new_array_section(rcvx_sec,2)
 
       m2i_tmp_lb(1) = 1
       m2i_tmp_ub(1) = na1cell*lxdiv*lydiv*lzdiv
       call xmp_new_local_array(m2i_tmp_local_desc,8,1,
      & m2i_tmp_lb,m2i_tmp_ub,loc(m2i_tmp))
       call xmp_new_array_section(m2i_tmp_local_sec,1)
+
 
 !!
 
@@ -2172,10 +2175,10 @@ c----------------------------------------------------------------------
         !allocate(natmlist(nprocs)[*])
         natmlist_lb(1) = 1
         natmlist_ub(1) = nprocs
-        call xmp_new_coarray(natmlist_desc,8,2,
+        call xmp_new_coarray(natmlist_desc,8,1,
      &   natmlist_lb,natmlist_ub,1,img_dims)
         call xmp_coarray_bind(natmlist_desc,natmlist)
-        call xmp_new_array_section(natmlist_sec,2)
+        call xmp_new_array_section(natmlist_sec,1)
 
         allocate(natmlist_tmp(nprocs))
         allocate(natmdisp(nprocs))
@@ -2204,7 +2207,7 @@ c----------------------------------------------------------------------
         do mm = 1,np
           !natmlist(me)[mm] = nselfatm ! Put
           call xmp_array_section_set_triplet(natmlist_sec,
-     &     1,int(me,kind=8),int(1,kind=8),1,status)
+     &     1,int(me,kind=8),int(me,kind=8),1,status)
           img_dims(1) = mm
           call xmp_coarray_put_scalar(img_dims,natmlist_desc,
      &     natmlist_sec,nselfatm,status)

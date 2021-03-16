@@ -447,7 +447,7 @@ c----------------------------------------------------------------------
       na_per_cell_ub(2) = lydiv+4
       na_per_cell_ub(3) = lxdiv+4
       call xmp_new_coarray(na_per_cell_desc,4,3,
-     & na_per_cell_lb,na_per_cell_ub,1, trj_mpi_img_dims)
+     & na_per_cell_lb,na_per_cell_ub,1, img_dims)
       call xmp_coarray_bind(na_per_cell_desc,na_per_cell)
 
 !############
@@ -474,7 +474,7 @@ c----------------------------------------------------------------------
       wkxyz_ub(1) = 3
       wkxyz_ub(2) = nadirect
       call xmp_new_coarray(wkxyz_desc,8,2,
-     & wkxyz_lb,wkxyz_ub,1, trj_mpi_img_dims)
+     & wkxyz_lb,wkxyz_ub,1, img_dims)
       call xmp_coarray_bind(wkxyz_desc,wkxyz)
 
       allocate(wkv(3,nadirect))
@@ -483,7 +483,7 @@ c----------------------------------------------------------------------
       m2i_lb(1) = 1
       m2i_ub(1) = nadirect
       call xmp_new_coarray(m2i_desc,4,1,
-     & m2i_lb,m2i_ub,1,trj_mpi_img_dims)
+     & m2i_lb,m2i_ub,1,img_dims)
       call xmp_coarray_bind(m2i_desc,m2i)
 
 !Force

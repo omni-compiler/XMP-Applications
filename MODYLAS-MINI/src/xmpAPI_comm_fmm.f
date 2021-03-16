@@ -78,7 +78,6 @@ c---------------------------------------------------------------------
       integer icyb0prior, icxb0prior
       integer ierr,istatus(mpi_status_size)
       integer(4)  status
-      integer :: img_dims(1)
 
 !coarray
       !allocate( rccbuf(mylm*5*nscydiv*nscxdiv,2)[*] )
@@ -105,8 +104,8 @@ c---------------------------------------------------------------------
       call xmp_new_coarray(wm_tmp_desc,
      & 8,4,wm_tmp_lb,wm_tmp_ub,1,img_dims)
       call xmp_coarray_bind(wm_tmp_desc,wm_tmp)
-      call xmp_new_array_section(wm_tmp_l_sec,2)
-      call xmp_new_array_section(wm_tmp_r_sec,2)
+      call xmp_new_array_section(wm_tmp_l_sec,4)
+      call xmp_new_array_section(wm_tmp_r_sec,4)
 
 
       wm_tmp = wm
@@ -115,7 +114,7 @@ c---------------------------------------------------------------------
       !allocate( ndis(np)[*] )
       ndis_lb(1)=1
       ndis_ub(1)=np
-      call xmp_new_coarray(ndis_desc,8,2,ndis_lb,ndis_ub,1,img_dims)
+      call xmp_new_coarray(ndis_desc,8,1,ndis_lb,ndis_ub,1,img_dims)
       call xmp_coarray_bind(ndis_desc,ndis)
       call xmp_new_array_section(ndis_sec,1)
 !!
@@ -222,7 +221,7 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(rccbuf_l_sec,
      & 2,int(ibs,kind=8),int(1,kind=8),1,status)
       img_dims(1) = ipz_dest+1
-      call xmp_coarray_put_local(img_dims,rccbuf_desc,rccbuf_r_sec, 
+      call xmp_coarray_put(img_dims,rccbuf_desc,rccbuf_r_sec, 
      & rccbuf_desc,rccbuf_l_sec,status)
 !      sync all
       call xmp_sync_all(status)
@@ -303,7 +302,7 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(rccbuf_l_sec,
      & 2,int(ibs,kind=8),int(ibs,kind=8),1,status)
       img_dims(1) = ipz_dest+1
-      call xmp_coarray_put_local(img_dims,rccbuf_desc,rccbuf_r_sec, 
+      call xmp_coarray_put(img_dims,rccbuf_desc,rccbuf_r_sec, 
      & rccbuf_desc,rccbuf_l_sec,status)
 !      sync all
       call xmp_sync_all(status)
@@ -373,7 +372,7 @@ c---------------------------------------------------------------------
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
       img_dims(1) = ipy_dest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -422,7 +421,7 @@ c---------------------------------------------------------------------
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
       img_dims(1) = ipy_dest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -485,7 +484,7 @@ c---------------------------------------------------------------------
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
       img_dims(1) = ipy_dest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -532,7 +531,7 @@ c---------------------------------------------------------------------
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
       img_dims(1) = ipy_dest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -594,7 +593,7 @@ c---------------------------------------------------------------------
      & 4,int(icx0,kind=8),int(icx0+nd,kind=8),1,status)
 
       img_dims(1) = ipx_dest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 !      sync all
@@ -641,7 +640,7 @@ c---------------------------------------------------------------------
      & 4,int(icxb0prior,kind=8),int(icxb0prior+nd,kind=8),1,status)
 
       img_dims(1) = ipx_dest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 !      sync all
@@ -700,7 +699,7 @@ c---------------------------------------------------------------------
      & 4,int(icx0,kind=8),int(icx0+nd,kind=8),1,status)
 
       img_dims(1) = ipx_dest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 !      sync all
@@ -746,7 +745,7 @@ c---------------------------------------------------------------------
      & 4,int(icxb0prior,kind=8),int(icxb0prior+nd,kind=8),1,status)
 
       img_dims(1) = ipx_dest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 !      sync all
@@ -854,7 +853,6 @@ c---------------------------------------------------------------------
       integer ibs, ibr
       integer istatus(mpi_status_size, 4), ierr
       integer(4) status
-      integer(4) img_dims(1)
 #ifndef SYNC_COM
       integer,dimension(4) :: irq
       integer nrq
@@ -883,19 +881,19 @@ c---------------------------------------------------------------------
       call xmp_new_array_section(rccbufm_r_sec,2)
 
 !      allocate( wm_tmp(mylm, lclz, lcly, lclx)[*] )
-      rccbufm_lb(1)=1
-      rccbufm_lb(2)=1
-      rccbufm_lb(3)=1
-      rccbufm_lb(4)=1
-      rccbufm_ub(1)=mylm
-      rccbufm_ub(2)=lclz
-      rccbufm_ub(3)=lcly
-      rccbufm_ub(4)=lclx
-      call xmp_new_coarray(rccbufm_desc,
-     & 8,4,rccbufm_lb,rccbufm_ub,1,img_dims)
-      call xmp_coarray_bind(rccbufm_desc,rccbufm)
-      call xmp_new_array_section(rccbufm_l_sec,4)
-      call xmp_new_array_section(rccbufm_r_sec,4)
+      wm_tmp_lb(1)=1
+      wm_tmp_lb(2)=1
+      wm_tmp_lb(3)=1
+      wm_tmp_lb(4)=1
+      wm_tmp_ub(1)=mylm
+      wm_tmp_ub(2)=lclz
+      wm_tmp_ub(3)=lcly
+      wm_tmp_ub(4)=lclx
+      call xmp_new_coarray(wm_tmp_desc,
+     & 8,4,wm_tmp_lb,wm_tmp_ub,1,img_dims)
+      call xmp_coarray_bind(wm_tmp_desc,wm_tmp)
+      call xmp_new_array_section(wm_tmp_l_sec,4)
+      call xmp_new_array_section(wm_tmp_r_sec,4)
 
       wm_tmp = wm
 !      me = this_image()
@@ -970,6 +968,7 @@ c---------------------------------------------------------------------
       if(nbound_zp == 4 .and. nsczdiv == 1) nf_mprovider = 1
       nitr = max( (nbound_zm - 1) / nsczdiv + 1,
      &            (nbound_zp - 1) / nsczdiv + 1    )
+
 
 !coarray
 !      allocate( rccbufp(mylm*nbsize*nscydiv*nscxdiv, 2)[*] )
@@ -1128,7 +1127,7 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(rccbufp_l_sec,
      & 2,int(ibs,kind=8),int(ibs,kind=8),1,status)
       img_dims(1) = ipz_pdest+1
-      call xmp_coarray_put_local(img_dims,rccbufp_desc,rccbufp_r_sec, 
+      call xmp_coarray_put(img_dims,rccbufp_desc,rccbufp_r_sec, 
      & rccbufp_desc,rccbufp_l_sec,status)
 
 !      rccbufm(1:nccm,ibr)[ipz_mdest+1] = rccbufm(1:nccm,ibs) ! Put
@@ -1142,7 +1141,7 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(rccbufm_l_sec,
      & 2,int(ibs,kind=8),int(ibs,kind=8),1,status)
       img_dims(1) = ipz_mdest+1
-      call xmp_coarray_put_local(img_dims,rccbufm_desc,rccbufm_r_sec,
+      call xmp_coarray_put(img_dims,rccbufm_desc,rccbufm_r_sec,
      & rccbufm_desc,rccbufm_l_sec,status)
 
 
@@ -1208,7 +1207,7 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(rccbufp_l_sec,
      & 2,int(ibs,kind=8),int(ibs,kind=8),1,status)
       img_dims(1) = ipz_pdest+1
-      call xmp_coarray_put_local(img_dims,rccbufp_desc,rccbufp_r_sec, 
+      call xmp_coarray_put(img_dims,rccbufp_desc,rccbufp_r_sec, 
      & rccbufp_desc,rccbufp_l_sec,status)
 
 !      sync all
@@ -1252,7 +1251,7 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(rccbufm_l_sec,
      & 2,int(ibs,kind=8),int(ibs,kind=8),1,status)
       img_dims(1) = ipz_mdest+1
-      call xmp_coarray_put_local(img_dims,rccbufm_desc,rccbufm_r_sec, 
+      call xmp_coarray_put(img_dims,rccbufm_desc,rccbufm_r_sec, 
      & rccbufm_desc,rccbufm_l_sec,status)
 !      sync all
       call xmp_sync_all(status)
@@ -1389,8 +1388,9 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(wm_tmp_l_sec,
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
+
       img_dims(1) = ipy_pdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -1411,6 +1411,7 @@ c---------------------------------------------------------------------
       img_dims(1) = ipy_msrc+1
       call xmp_coarray_put_scalar(img_dims,mdis_desc,
      & mdis_sec,icybm0,status)
+
 
 
 !      sync all
@@ -1437,7 +1438,7 @@ c---------------------------------------------------------------------
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
       img_dims(1) = ipy_mdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -1495,7 +1496,7 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(wm_tmp_r_sec,
      & 2,int(1,kind=8),int(lclz,kind=8),1,status)
       call xmp_array_section_set_triplet(wm_tmp_r_sec,
-     & 3,int(mb,kind=8),int(nb+nd,kind=8),1,status)
+     & 3,int(nb,kind=8),int(nb+nd,kind=8),1,status)
       call xmp_array_section_set_triplet(wm_tmp_r_sec,
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
@@ -1509,7 +1510,7 @@ c---------------------------------------------------------------------
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
       img_dims(1) = ipy_pdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -1553,7 +1554,7 @@ c---------------------------------------------------------------------
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
       img_dims(1) = ipy_mdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -1615,7 +1616,7 @@ c---------------------------------------------------------------------
      & 4,int(icx,kind=8),int(icx,kind=8),1,status)
 
       img_dims(1) = ipy_pdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 !      sync all
       call xmp_sync_all(status)
@@ -1781,7 +1782,7 @@ c---------------------------------------------------------------------
      & 4,int(icxp0,kind=8),int(icxp0+nd,kind=8),1,status)
 
       img_dims(1) = ipx_pdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -1824,7 +1825,7 @@ c---------------------------------------------------------------------
      & 4,int(icxm0,kind=8),int(icxm0+md,kind=8),1,status)
 
       img_dims(1) = ipx_mdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 !      sync all
       call xmp_sync_all(status)
@@ -1896,7 +1897,7 @@ c---------------------------------------------------------------------
      & 4,int(icxbp0prior,kind=8),int(icxbp0prior+nd-1,kind=8),1,status)
 
       img_dims(1) = ipx_pdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 
@@ -1940,7 +1941,7 @@ c---------------------------------------------------------------------
      & 4,int(icxbm0prior,kind=8),int(icxbm0prior+md-1,kind=8),1,status)
 
       img_dims(1) = ipx_mdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 !      sync all
       call xmp_sync_all(status)
@@ -2000,7 +2001,7 @@ c---------------------------------------------------------------------
      & 4,int(icxbp0prior,kind=8),int(icxbp0prior+nd-1,kind=8),1,status)
 
       img_dims(1) = ipx_pdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 
 !      sync all
@@ -2062,7 +2063,7 @@ c---------------------------------------------------------------------
      & 4,int(icxbm0prior,kind=8),int(icxbm0prior+md,kind=8),1,status)
 
       img_dims(1) = ipx_mdest+1
-      call xmp_coarray_put_local(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
+      call xmp_coarray_put(img_dims,wm_tmp_desc,wm_tmp_r_sec, 
      & wm_tmp_desc,wm_tmp_l_sec,status)
 !      sync all
       call xmp_sync_all(status)
