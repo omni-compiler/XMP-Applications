@@ -47,17 +47,20 @@ c----------------------------------------------------------------------
       ! real(8),allocatable :: wkxyz(:,:)[:]
       real(8), POINTER :: wkxyz(:,:) => null ()
       integer(8) :: wkxyz_desc
+      integer(8) :: wkxyz_local_sec, wkxyz_remote_sec
 
       real(8),allocatable :: wkv(:,:)
 !      ! integer(4),allocatable :: i2m(:), m2i(:)[:]
       integer(4),allocatable :: i2m(:)
       integer(4), POINTER :: m2i(:) => null ()
       integer(8) :: m2i_desc
+      integer(8) :: m2i_local_sec, m2i_remote_sec
 
 !      !integer(4),allocatable :: tag(:,:,:),na_per_cell(:,:,:)[:]
       integer(4),allocatable :: tag(:,:,:)
       integer(4), POINTER :: na_per_cell(:,:,:) => null ()
       integer(8) :: na_per_cell_desc
+      integer(8) :: na_per_cell_local_sec, na_per_cell_remote_sec
 
       integer(4) :: na1cell,na5cell,nadirect 
       integer(4) :: naline,narea 
@@ -285,28 +288,65 @@ c----------------------------------------------------------------------
       integer nczdiv, ncydiv, ncxdiv
 !      ! integer,allocatable :: icbufp(:)[:]
       integer, POINTER :: icbufp(:) => null ()
+      integer(8) :: icbufp_sec, icbufp_desc
+      integer(8), dimension(1) :: icbufp_lb, icbufp_ub
+
 !      ! integer,allocatable :: ircbufp(:)[:]
       integer, POINTER :: ircbufp(:) => null ()
+      integer(8) :: ircbufp_sec, ircbufp_desc
+      integer(8), dimension(1) :: ircbufp_lb, ircbufp_ub
+
 !      ! integer,allocatable :: icbufm(:)[:]
       integer, POINTER :: icbufm(:) => null ()
+      integer(8) :: icbufm_sec, icbufm_desc
+      integer(8), dimension(1) :: icbufm_lb, icbufm_ub
+
 !      ! integer,allocatable :: ircbufm(:)[:]
       integer, POINTER :: ircbufm(:) => null ()
+      integer(8) :: ircbufm_sec, ircbufm_desc
+      integer(8), dimension(1) :: ircbufm_lb, ircbufm_ub
+
 !      ! integer,allocatable :: ibuffp(:)[:]
       integer, POINTER :: ibuffp(:) => null ()
+      integer(8) :: ibuffp_sec, ibuffp_desc
+      integer(8), dimension(1) :: ibuffp_lb, ibuffp_ub
+
 !      ! integer,allocatable :: irbuffp(:)[:]
       integer, POINTER :: irbuffp(:) => null ()
+      integer(8) :: irbuffp_sec, irbuffp_desc
+      integer(8), dimension(1) :: irbuffp_lb, irbuffp_ub
+
 !      ! integer,allocatable :: ibuffm(:)[:]
       integer, POINTER :: ibuffm(:) => null ()
+      integer(8) :: ibuffm_sec, ibuffm_desc
+      integer(8), dimension(1) :: ibuffm_lb, ibuffm_ub
+
 !      ! integer,allocatable :: irbuffm(:)[:]
       integer, POINTER :: irbuffm(:) => null ()
+      integer(8) :: irbuffm_sec, irbuffm_desc
+      integer(8), dimension(1) :: irbuffm_lb, irbuffm_ub
+
 !      ! real(8),allocatable :: buffp(:,:)[:]
       real(8), POINTER :: buffp(:,:) => null ()
+      integer(8) :: buffp_sec, buffp_desc
+      integer(8), dimension(2) :: buffp_lb, buffp_ub
+
 !      ! real(8),allocatable :: rbuffp(:,:)[:]
       real(8), POINTER :: rbuffp(:,:) => null ()
+      integer(8) :: rbuffp_sec, rbuffp_desc
+      integer(8), dimension(2) :: rbuffp_lb, rbuffp_ub
+
 !      ! real(8),allocatable :: buffm(:,:)[:]
       real(8), POINTER :: buffm(:,:) => null ()
+      integer(8) :: buffm_sec, buffm_desc
+      integer(8), dimension(2) :: buffm_lb, buffm_ub
+
 !      ! real(8),allocatable :: rbuffm(:,:)[:]
       real(8), POINTER :: rbuffm(:,:) => null ()
+      integer(8) :: rbuffm_sec, rbuffm_desc
+      integer(8), dimension(2) :: rbuffm_lb, rbuffm_ub
+
+      integer :: img_dims(1)
       end module
 c----------------------------------------------------------------------
       module comm_bd
@@ -319,32 +359,61 @@ c----------------------------------------------------------------------
       integer,allocatable :: isbucket(:,:,:,:)
       integer,allocatable :: ncseg(:,:,:)
       integer,allocatable :: ncatom(:,:,:)
+
       real(8),allocatable :: buffp(:,:)
       real(8),allocatable :: buffm(:,:)
+      integer(8) :: buffp_local_sec, buffm_local_sec
+      integer(8) :: buffp_local_desc, buffm_local_desc
+      integer(8), dimension(2) :: buffp_lb, buffm_lb
+      integer(8), dimension(2) :: buffp_ub, buffm_ub
+
       integer,allocatable :: ibuffp(:)
+      integer(8) :: ibuffp_local_sec, ibuffp_local_desc
+      integer(8), dimension(1) :: ibuffp_lb, ibuffp_ub
+
       integer,allocatable :: ibuffm(:)
+      integer(8) :: ibuffm_local_sec, ibuffm_local_desc
+      integer(8), dimension(1) :: ibuffm_lb, ibuffm_ub
+
       integer,allocatable :: isbufp(:)
       integer,allocatable :: isbufm(:)
+      integer(8) :: isbufp_local_sec, isbufm_local_sec
+      integer(8) :: isbufp_local_desc, isbufm_local_desc
+      integer(8), dimension(1) :: isbufp_lb,isbufm_lb
+      integer(8), dimension(1) :: isbufp_ub,isbufm_ub
+
 !      ! real(8),allocatable :: rbuff_p(:,:)[:]
       real(8), POINTER :: rbuff_p(:,:) => null ()
       integer(8) :: rbuff_p_desc
+      integer(8) :: rbuff_p_sec
+      integer(8), dimension(2) :: rbuff_p_lb,rbuff_p_ub
 !      ! real(8),allocatable :: rbuff_m(:,:)[:]
       real(8), POINTER :: rbuff_m(:,:) => null ()
       integer(8) :: rbuff_m_desc
+      integer(8) :: rbuff_m_sec
+      integer(8), dimension(2) ::  rbuff_m_lb, rbuff_m_ub
 !      ! integer,allocatable :: irbuff_p(:)[:]
       integer, POINTER :: irbuff_p(:) => null ()
       integer(8) :: irbuff_p_desc
+      integer(8) :: irbuff_p_sec
+      integer(8), dimension(1) :: irbuff_p_lb, irbuff_p_ub
 !      ! integer,allocatable :: irbuff_m(:)[:]
       integer, POINTER :: irbuff_m(:) => null ()
       integer(8) :: irbuff_m_desc
+      integer(8) :: irbuff_m_sec
+      integer(8), dimension(1) :: irbuff_m_lb, irbuff_m_ub
 !      ! integer,allocatable :: irsbuf_p(:)[:]
       integer, POINTER :: irsbuf_p(:) => null ()
       integer(8) :: irsbuf_p_desc
+      integer(8) :: irsbuf_p_sec
+      integer(8), dimension(1) :: irsbuf_p_lb, irsbuf_p_ub
 !      ! integer,allocatable :: irsbuf_m(:)[:]
       integer, POINTER :: irsbuf_m(:) => null ()
       integer(8) :: irsbuf_m_desc
+      integer(8) :: irsbuf_m_sec
+      integer(8), dimension(1) :: irsbuf_m_lb, irsbuf_m_ub
 
-      integer(4), dimension(1) :: comm_bd_img_dims
+      integer(4), dimension(1) :: img_dims
 
 
       integer,allocatable :: ncatmw(:,:,:,:)

@@ -39,10 +39,9 @@ c
 !coarray      call mpi_comm_rank(mpi_comm_world,myrank,ierr)
       ! nprocs = num_images()
 !      nprocs = xmp_num_images()
-      ! TODO: use xmp_num_images
-      call mpi_comm_size(mpi_comm_world,nprocs,ierr)
+      !call mpi_comm_size(mpi_comm_world,nprocs,ierr)
 
-
+      nprocs = xmp_num_images()
       ! myrank = this_image()-1   
       myrank = xmp_this_image() - 1
 !!

@@ -188,8 +188,11 @@ c----------------------------------------------------------------------
 !     ^^^ reduce potential energy ^^^
 !coarray      call mpi_allreduce(wk_p_energy,p_energy,1,
 !coarray     &       mpi_double_precision,mpi_sum,mpi_comm_world,ierr)
-      p_energy = wk_p_energy
-      call co_sum(p_energy)
+!      p_energy = wk_p_energy
+!      call co_sum(p_energy)
+      call mpi_allreduce(wk_p_energy,p_energy,1,
+     &       mpi_double_precision,mpi_sum,mpi_comm_world,ierr)
+      wk_p_energy = p_energy
 !!
 
 !     ^^^ reduce kinetic energy ^^^

@@ -87,8 +87,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 !coarray      call mpi_allreduce(wk_ksum,k_ene_sum,1,
 !coarray     &     mpi_double_precision,mpi_sum,mpi_comm_world,ierr)
-      k_ene_sum = wk_ksum
-      call co_sum(k_ene_sum)
+!      k_ene_sum = wk_ksum
+!      call co_sum(k_ene_sum)
+      call mpi_allreduce(wk_ksum,k_ene_sum,1,
+     &     mpi_double_precision,mpi_sum,mpi_comm_world,ierr)
+      wk_ksum = k_ene_sum
+
 !!
 
       return

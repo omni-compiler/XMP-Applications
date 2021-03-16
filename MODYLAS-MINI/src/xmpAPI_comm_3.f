@@ -33,6 +33,7 @@ c----------------------------------------------------------------------
       use md_fmm
       use md_fmm_domdiv_flg
       use mpivar
+      use xmp_api
       implicit none
       INCLUDE 'mpif.h'
 
@@ -46,18 +47,110 @@ c----------------------------------------------------------------------
       ncydiv = lydiv
       nczdiv = lzdiv
 
-      allocate(icbufp ((ncell/npy)*(ncell/npx)*2)[*])
-      allocate(ircbufp((ncell/npy)*(ncell/npx)*2)[*])
-      allocate(icbufm ((ncell/npy)*(ncell/npx)*2)[*])
-      allocate(ircbufm((ncell/npy)*(ncell/npx)*2)[*])
-      allocate(ibuffp (na1cell*(ncell/npy)*(ncell/npx)*2)[*])
-      allocate(irbuffp(na1cell*(ncell/npy)*(ncell/npx)*2)[*])
-      allocate(ibuffm (na1cell*(ncell/npy)*(ncell/npx)*2)[*])
-      allocate(irbuffm(na1cell*(ncell/npy)*(ncell/npx)*2)[*])
-      allocate(buffp (3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
-      allocate(rbuffp(3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
-      allocate(buffm (3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
-      allocate(rbuffm(3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!     allocate(icbufp ((ncell/npy)*(ncell/npx)*2)[*])
+      icbufp_lb(1) = 1
+      icbufp_ub(1) = (ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(icbufp_desc,4,1,
+     & icbufp_lb,icbufp_ub,1,img_dims)
+      call xmp_coarray_bind(icbufp_desc,icbufp)
+      call xmp_new_array_section(icbufp_sec,1)
+
+!     allocate(ircbufp((ncell/npy)*(ncell/npx)*2)[*])
+      ircbufp_lb(1) = 1
+      ircbufp_ub(1) = (ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(ircbufp_desc,4,1,
+     & ircbufp_lb,ircbufp_ub,1,img_dims)
+      call xmp_coarray_bind(ircbufp_desc,ircbufp)
+      call xmp_new_array_section(ircbufp_sec,1)
+
+      !allocate(icbufm ((ncell/npy)*(ncell/npx)*2)[*])
+      icbufm_lb(1) = 1
+      icbufm_ub(1) = (ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(icbufm_desc,4,1,
+     & icbufm_lb,icbufm_ub,1,img_dims)
+      call xmp_coarray_bind(icbufm_desc,icbufm)
+      call xmp_new_array_section(icbufm_sec,1)
+
+      !allocate(ircbufm((ncell/npy)*(ncell/npx)*2)[*])
+      ircbufm_lb(1) = 1
+      ircbufm_ub(1) = (ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(ircbufm_desc,4,1,
+     & ircbufm_lb,ircbufm_ub,1,img_dims)
+      call xmp_coarray_bind(ircbufm_desc,ircbufm)
+      call xmp_new_array_section(ircbufm_sec,1)
+
+      !allocate(ibuffp (na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+      ibuffp_lb(1) = 1
+      ibuffp_ub(1) = na1cell*(ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(ibuffp_desc,4,1,
+     & ibuffp_lb,ibuffp_ub,1,img_dims)
+      call xmp_coarray_bind(ibuffp_desc,ibuffp)
+      call xmp_new_array_section(ibuffp_sec,1)
+
+      !allocate(irbuffp(na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+      irbuffp_lb(1) = 1
+      irbuffp_ub(1) = na1cell*(ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(irbuffp_desc,4,1,
+     & irbuffp_lb,irbuffp_ub,1,img_dims)
+      call xmp_coarray_bind(irbuffp_desc,irbuffp)
+      call xmp_new_array_section(irbuffp_sec,1)
+
+      !allocate(ibuffm (na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+      ibuffm_lb(1) = 1
+      ibuffm_ub(1) = na1cell*(ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(ibuffm_desc,4,1,
+     & ibuffm_lb,ibuffm_ub,1,img_dims)
+      call xmp_coarray_bind(ibuffm_desc,ibuffm)
+      call xmp_new_array_section(ibuffm_sec,1)
+
+      !allocate(irbuffm(na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+      irbuffm_lb(1) = 1
+      irbuffm_ub(1) = na1cell*(ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(irbuffm_desc,4,1,
+     & irbuffm_lb,irbuffm_ub,1,img_dims)
+      call xmp_coarray_bind(irbuffm_desc,irbuffm)
+      call xmp_new_array_section(irbuffm_sec,1)
+
+      !allocate(buffp (3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+      buffp_lb(1) = 1
+      buffp_ub(1) = 3
+      buffp_lb(2) = 1
+      buffp_ub(2) = na1cell*(ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(buffp_desc,4,2,
+     & buffp_lb,buffp_ub,1,img_dims)
+      call xmp_coarray_bind(buffp_desc,buffp)
+      call xmp_new_array_section(buffp_sec,2)
+
+      !allocate(rbuffp(3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+      rbuffp_lb(1) = 1
+      rbuffp_ub(1) = 3
+      rbuffp_lb(2) = 1
+      rbuffp_ub(2) = na1cell*(ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(rbuffp_desc,4,2,
+     & rbuffp_lb,rbuffp_ub,1,img_dims)
+      call xmp_coarray_bind(rbuffp_desc,rbuffp)
+      call xmp_new_array_section(rbuffp_sec,2)
+
+      !allocate(buffm (3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+      buffm_lb(1) = 1
+      buffm_ub(1) = 3
+      buffm_lb(2) = 1
+      buffm_ub(2) = na1cell*(ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(buffm_desc,4,2,
+     & buffm_lb,buffm_ub,1,img_dims)
+      call xmp_coarray_bind(buffm_desc,buffm)
+      call xmp_new_array_section(buffm_sec,2)
+
+      !allocate(rbuffm(3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+      rbuffm_lb(1) = 1
+      rbuffm_ub(1) = 3
+      rbuffm_lb(2) = 1
+      rbuffm_ub(2) = na1cell*(ncell/npy)*(ncell/npx)*2
+      call xmp_new_coarray(rbuffm_desc,4,2,
+     & rbuffm_lb,rbuffm_ub,1,img_dims)
+      call xmp_coarray_bind(rbuffm_desc,rbuffm)
+      call xmp_new_array_section(rbuffm_sec,2)
+
 
       return
       end
@@ -123,6 +216,12 @@ c----------------------------------------------------------------------
       integer nd
       integer(4) status
 !!
+      call xmp_new_array_section(na_per_cell_local_sec,3)
+      call xmp_new_array_section(na_per_cell_remote_sec,3)
+      call xmp_new_array_section(wkxyz_local_sec,2)
+      call xmp_new_array_section(wkxyz_remote_sec,2)
+      call xmp_new_array_section(m2i_local_sec,1)
+      call xmp_new_array_section(m2i_remote_sec,1)
 
 c----- common parameters for coordinate communication. -----
       ipx=mod(myrank,npx)
@@ -186,8 +285,25 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             ipz_mdest, myrank,
 !coarray     &             ircbufm, nccm, MPI_INTEGER, ipz_msrc, ipz_msrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      ircbufp(1:nccp)[ipz_pdest+1] = icbufp(1:nccp) ! Put
-      ircbufm(1:nccm)[ipz_mdest+1] = icbufm(1:nccm) ! Put
+
+      !ircbufp(1:nccp)[ipz_pdest+1] = icbufp(1:nccp) ! Put
+      call xmp_array_section_set_triplet(ircbufp_sec,
+     & 1,int(1,kind=8),int(nccp,kind=8),1,status)
+      call xmp_array_section_set_triplet(icbufp_sec,
+     & 1,int(1,kind=8),int(nccp,kind=8),1,status)
+      img_dims(1) = ipz_pdest+1
+      call xmp_coarray_put(img_dims,ircbufp_desc,ircbufp_sec,
+     & icbufp_desc,icbufp_sec,status)
+
+      !ircbufm(1:nccm)[ipz_mdest+1] = icbufm(1:nccm) ! Put
+      call xmp_array_section_set_triplet(ircbufm_sec,
+     & 1,int(1,kind=8),int(nccm,kind=8),1,status)
+      call xmp_array_section_set_triplet(icbufm_sec,
+     & 1,int(1,kind=8),int(nccm,kind=8),1,status)
+      img_dims(1) = ipz_mdest+1
+      call xmp_coarray_put(img_dims,ircbufm_desc,ircbufm_sec,
+     & icbufm_desc,icbufm_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -296,10 +412,52 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             myrank, irbuffm, ncarm, MPI_INTEGER,
 !coarray     &             ipz_msrc, ipz_msrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      rbuffp(1:3,1:ncap)[ipz_pdest+1] = buffp(1:3,1:ncap) ! Put
-      irbuffp(1:ncap)[ipz_pdest+1]    = ibuffp(1:ncap)    ! Put
-      rbuffm(1:3,1:ncam)[ipz_mdest+1] = buffm(1:3,1:ncam) ! Put
-      irbuffm(1:ncam)[ipz_mdest+1]    = ibuffm(1:ncam)    ! Put 
+
+      !rbuffp(1:3,1:ncap)[ipz_pdest+1] = buffp(1:3,1:ncap) ! Put
+      call xmp_array_section_set_triplet(rbuffp_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(rbuffp_sec,
+     & 2,int(1,kind=8),int(ncap,kind=8),1,status)
+      call xmp_array_section_set_triplet(buffp_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(buffp_sec,
+     & 2,int(1,kind=8),int(ncap,kind=8),1,status)
+      img_dims(1) = ipz_pdest+1
+      call xmp_coarray_put(img_dims,rbuffp_desc,rbuffp_sec,
+     & buffp_desc,buffp_sec,status)
+
+      !irbuffp(1:ncap)[ipz_pdest+1]    = ibuffp(1:ncap)    ! Put
+      call xmp_array_section_set_triplet(irbuffp_sec,
+     & 1,int(1,kind=8),int(ncap,kind=8),1,status)
+      call xmp_array_section_set_triplet(ibuffp_sec,
+     & 1,int(1,kind=8),int(ncap,kind=8),1,status)
+      img_dims(1) = ipz_pdest+1
+      call xmp_coarray_put(img_dims,irbuffp_desc,irbuffp_sec,
+     & ibuffp_desc,ibuffp_sec,status)
+
+
+      !rbuffm(1:3,1:ncam)[ipz_mdest+1] = buffm(1:3,1:ncam) ! Put
+      call xmp_array_section_set_triplet(rbuffm_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(rbuffm_sec,
+     & 2,int(1,kind=8),int(ncap,kind=8),1,status)
+      call xmp_array_section_set_triplet(buffm_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(buffm_sec,
+     & 2,int(1,kind=8),int(ncap,kind=8),1,status)
+      img_dims(1) = ipz_mdest+1
+      call xmp_coarray_put(img_dims,rbuffm_desc,rbuffm_sec,
+     & buffm_desc,buffm_sec,status)
+
+      !irbuffm(1:ncam)[ipz_mdest+1]    = ibuffm(1:ncam)    ! Put 
+      call xmp_array_section_set_triplet(irbuffm_sec,
+     & 1,int(1,kind=8),int(ncap,kind=8),1,status)
+      call xmp_array_section_set_triplet(ibuffm_sec,
+     & 1,int(1,kind=8),int(ncap,kind=8),1,status)
+      img_dims(1) = ipz_mdest+1
+      call xmp_coarray_put(img_dims,irbuffm_desc,irbuffm_sec,
+     & ibuffm_desc,ibuffm_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -374,8 +532,25 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             ipz_mdest, myrank,
 !coarray     &             icbufm, nccm, MPI_INTEGER, ipz_msrc, ipz_msrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      icbufp(1:nccp)[ipz_pdest+1] = ircbufp(1:nccp) ! Put
-      icbufm(1:nccm)[ipz_mdest+1] = ircbufm(1:nccm) ! Put
+
+      !icbufp(1:nccp)[ipz_pdest+1] = ircbufp(1:nccp) ! Put
+      call xmp_array_section_set_triplet(icbufp_sec,
+     & 1,int(1,kind=8),int(nccp,kind=8),1,status)
+      call xmp_array_section_set_triplet(ircbufp_sec,
+     & 1,int(1,kind=8),int(nccp,kind=8),1,status)
+      img_dims(1) = ipz_pdest+1
+      call xmp_coarray_put(img_dims,icbufp_desc,icbufp_sec,
+     & ircbufp_desc,ircbufp_sec,status)
+
+      !icbufm(1:nccm)[ipz_mdest+1] = ircbufm(1:nccm) ! Put
+      call xmp_array_section_set_triplet(icbufm_sec,
+     & 1,int(1,kind=8),int(nccp,kind=8),1,status)
+      call xmp_array_section_set_triplet(ircbufm_sec,
+     & 1,int(1,kind=8),int(nccp,kind=8),1,status)
+      img_dims(1) = ipz_mdest+1
+      call xmp_coarray_put(img_dims,icbufm_desc,icbufm_sec,
+     & ircbufm_desc,ircbufm_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -449,10 +624,50 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             ipz_mdest, myrank,
 !coarray     &             ibuffm, ncar2m, MPI_INTEGER, ipz_msrc, ipz_msrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      buffp(1:3,1:ncarp)[ipz_pdest+1] = rbuffp(1:3,1:ncarp) ! Put 
-      ibuffp(1:ncarp)[ipz_pdest+1]    = irbuffp(1:ncarp)    ! Put
-      buffm(1:3,1:ncarm)[ipz_mdest+1] = rbuffm(1:3,1:ncarm) ! Put
-      ibuffm(1:ncarm)[ipz_mdest+1]    = irbuffm(1:ncarm)    ! Put
+      !buffp(1:3,1:ncarp)[ipz_pdest+1] = rbuffp(1:3,1:ncarp) ! Put 
+      call xmp_array_section_set_triplet(buffp_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(buffp_sec,
+     & 2,int(1,kind=8),int(ncarp,kind=8),1,status)
+      call xmp_array_section_set_triplet(rbuffp_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(rbuffp_sec,
+     & 2,int(1,kind=8),int(ncarp,kind=8),1,status)
+      img_dims(1) = ipz_pdest+1
+      call xmp_coarray_put(img_dims,buffp_desc,buffp_sec,
+     & rbuffp_desc,rbuffp_sec,status)
+
+      !ibuffp(1:ncarp)[ipz_pdest+1]    = irbuffp(1:ncarp)    ! Put
+      call xmp_array_section_set_triplet(ibuffp_sec,
+     & 1,int(1,kind=8),int(ncarp,kind=8),1,status)
+      call xmp_array_section_set_triplet(irbuffp_sec,
+     & 1,int(1,kind=8),int(ncarp,kind=8),1,status)
+      img_dims(1) = ipz_pdest+1
+      call xmp_coarray_put(img_dims,ibuffp_desc,ibuffp_sec,
+     & irbuffp_desc,irbuffp_sec,status)
+
+      !buffm(1:3,1:ncarm)[ipz_mdest+1] = rbuffm(1:3,1:ncarm) ! Put
+      call xmp_array_section_set_triplet(buffm_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(buffm_sec,
+     & 2,int(1,kind=8),int(ncarm,kind=8),1,status)
+      call xmp_array_section_set_triplet(rbuffm_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(rbuffm_sec,
+     & 2,int(1,kind=8),int(ncarm,kind=8),1,status)
+      img_dims(1) = ipz_mdest+1
+      call xmp_coarray_put(img_dims,buffm_desc,buffm_sec,
+     & rbuffm_desc,rbuffm_sec,status)
+
+      !ibuffm(1:ncarm)[ipz_mdest+1]    = irbuffm(1:ncarm)    ! Put
+      call xmp_array_section_set_triplet(ibuffm_sec,
+     & 1,int(1,kind=8),int(ncarm,kind=8),1,status)
+      call xmp_array_section_set_triplet(irbuffm_sec,
+     & 1,int(1,kind=8),int(ncarm,kind=8),1,status)
+      img_dims(1) = ipz_mdest+1
+      call xmp_coarray_put(img_dims,ibuffm_desc,ibuffm_sec,
+     & irbuffm_desc,irbuffm_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -557,11 +772,54 @@ c----- common parameters for coordinate communication. -----
 !coarray     &                ipy_msrc, ipy_msrc,
 !coarray     &                mpi_comm_world, istatus, ierr )
       nd = abs(icyp1 - icyp0)
-         na_per_cell(:, icybp0:icybp0+nd, icx)[ipy_pdest+1]
-     . = na_per_cell(:,  icyp0:icyp0 +nd, icx) ! Put
+!     !    na_per_cell(:, icybp0:icybp0+nd, icx)[ipy_pdest+1]
+!     !. = na_per_cell(:,  icyp0:icyp0 +nd, icx) ! Put
+
+
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 1,int(1,kind=8),int(lzdiv+4,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 2,int(icybp0,kind=8),int(icybp0+nd,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 3,int(icx,kind=8),int(1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 1,int(1,kind=8),int(lzdiv+4,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 2,int(icyp0,kind=8),int(icyp0+nd,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 3,int(icx,kind=8),int(1,kind=8),1,status)
+
+      img_dims(1) = ipy_pdest+1
+      call xmp_coarray_put(img_dims,na_per_cell_desc,
+     & na_per_cell_remote_sec, 
+     & na_per_cell_desc,na_per_cell_local_sec,status)
+
+
       nd = abs(icym1 - icym0)
-         na_per_cell(:, icybm0:icybm0+nd, icx)[ipy_mdest+1]
-     . = na_per_cell(:,  icym0:icym0 +nd, icx) ! Put
+!    !     na_per_cell(:, icybm0:icybm0+nd, icx)[ipy_mdest+1]
+!    ! . = na_per_cell(:,  icym0:icym0 +nd, icx) ! Put
+
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 1,int(1,kind=8),int(lzdiv+4,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 2,int(icybm0,kind=8),int(icybm0+nd,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 3,int(icx,kind=8),int(1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 1,int(1,kind=8),int(lzdiv+4,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 2,int(icym0,kind=8),int(icym0+nd,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 3,int(icx,kind=8),int(1,kind=8),1,status)
+
+      img_dims(1) = ipy_mdest+1
+      call xmp_coarray_put(img_dims,
+     & na_per_cell_desc,na_per_cell_remote_sec,
+     & na_per_cell_desc,na_per_cell_local_sec,status)
+
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -634,18 +892,73 @@ c----- common parameters for coordinate communication. -----
 !coarray     &                ipy_mdest, myrank,
 !coarray     &                m2i(icarm), ncam, MPI_INTEGER, ipy_msrc, ipy_msrc,
 !coarray     &                mpi_comm_world, istatus, ierr )
-         wkxyz(:,icarp:icarp+ncap-1)[ipy_pdest+1]
-     . = wkxyz(:,icasp:icasp+ncap-1) ! Put
-         m2i(icarp:icarp+ncap-1)[ipy_pdest+1]
-     . = m2i(icasp:icasp+ncap-1)     ! Put
+
+!     !    wkxyz(:,icarp:icarp+ncap-1)[ipy_pdest+1]
+!     !. = wkxyz(:,icasp:icasp+ncap-1) ! Put
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 2,int(icarp,kind=8),int(icarp+ncap-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 2,int(icasp,kind=8),int(icasp+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipy_pdest+1
+      call xmp_coarray_put(img_dims,wkxyz_desc,wkxyz_remote_sec,
+     & wkxyz_desc,wkxyz_local_sec,status)
+
+
+!     !    m2i(icarp:icarp+ncap-1)[ipy_pdest+1]
+!     !. = m2i(icasp:icasp+ncap-1)     ! Put
+      call xmp_array_section_set_triplet(m2i_remote_sec,
+     & 1,int(icarp,kind=8),int(icarp+ncap-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(m2i_local_sec,
+     & 1,int(icasp,kind=8),int(icasp+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipy_pdest+1
+      call xmp_coarray_put(img_dims,m2i_desc,m2i_remote_sec,
+     & m2i_desc,m2i_local_sec,status)
+
+
+
 !      sync all
       call xmp_sync_all(status)
-         wkxyz(:,icarm:icarm+ncam-1)[ipy_mdest+1]
-     . = wkxyz(:,icasm:icasm+ncam-1) ! Put
-         m2i(icarm:icarm+ncam-1)[ipy_mdest+1]
-     . = m2i(icasm:icasm+ncam-1)     ! Put
+!     !    wkxyz(:,icarm:icarm+ncam-1)[ipy_mdest+1]
+!     !. = wkxyz(:,icasm:icasm+ncam-1) ! Put
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 2,int(icarp,kind=8),int(icarp+ncam-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 2,int(icasm,kind=8),int(icasm+ncam-1,kind=8),1,status)
+
+      img_dims(1) = ipy_mdest+1
+      call xmp_coarray_put(img_dims,wkxyz_desc,wkxyz_remote_sec,
+     & wkxyz_desc,wkxyz_local_sec,status)
+
+
+
+!     !    m2i(icarm:icarm+ncam-1)[ipy_mdest+1]
+!     !. = m2i(icasm:icasm+ncam-1)     ! Put
+      call xmp_array_section_set_triplet(m2i_remote_sec,
+     & 1,int(icarm,kind=8),int(icarm+ncam-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(m2i_local_sec,
+     & 1,int(icasm,kind=8),int(icasm+ncam-1,kind=8),1,status)
+
+      img_dims(1) = ipy_mdest+1
+      call xmp_coarray_put(img_dims,m2i_desc,m2i_remote_sec,
+     & m2i_desc,m2i_local_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
+
 !!
 #else
                call mpi_irecv(wkxyz(1,icarp), 3*ncap, 
@@ -697,13 +1010,55 @@ c----- common parameters for coordinate communication. -----
 !coarray     &                ipy_msrc, ipy_msrc,
 !coarray     &                mpi_comm_world, istatus, ierr )
       nd = abs(icyp1 - icyp0)
-         na_per_cell(:,   icybp0:icybp0+nd,   icx)[ipy_pdest+1]
-     . = na_per_cell(:, icybp1st:icybp1st+nd, icx) ! Put
+
+!     !    na_per_cell(:,   icybp0:icybp0+nd,   icx)[ipy_pdest+1]
+!     !. = na_per_cell(:, icybp1st:icybp1st+nd, icx) ! Put
+
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 1,int(1,kind=8),int(lzdiv+4,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 2,int(icybp0,kind=8),int(icybp0+nd,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 3,int(icx,kind=8),int(1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 1,int(1,kind=8),int(lzdiv+4,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 2,int(icybp1st,kind=8),int(icybp1st+nd,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 3,int(icx,kind=8),int(1,kind=8),1,status)
+
+      img_dims(1) = ipy_pdest+1
+      call xmp_coarray_put(img_dims,
+     & na_per_cell_desc,na_per_cell_remote_sec,
+     & na_per_cell_desc,na_per_cell_local_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
       nd = abs(icym1 - icym0)
-         na_per_cell(:,   icybm0:icybm0+nd,   icx)[ipy_pdest+1]
-     . = na_per_cell(:, icybm1st:icybm1st+nd, icx) ! Put
+!     !    na_per_cell(:,   icybm0:icybm0+nd,   icx)[ipy_pdest+1]
+!     !. = na_per_cell(:, icybm1st:icybm1st+nd, icx) ! Put
+
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 1,int(1,kind=8),int(lzdiv+4,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 2,int(icybm0,kind=8),int(icybm0+nd,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 3,int(icx,kind=8),int(1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 1,int(1,kind=8),int(lzdiv+4,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 2,int(icybm1st,kind=8),int(icybm1st+nd,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 3,int(icx,kind=8),int(1,kind=8),1,status)
+
+      img_dims(1) = ipy_pdest+1
+      call xmp_coarray_put(img_dims,
+     & na_per_cell_desc,na_per_cell_remote_sec,
+     & na_per_cell_desc,na_per_cell_local_sec,status)
+
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -766,18 +1121,74 @@ c----- common parameters for coordinate communication. -----
 !coarray     &                ipy_mdest, myrank,
 !coarray     &                m2i(icarm), ncam, MPI_INTEGER,ipy_msrc,ipy_msrc,
 !coarray     &                mpi_comm_world, istatus, ierr )
-         wkxyz(:,icarp:icarp+ncap-1)[ipy_pdest+1]
-     . = wkxyz(:,icasp:icasp+ncap-1) ! Put
-         m2i(icarp:icarp+ncap-1)[ipy_pdest+1]
-     . = m2i(icasp:icasp+ncap-1)     ! Put
+
+
+!     !    wkxyz(:,icarp:icarp+ncap-1)[ipy_pdest+1]
+!     !. = wkxyz(:,icasp:icasp+ncap-1) ! Put
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 2,int(icarp,kind=8),int(icarp+ncap-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 2,int(icasp,kind=8),int(icasp+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipy_pdest+1
+      call xmp_coarray_put(img_dims,wkxyz_desc,wkxyz_remote_sec,
+     & wkxyz_desc,wkxyz_local_sec,status)
+
+!     !    m2i(icarp:icarp+ncap-1)[ipy_pdest+1]
+!     !. = m2i(icasp:icasp+ncap-1)     ! Put
+      call xmp_array_section_set_triplet(m2i_remote_sec,
+     & 1,int(icarp,kind=8),int(icarp+ncap-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(m2i_local_sec,
+     & 1,int(icasp,kind=8),int(icasp+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipy_pdest+1
+      call xmp_coarray_put(img_dims,m2i_desc,m2i_remote_sec,
+     & m2i_desc,m2i_local_sec,status)
+
+
 !      sync all
       call xmp_sync_all(status)
-         wkxyz(:,icarm:icarm+ncam-1)[ipy_mdest+1]
-     . = wkxyz(:,icasm:icasm+ncam-1) ! Put
-         m2i(icarm:icarm+ncam-1)[ipy_mdest+1]
-     . = m2i(icasm:icasm+ncam-1)     ! Put
+
+!     !    wkxyz(:,icarm:icarm+ncam-1)[ipy_mdest+1]
+!     !. = wkxyz(:,icasm:icasm+ncam-1) ! Put
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 2,int(icarm,kind=8),int(icarm+ncam-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 2,int(icasm,kind=8),int(icasm+ncam-1,kind=8),1,status)
+
+      img_dims(1) = ipy_mdest+1
+      call xmp_coarray_put(img_dims,wkxyz_desc,wkxyz_remote_sec,
+     & wkxyz_desc,wkxyz_local_sec,status)
+
+
+
+!     !    m2i(icarm:icarm+ncam-1)[ipy_mdest+1]
+!     !. = m2i(icasm:icasm+ncam-1)     ! Put
+      call xmp_array_section_set_triplet(m2i_remote_sec,
+     & 1,int(icarm,kind=8),int(icarm+ncam-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(m2i_local_sec,
+     & 1,int(icasm,kind=8),int(icasm+ncam-1,kind=8),1,status)
+
+      img_dims(1) = ipy_mdest+1
+      call xmp_coarray_put(img_dims,m2i_desc,m2i_remote_sec,
+     & m2i_desc,m2i_local_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
+
+
 !!
 #else
                call mpi_irecv(wkxyz(1,icarp), 3*ncap, 
@@ -855,11 +1266,32 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             na_per_cell(icz0,icy0,icxbp0),
 !coarray     &             nccp, MPI_INTEGER, ipx_psrc, ipx_psrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      na_per_cell(icz0:icz1,icy0:icy1,icxbp0:icxbp0+(icxp1-icxp0))
-     . [ipx_pdest+1]
-     . = na_per_cell(icz0:icz1,icy0:icy1,icxp0:icxp1) ! Put
+!     ! na_per_cell(icz0:icz1,icy0:icy1,icxbp0:icxbp0+(icxp1-icxp0))
+!     !. [ipx_pdest+1]
+!     !. = na_per_cell(icz0:icz1,icy0:icy1,icxp0:icxp1) ! Put
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 1,int(icz0,kind=8),int(icz1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 2,int(icy0,kind=8),int(icy1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 3,int(icxbp0,kind=8),int(icxbp0+(icxp1-icxp0),kind=8),1,status)
+
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 1,int(icz0,kind=8),int(icz1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 2,int(icy0,kind=8),int(icy1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 3,int(icxp0,kind=8),int(icxp1,kind=8),1,status)
+
+      img_dims(1) = ipx_pdest+1
+      call xmp_coarray_put(img_dims,
+     & na_per_cell_desc,na_per_cell_remote_sec,
+     & na_per_cell_desc,na_per_cell_local_sec,status)
+
+
 !      sync all
       call xmp_sync_all(status)
+
 !!
 #endif
 !coarray            call mpi_sendrecv(na_per_cell(icz0,icy0,icxm0), nccm,
@@ -867,9 +1299,29 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             na_per_cell(icz0,icy0,icxbm0), nccm, MPI_INTEGER,
 !coarray     &             ipx_msrc, ipx_msrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      na_per_cell(icz0:icz1,icy0:icy1,icxbm0:icxbm0+(icxm1-icxm0))
-     . [ipx_mdest+1]
-     . = na_per_cell(icz0:icz1,icy0:icy1,icxm0:icxm1) ! Put
+!     ! na_per_cell(icz0:icz1,icy0:icy1,icxbm0:icxbm0+(icxm1-icxm0))
+!     !. [ipx_mdest+1]
+!     !. = na_per_cell(icz0:icz1,icy0:icy1,icxm0:icxm1) ! Put
+
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 1,int(icz0,kind=8),int(icz1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 2,int(icy0,kind=8),int(icy1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 3,int(icxbm0,kind=8),int(icxbm0+(icxm1-icxm0),kind=8),1,status)
+
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 1,int(icz0,kind=8),int(icz1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 2,int(icy0,kind=8),int(icy1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 3,int(icxm0,kind=8),int(icxm1,kind=8),1,status)
+
+      img_dims(1) = ipx_mdest+1
+      call xmp_coarray_put(img_dims,
+     & na_per_cell_desc,na_per_cell_remote_sec,
+     & na_per_cell_desc,na_per_cell_local_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -956,10 +1408,34 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             ipx_pdest, myrank,
 !coarray     &             m2i(icarp), ncap, MPI_INTEGER, ipx_psrc, ipx_psrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-         wkxyz(:,icarp:icarp+ncap-1)[ipx_pdest+1]
-     . = wkxyz(:,icasp:icasp+ncap-1) ! Put
-         m2i(icarp:icarp+ncap-1)[ipx_pdest+1]
-     . = m2i(icasp:icasp+ncap-1)     ! Put
+!     !    wkxyz(:,icarp:icarp+ncap-1)[ipx_pdest+1]
+!     !. = wkxyz(:,icasp:icasp+ncap-1) ! Put
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 2,int(icarp,kind=8),int(icarp+ncap-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 2,int(icasp,kind=8),int(icasp+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipx_pdest+1
+      call xmp_coarray_put(img_dims,wkxyz_desc,wkxyz_remote_sec,
+     & wkxyz_desc,wkxyz_local_sec,status)
+
+!     !    m2i(icarp:icarp+ncap-1)[ipx_pdest+1]
+!     !. = m2i(icasp:icasp+ncap-1)     ! Put
+      call xmp_array_section_set_triplet(m2i_remote_sec,
+     & 1,int(icarp,kind=8),int(icarp+ncap-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(m2i_local_sec,
+     & 1,int(icasp,kind=8),int(icasp+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipx_pdest+1
+      call xmp_coarray_put(img_dims,m2i_desc,m2i_remote_sec,
+     & m2i_desc,m2i_local_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -973,12 +1449,36 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             ipx_mdest, myrank,
 !coarray     &             m2i(icarm), ncam, MPI_INTEGER, ipx_msrc, ipx_msrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-         wkxyz(:,icarm:icarm+ncam-1)[ipx_mdest+1]
-     . = wkxyz(:,icasm:icasm+ncam-1) ! Put
-         m2i(icarm:icarm+ncam-1)[ipx_mdest+1]
-     . = m2i(icasm:icasm+ncam-1)     ! Put
+!     !    wkxyz(:,icarm:icarm+ncam-1)[ipx_mdest+1]
+!     !. = wkxyz(:,icasm:icasm+ncam-1) ! Put
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 2,int(icarm,kind=8),int(icarm+ncam-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 2,int(icasm,kind=8),int(icasm+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipx_mdest+1
+      call xmp_coarray_put(img_dims,wkxyz_desc,wkxyz_remote_sec,
+     & wkxyz_desc,wkxyz_local_sec,status)
+
+!     !    m2i(icarm:icarm+ncam-1)[ipx_mdest+1]
+!     !. = m2i(icasm:icasm+ncam-1)     ! Put
+      call xmp_array_section_set_triplet(m2i_remote_sec,
+     & 1,int(icarm,kind=8),int(icarm+ncam-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(m2i_local_sec,
+     & 1,int(icasm,kind=8),int(icasm+ncam-1,kind=8),1,status)
+
+      img_dims(1) = ipx_mdest+1
+      call xmp_coarray_put(img_dims,m2i_desc,m2i_remote_sec,
+     & m2i_desc,m2i_local_sec,status)
 !      sync all
       call xmp_sync_all(status)
+
 !!
 #else
 #ifndef HALFDIREE
@@ -1046,8 +1546,31 @@ c----- common parameters for coordinate communication. -----
 !coarray     &           ipx_psrc, ipx_psrc,
 !coarray     &           mpi_comm_world, istatus, ierr )
       nd = abs(icxp1 - icxp0)
-      na_per_cell(icz0:icz1,icy0:icy1,icxbp0:icxbp0+nd)[ipx_pdest+1]
-     .= na_per_cell(icz0:icz1,icy0:icy1,icxbp1st:icxbp1st+nd)
+!     ! na_per_cell(icz0:icz1,icy0:icy1,icxbp0:icxbp0+nd)[ipx_pdest+1]
+!     !.= na_per_cell(icz0:icz1,icy0:icy1,icxbp1st:icxbp1st+nd)
+
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 1,int(icz0,kind=8),int(icz1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 2,int(icy0,kind=8),int(icy1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 3,int(icxbp0,kind=8),int(icxbp0+nd,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 1,int(icz0,kind=8),int(icz1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 2,int(icy0,kind=8),int(icy1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 3,int(icxbp1st,kind=8),int(icxbp1st+nd,kind=8),1,status)
+
+      img_dims(1) = ipx_pdest+1
+      call xmp_coarray_put(img_dims,
+     & na_per_cell_desc,na_per_cell_remote_sec,
+     & na_per_cell_desc,na_per_cell_local_sec,status)
+
+
+
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -1058,8 +1581,30 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             ipx_msrc, ipx_msrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
       nd = abs(icxm1 - icxm0)
-      na_per_cell(icz0:icz1,icy0:icy1,icxbm0:icxbm0+nd)[ipx_pdest+1]
-     .= na_per_cell(icz0:icz1,icy0:icy1,icxbm1st:icxbm1st+nd)
+
+!     ! na_per_cell(icz0:icz1,icy0:icy1,icxbm0:icxbm0+nd)[ipx_pdest+1]
+!     !.= na_per_cell(icz0:icz1,icy0:icy1,icxbm1st:icxbm1st+nd)
+
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 1,int(icz0,kind=8),int(icz1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 2,int(icy0,kind=8),int(icy1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_remote_sec,
+     & 3,int(icxbm0,kind=8),int(icxbm0+nd,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 1,int(icz0,kind=8),int(icz1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 2,int(icy0,kind=8),int(icy1,kind=8),1,status)
+      call xmp_array_section_set_triplet(na_per_cell_local_sec,
+     & 3,int(icxbm1st,kind=8),int(icxbm1st+nd,kind=8),1,status)
+
+      img_dims(1) = ipx_pdest+1
+      call xmp_coarray_put(img_dims,
+     & na_per_cell_desc,na_per_cell_remote_sec,
+     & na_per_cell_desc,na_per_cell_local_sec,status)
+
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -1133,10 +1678,39 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             ipx_pdest, myrank,
 !coarray     &             m2i(icarp), ncap, MPI_INTEGER, ipx_psrc, ipx_psrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      wkxyz(:,icarp:icarp+ncap-1)[ipx_pdest+1]
-     . = wkxyz(:,icasp:icasp+ncap-1) ! Put
-      m2i(icarp:icarp+ncap-1)[ipx_pdest+1]
-     . = m2i(icasp:icasp+ncap-1) ! Put
+
+!     ! wkxyz(:,icarp:icarp+ncap-1)[ipx_pdest+1]
+!     !. = wkxyz(:,icasp:icasp+ncap-1) ! Put
+
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 2,int(icarp,kind=8),int(icarp+ncap-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 2,int(icasp,kind=8),int(icasp+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipx_pdest+1
+      call xmp_coarray_put(img_dims,wkxyz_desc,wkxyz_remote_sec,
+     & wkxyz_desc,wkxyz_local_sec,status)
+
+
+
+!     ! m2i(icarp:icarp+ncap-1)[ipx_pdest+1]
+!     !. = m2i(icasp:icasp+ncap-1) ! Put
+      call xmp_array_section_set_triplet(m2i_remote_sec,
+     & 1,int(icarp,kind=8),int(icarp+ncap-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(m2i_local_sec,
+     & 1,int(icasp,kind=8),int(icasp+ncap-1,kind=8),1,status)
+
+      img_dims(1) = ipx_pdest+1
+      call xmp_coarray_put(img_dims,m2i_desc,m2i_remote_sec,
+     & m2i_desc,m2i_local_sec,status)
+
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -1150,10 +1724,35 @@ c----- common parameters for coordinate communication. -----
 !coarray     &             ipx_mdest, myrank,
 !coarray     &             m2i(icarm), ncam, MPI_INTEGER, ipx_msrc, ipx_msrc,
 !coarray     &             mpi_comm_world, istatus, ierr )
-      wkxyz(:,icarm:icarm+ncam-1)[ipx_mdest+1]
-     . = wkxyz(:,icasm:icasm+ncam-1) ! Put
-      m2i(icarm:icarm+ncam-1)[ipx_mdest+1]
-     . = m2i(icasm:icasm+ncam-1) ! Put
+!     ! wkxyz(:,icarm:icarm+ncam-1)[ipx_mdest+1]
+!     !. = wkxyz(:,icasm:icasm+ncam-1) ! Put
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_remote_sec,
+     & 2,int(icarm,kind=8),int(icarm+ncam-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 1,int(1,kind=8),int(3,kind=8),1,status)
+      call xmp_array_section_set_triplet(wkxyz_local_sec,
+     & 2,int(icasm,kind=8),int(icasm+ncam-1,kind=8),1,status)
+
+      img_dims(1) = ipx_mdest+1
+      call xmp_coarray_put(img_dims,wkxyz_desc,wkxyz_remote_sec,
+     & wkxyz_desc,wkxyz_local_sec,status)
+
+
+!     ! m2i(icarm:icarm+ncam-1)[ipx_mdest+1]
+!     !. = m2i(icasm:icasm+ncam-1) ! Put
+      call xmp_array_section_set_triplet(m2i_remote_sec,
+     & 1,int(icarm,kind=8),int(icarm+ncam-1,kind=8),1,status)
+
+      call xmp_array_section_set_triplet(m2i_local_sec,
+     & 1,int(icasm,kind=8),int(icasm+ncam-1,kind=8),1,status)
+
+      img_dims(1) = ipx_pdest+1
+      call xmp_coarray_put(img_dims,m2i_desc,m2i_remote_sec,
+     & m2i_desc,m2i_local_sec,status)
+
 !      sync all
       call xmp_sync_all(status)
 !!
@@ -1242,5 +1841,23 @@ c----- common parameters for coordinate communication. -----
 !$omp end parallel
       ndatm=nselfatm+ntmp
 
+      call xmp_free_array_section(icbufp_sec)
+      call xmp_free_array_section(ircbufp_sec)
+      call xmp_free_array_section(icbufm_sec)
+      call xmp_free_array_section(ircbufm_sec)
+      call xmp_free_array_section(ibuffp_sec)
+      call xmp_free_array_section(irbuffp_sec)
+      call xmp_free_array_section(ibuffm_sec)
+      call xmp_free_array_section(irbuffm_sec)
+      call xmp_free_array_section(buffp_sec)
+      call xmp_free_array_section(rbuffp_sec)
+      call xmp_free_array_section(buffm_sec)
+      call xmp_free_array_section(rbuffm_sec)
+      call xmp_free_array_section(wkxyz_local_sec)
+      call xmp_free_array_section(wkxyz_remote_sec)
+      call xmp_free_array_section(m2i_local_sec)
+      call xmp_free_array_section(m2i_remote_sec)
+      call xmp_free_array_section(na_per_cell_local_sec)
+      call xmp_free_array_section(na_per_cell_remote_sec)
       return
       end
