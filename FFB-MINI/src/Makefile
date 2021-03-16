@@ -39,7 +39,7 @@ OBJS += metis_wrapper.o
 endif
 
 ifeq (, $(findstring -DNO_REFINER, $(FFLAGS)))
-OBJS += xmpAPI_lrfnms.o extrfn.o
+OBJS += xmpAPI_lrfnms.o xmpAPI_extrfn.o
 endif
 
 param.h: param.h.in

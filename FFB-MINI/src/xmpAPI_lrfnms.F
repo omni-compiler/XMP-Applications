@@ -203,7 +203,8 @@ C
          CALL DDCOMX(IPART,IDIM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,
 C Fujitsu start 202103
 C     *               WRK04,WRK04,WRK04,NP,IUT0,IERR,RX,RY,MAXBUF)
-     *               WRK04,WRK04,WRK04,NP,IUT0,IERR,rx_desc,ry_desc,MAXBUF)
+     *               WRK04,WRK04,WRK04,NP,IUT0,IERR,rx_desc,ry_desc,
+     *               MAXBUF)
 C Fujitsu end 202103
          CALL ERRCHK(IUT6,IPART,1,IERR,IERRA)
          IF(IERRA.NE.0) THEN
@@ -223,7 +224,10 @@ CC
      *            NPINLT,LPINLT,
      *            LWRK01,LWRK02,LEACNV,NE1,NE2,NDORG,NODEBK,
      *            WRK04,IPART,NDOM,MBPDOM,LDOM,NBPDOM,
-     *            IPSLF,IPSND,RX,RY,MAXBUF,IUT0,IERR)
+C Fujitsu start 202103
+C     *            IPSLF,IPSND,RX,RY,MAXBUF,IUT0,IERR)
+     *            IPSLF,IPSND,rx_desc,ry_desc,MAXBUF,IUT0,IERR)
+C Fujitsu end 202103
       CALL ERRCHK(IUT6,IPART,1,IERR,IERRA)
       IF(IERRA.NE.0) THEN
          WRITE(IUT0,*)
@@ -708,7 +712,10 @@ C
          CALL DDCOM4(NDOM,LDOM,MBPDOM,
      *               NPB1,LPB1,XPB1,YPB1,ZPB1,
      *               NPB2,LPB2,XPB2,YPB2,ZPB2,
-     *               MAXBUF,RX,RY,IUT0,IERR)
+C Fujitsu start 202103
+C     *               MAXBUF,RX,RY,IUT0,IERR)
+     *               MAXBUF,rx_desc,ry_desc,IUT0,IERR)
+C Fujitsu end 202103
 C
 CC
 CC    MAKE INTER-CONNECT NODES
@@ -771,7 +778,10 @@ C
          CALL DDCOM4(NDOM,LDOM,MBPDOM,
      *               NPB0,LPB1,XPB1,YPB1,ZPB1,
      *               NPB2,LPB2,XPB2,YPB2,ZPB2,
-     *               MAXBUF,RX,RY,IUT0,IERR)
+C Fujitsu start 202103
+C     *               MAXBUF,RX,RY,IUT0,IERR)
+     *               MAXBUF,rx_desc,ry_desc,IUT0,IERR)
+C Fujitsu end 202103
 C
          DO 6950 IDOM=1,NDOM
             IF(NPB0(IDOM).NE.NPB2(IDOM)) IERR=1
