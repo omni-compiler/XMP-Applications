@@ -57,7 +57,7 @@ done
 cat << EOF2 >> run.sh
 
 # run
-${MPIEXEC} ./${BINNAME} || exit
+${MPIEXEC} -x OMNI_ONESIDED_HEAP_SIZE=28192M ./${BINNAME} || exit
 
 ################################################################################
 EOF2

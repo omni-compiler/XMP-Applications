@@ -23,9 +23,6 @@ C      REAL*4  SN,DNX,DNY,DNZ,E,EX,EY,EZ,EXX,EYY,EZZ,EXY,EYZ,EXZ
       REAL*4 , POINTER :: DNX ( : , : ) => null ( )
       REAL*4 , POINTER :: DNY ( : , : ) => null ( )
       INTEGER*8 :: rx_desc, ry_desc
-      INTEGER*8, DIMENSION(2) :: rx_lb, rx_ub, ry_lb, ry_ub
-      INTEGER*4 :: img_dims(1)
-      INTEGER*4 :: status
 C Fujitsu end 202103
       INTEGER IUT0,IERR
       REAL*8  NN,NC,PSI,PSIC,WW
