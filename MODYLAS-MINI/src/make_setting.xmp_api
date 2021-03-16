@@ -14,7 +14,5 @@ OMNI_INC = -I$(OMNI_HOME)/include
 OMNI_LIB = $(shell xmpcc --show-env | grep OMNI_LINKER_OPT | sed -e 's/OMNI_LINKER_OPT=//' -e 's/"//g')
 
 
-FFLAGS += -I$(MPIHOME)/include $(OMNI_LIB) $(OMNI_INC)
-
-# TODO: temporal option 
-#FFLAGS += -fcoarray=lib
+LIBS = $(OMNI_LIB)
+FFLAGS += -I$(MPIHOME)/include $(OMNI_INC)
