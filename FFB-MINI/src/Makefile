@@ -20,19 +20,33 @@ FFLAGS += -DFFB_MINI_VERSION=\"$(VERSION)\"
 all: $(LES3X.MPI) $(FFB_MINI)
 
 OBJS = \
-  xmpAPI_les3x.o  xmpAPI_bcgs3x.o xmpAPI_bcgsxe.o xmpAPI_calax3.o          \
-           xmpAPI_callap.o caluel.o clrcrs.o \
+  caluel.o clrcrs.o \
   csin3x.o datcnv.o dgnscl.o e2plst.o e2pmtr.o \
-           xmpAPI_elm3dx.o          errchk.o          \
-  fild3x.o fld3x2.o                            \
-  xmpAPI_grad3x.o          icalel.o          int3dx.o \
-           lesrop.o lesrpx.o xmpAPI_lessfx.o lumpex.o \
-  match4.o matgau.o          mkcrs.o  neibr2.o \
-  xmpAPI_nodlex.o xmpAPI_pres3e.o xmpAPI_rcmelm.o          reordr.o \
-  rfname.o sethex.o srfexx.o          subcnv.o \
-           xmpAPI_vel3d1.o xmpAPI_vel3d2.o          \
+  errchk.o fild3x.o fld3x2.o \
+  icalel.o int3dx.o \
+  lesrop.o lesrpx.o lumpex.o \
+  match4.o matgau.o mkcrs.o  neibr2.o \
+  reordr.o \
+  rfname.o sethex.o srfexx.o subcnv.o \
   mfname.o \
   miniapp_util.o
+
+OBJS0 = \
+  les3x.o bcgs3x.o bcgsxe.o calax3.o \
+  callap.o elm3dx.o grad3x.o lessfx.o \
+  nodlex.o pres3e.o rcmelm.o vel3d1.o vel3d2.o
+OBJS1 = \
+  xmpAPI_les3x.o xmpAPI_bcgs3x.o xmpAPI_bcgsxe.o xmpAPI_calax3.o \
+  xmpAPI_callap.o xmpAPI_elm3dx.o xmpAPI_grad3x.o xmpAPI_lessfx.o \
+  xmpAPI_nodlex.o xmpAPI_pres3e.o xmpAPI_rcmelm.o xmpAPI_vel3d1.o xmpAPI_vel3d2.o
+
+ifeq ($(USE_XMP_API), yes)
+  OBJS += $(OBJS1)
+  FBMOBJ = xmpAPI_ffb_mini_main.o
+else
+  OBJS += $(OBJS0)
+  FBMOBJ = ffb_mini_main.o
+endif
 
 ifeq (, $(findstring -DNO_METIS, $(FFLAGS)))
 OBJS += metis_wrapper.o
@@ -75,8 +89,8 @@ $(LIB_DD_MPI):
 $(LES3X.MPI): $(LIB_GF2) $(LIB_DD_MPI) $(OBJS) les3x_main.o
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) les3x_main.o $(LIB_GF2) $(LIB_DD_MPI) $(LIBS)
 
-$(FFB_MINI): $(LIB_GF2) $(LIB_DD_MPI) $(OBJS) xmpAPI_ffb_mini_main.o makemesh.o
-	$(LD) $(LDFLAGS) -o $@ $(OBJS) xmpAPI_ffb_mini_main.o makemesh.o $(LIB_GF2) $(LIB_DD_MPI) $(LIBS)
+$(FFB_MINI): $(LIB_GF2) $(LIB_DD_MPI) $(OBJS) $(FBMOBJ) makemesh.o
+	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(FBMOBJ) makemesh.o $(LIB_GF2) $(LIB_DD_MPI) $(LIBS)
 
 .SUFFIXES:
 .SUFFIXES: .f .f90 .F .F90 .c .o
