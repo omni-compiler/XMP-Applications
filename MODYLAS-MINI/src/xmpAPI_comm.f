@@ -130,16 +130,17 @@ c----------------------------------------------------------------------
       allocate(ibuffm  (  max_cellcbd*max_mvatom))
 
       allocate(isbufp  (2*max_cellcbd + 1 + max_cellcbd*max_mvseg))
-      allocate(isbufm  (2*max_cellcbd + 1 + max_cellcbd*max_mvseg))
       isbufp_lb(1) = 1
-      isbufp_ub(1) = max_cellcbd*max_mvatom
-      isbufm_lb(1) = 1
-      isbufm_ub(1) = max_cellcbd*max_mvatom
+      isbufp_ub(1) = 2*max_cellcbd + 1 + max_cellcbd*max_mvseg
       call xmp_new_local_array(isbufp_local_desc,4,1, 
      & isbufp_lb,isbufp_ub,loc(isbufp))
+      call xmp_new_array_section(isbufp_local_sec,1)
+
+      allocate(isbufm  (2*max_cellcbd + 1 + max_cellcbd*max_mvseg))
+      isbufm_lb(1) = 1
+      isbufm_ub(1) = 2*max_cellcbd + 1 + max_cellcbd*max_mvseg
       call xmp_new_local_array(isbufm_local_desc,4,1,
      & isbufm_lb,isbufm_ub,loc(isbufm))
-      call xmp_new_array_section(isbufp_local_sec,1)
       call xmp_new_array_section(isbufm_local_sec,1)
 
 
@@ -158,8 +159,8 @@ c----------------------------------------------------------------------
 !      !allocate(rbuff_m (6,max_cellcbd*max_mvatom)[*])
       rbuff_m_lb(1) = 1
       rbuff_m_lb(2) = 1
-      rbuff_m_ub(1) = max_cellcbd*max_mvatom
-      rbuff_m_ub(2) = 6
+      rbuff_m_ub(1) = 6
+      rbuff_m_ub(2) = max_cellcbd*max_mvatom
       call xmp_new_coarray(rbuff_m_desc,8,2,
      & rbuff_m_lb,rbuff_m_ub,1,img_dims)
       call xmp_coarray_bind(rbuff_m_desc,rbuff_m)
@@ -1300,10 +1301,10 @@ c----------------------------------------------------------------------
       !irbuff_m(1:ncam)[ipy_dest+1] = ibuffm(1:ncam) ! Put
 
       call xmp_array_section_set_triplet(irbuff_m_sec,
-     & 1,int(1,kind=8),int(6,kind=8),1,status)
+     & 1,int(1,kind=8),int(ncam,kind=8),1,status)
 
       call xmp_array_section_set_triplet(ibuffm_local_sec, 
-     & 1,int(1,kind=8),int(6,kind=8),1,status)
+     & 1,int(1,kind=8),int(ncam,kind=8),1,status)
 
       img_dims(1) = ipy_dest+1
       call xmp_coarray_put_local(img_dims,irbuff_m_desc,irbuff_m_sec, 
@@ -1555,7 +1556,7 @@ c----------------------------------------------------------------------
       call xmp_array_section_set_triplet(isbufp_local_sec, 
      & 1,int(1,kind=8),int(ncs+1,kind=8),1,status)
 
-      img_dims(1) = ipy_dest+1
+      img_dims(1) = ipx_dest+1
       call xmp_coarray_put_local(img_dims,irsbuf_p_desc,irsbuf_p_sec, 
      & isbufp_local_desc,isbufp_local_sec,status)
 !      sync all
@@ -1580,7 +1581,7 @@ c----------------------------------------------------------------------
       call xmp_array_section_set_triplet(buffp_local_sec, 
      & 2,int(1,kind=8),int(nca,kind=8),1,status)
 
-      img_dims(1) = ipy_dest+1
+      img_dims(1) = ipx_dest+1
       call xmp_coarray_put_local(img_dims,rbuff_p_desc,rbuff_p_sec, 
      & buffp_local_desc,buffp_local_sec,status)
 
@@ -1685,7 +1686,7 @@ c----------------------------------------------------------------------
      & 1,int(1,kind=8),int(ncs+1,kind=8),1,status)
 
       call xmp_array_section_set_triplet(isbufm_local_sec, 
-     & 1,int(1,kind=8),int(nca,kind=8),1,status)
+     & 1,int(1,kind=8),int(ncs+1,kind=8),1,status)
 
       img_dims(1) = ipx_dest+1
       call xmp_coarray_put_local(img_dims,irsbuf_m_desc,irsbuf_m_sec, 
@@ -2141,7 +2142,7 @@ c----------------------------------------------------------------------
 
       m2i_tmp_lb(1) = 1
       m2i_tmp_ub(1) = na1cell*lxdiv*lydiv*lzdiv
-      call xmp_new_local_array(m2i_tmp_local_desc,8,1,
+      call xmp_new_local_array(m2i_tmp_local_desc,4,1,
      & m2i_tmp_lb,m2i_tmp_ub,loc(m2i_tmp))
       call xmp_new_array_section(m2i_tmp_local_sec,1)
 
@@ -2175,7 +2176,7 @@ c----------------------------------------------------------------------
         !allocate(natmlist(nprocs)[*])
         natmlist_lb(1) = 1
         natmlist_ub(1) = nprocs
-        call xmp_new_coarray(natmlist_desc,8,1,
+        call xmp_new_coarray(natmlist_desc,4,1,
      &   natmlist_lb,natmlist_ub,1,img_dims)
         call xmp_coarray_bind(natmlist_desc,natmlist)
         call xmp_new_array_section(natmlist_sec,1)

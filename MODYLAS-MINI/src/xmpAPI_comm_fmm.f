@@ -215,11 +215,11 @@ c---------------------------------------------------------------------
       call xmp_array_section_set_triplet(rccbuf_r_sec,
      & 1,int(1,kind=8),int(ncc,kind=8),1,status)
       call xmp_array_section_set_triplet(rccbuf_r_sec,
-     & 2,int(ibr,kind=8),int(1,kind=8),1,status)
+     & 2,int(ibr,kind=8),int(ibr,kind=8),1,status)
       call xmp_array_section_set_triplet(rccbuf_l_sec,
      & 1,int(1,kind=8),int(ncc,kind=8),1,status)
       call xmp_array_section_set_triplet(rccbuf_l_sec,
-     & 2,int(ibs,kind=8),int(1,kind=8),1,status)
+     & 2,int(ibs,kind=8),int(ibs,kind=8),1,status)
       img_dims(1) = ipz_dest+1
       call xmp_coarray_put(img_dims,rccbuf_desc,rccbuf_r_sec, 
      & rccbuf_desc,rccbuf_l_sec,status)
