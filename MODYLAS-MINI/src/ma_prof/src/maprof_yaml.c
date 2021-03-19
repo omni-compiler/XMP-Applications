@@ -69,7 +69,7 @@ maprof_yaml_node maprof_yaml_str_node(const char *s)
   node_t *n = (node_t *)malloc(sizeof(node_t));
   n->type = SCALAR;
   n->data.scalar.type = STRING;
-  n->data.scalar.value.str = strdup(s);
+  n->data.scalar.value.str = (!s ? NULL : strdup(s));
   return n;
 }
 
@@ -154,7 +154,7 @@ void maprof_yaml_add_map_item(maprof_yaml_node map, const char *name, maprof_yam
 
   map_end = map->data.mapping.end;
   map_new = (map_item_t *)malloc(sizeof(map_item_t));
-  map_new->name = strdup(name);
+  map_new->name = (!name ? NULL : strdup(name));
   map_new->node = node;
   map_new->next = NULL;
   if (map_end == NULL) {

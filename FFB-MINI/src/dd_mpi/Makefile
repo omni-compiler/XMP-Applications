@@ -6,7 +6,11 @@ RANLIB ?= ranlib
 
 all: libdd_mpi.a
 
+ifeq ($(USE_XMP_API), yes)
+OBJS = xmpAPI_dd_mpi.o xmpAPI_ddcom4.o
+else
 OBJS = dd_mpi.o ddcom4.o
+endif
 
 libdd_mpi.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)

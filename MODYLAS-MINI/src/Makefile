@@ -17,14 +17,37 @@ FFLAGS += -DMODYLAS_MINI_VERSION=\"$(VERSION)\"
 
 CFLAGS = -DUSE_MPI
 
-OBJS = fmodules.o main_f90.o app_f90.o \
+ifeq ($(USE_XMP_API), yes)
+FMODULES = xmpAPI_fmodules
+APP_F90 = xmpAPI_app_f90
+PARSE_INPUT = xmpAPI_parse_input
+COMM = xmpAPI_comm
+COMM_3 = xmpAPI_comm_3
+COMM_FMM = xmpAPI_comm_fmm
+NVE_INTEGRATE = xmpAPI_nve_integrate
+K_ENERGY = xmpAPI_k_energy
+DOMAIN_DIV = xmpAPI_domain_div
+MPITOOL = xmpAPI_mpitool
+else
+FMODULES = fmodules
+APP_F90 = app_f90
+PARSE_INPUT = parse_input
+COMM = comm
+COMM_3 = comm_3
+COMM_FMM = comm_fmm
+NVE_INTEGRATE = nve_integrate
+K_ENERGY = k_energy
+DOMAIN_DIV = domain_div
+MPITOOL = mpitool
+endif
+
+OBJS = $(FMODULES).o main_f90.o $(APP_F90).o \
   md_charmm_f90.o md_fmm_f90.o md_direct_f90.o \
-  nve_integrate.o k_energy.o cell_edge.o \
-  mt19937ar.o mpitool.o domain_div.o assign2subcell.o \
+  $(NVE_INTEGRATE).o $(K_ENERGY).o cell_edge.o \
+  mt19937ar.o $(MPITOOL).o $(DOMAIN_DIV).o assign2subcell.o \
   shake_rattle_roll.o \
-  parse_input.o \
-  comm.o comm_3.o comm_fmm.o \
-  opening.o closing.o ConfigReader.o ConfigRead.o
+	$(PARSE_INPUT).o $(COMM).o $(COMM_3).o $(COMM_FMM).o \
+	opening.o closing.o ConfigReader.o ConfigRead.o
 
 all: $(PROGRAM)
 
@@ -80,28 +103,34 @@ test: $(PROGRAM)
 
 
 # DO NOT DELETE THIS LINE - used by make depend
-app_f90.o: atommass.mod g_main.mod md_condition.mod md_const.mod md_file.mod
-app_f90.o: md_fmm_domdiv_flg.mod md_monitors.mod md_periodic.mod md_segment.mod
-app_f90.o: mpivar.mod nhc.mod param.mod shakerattleroll.mod trj_mpi.mod
-app_f90.o: trj_org.mod unitcell.mod cutoffradius.mod
+$(APP_F90).o: atommass.mod g_main.mod md_condition.mod md_const.mod md_file.mod
+$(APP_F90).o: md_fmm_domdiv_flg.mod md_monitors.mod md_periodic.mod md_segment.mod
+$(APP_F90).o: mpivar.mod nhc.mod param.mod shakerattleroll.mod trj_mpi.mod
+$(APP_F90).o: trj_org.mod unitcell.mod cutoffradius.mod
 assign2subcell.o: atommass.mod md_fmm.mod md_fmm_domdiv_flg.mod md_periodic.mod
 assign2subcell.o: md_segment.mod mpivar.mod param.mod trj_mpi.mod trj_org.mod
 assign2subcell.o: unitcell.mod
 cell_edge.o: atommass.mod md_periodic.mod md_segment.mod param.mod trj_org.mod
 cell_edge.o: unitcell.mod
-comm.o: comm_base.mod comm_bd.mod md_fmm.mod md_fmm_domdiv_flg.mod
-comm.o: md_forces.mod md_monitors.mod md_periodic.mod md_segment.mod mpivar.mod
-comm.o: param.mod trj_mpi.mod trj_org.mod unitcell.mod ompvar.mod
-comm_3.o: comm_base.mod comm_d3.mod md_fmm.mod md_fmm_domdiv_flg.mod
-comm_3.o: md_forces.mod md_monitors.mod md_periodic.mod md_segment.mod
-comm_3.o: mpivar.mod trj_mpi.mod trj_org.mod unitcell.mod
-comm_fmm.o: comm_base.mod md_fmm.mod md_fmm_domdiv_flg.mod mpivar.mod
-domain_div.o: cutoffradius.mod md_condition.mod md_fmm.mod md_fmm_domdiv_flg.mod
-domain_div.o: md_forces.mod md_multiplestep.mod md_periodic.mod md_segment.mod
-domain_div.o: mpivar.mod shakerattleroll.mod trj_mpi.mod trj_org.mod
-domain_div.o: unitcell.mod ompvar.mod
-k_energy.o: atommass.mod md_const.mod md_fmm.mod md_fmm_domdiv_flg.mod
-k_energy.o: ompvar.mod mpivar.mod param.mod trj_mpi.mod trj_org.mod
+$(COMM).o: comm_base.mod comm_bd.mod md_fmm.mod md_fmm_domdiv_flg.mod
+$(COMM).o: md_forces.mod md_monitors.mod md_periodic.mod md_segment.mod mpivar.mod
+$(COMM).o: param.mod trj_mpi.mod trj_org.mod unitcell.mod ompvar.mod
+$(COMM_3).o: comm_base.mod comm_d3.mod md_fmm.mod md_fmm_domdiv_flg.mod
+$(COMM_3).o: md_forces.mod md_monitors.mod md_periodic.mod md_segment.mod
+$(COMM_3).o: mpivar.mod trj_mpi.mod trj_org.mod unitcell.mod
+$(COMM_FMM).o: comm_base.mod md_fmm.mod md_fmm_domdiv_flg.mod mpivar.mod
+$(PARSE_INPUT).o: atommass.mod md_charmm_lj.mod md_condition.mod md_const.mod
+$(PARSE_INPUT).o: md_coulomb.mod md_file.mod md_fmm_domdiv_flg.mod
+$(PARSE_INPUT).o: md_multiplestep.mod md_periodic.mod md_segment.mod mpivar.mod
+$(PARSE_INPUT).o: nhc.mod param.mod shakerattleroll.mod
+$(PARSE_INPUT).o: g_main.mod cutoffradius.mod md_fmm.mod md_ewald.mod
+$(PARSE_INPUT).o: trj_org.mod trj_mpi.mod unitcell.mod
+$(DOMAIN_DIV).o: cutoffradius.mod md_condition.mod md_fmm.mod md_fmm_domdiv_flg.mod
+$(DOMAIN_DIV).o: md_forces.mod md_multiplestep.mod md_periodic.mod md_segment.mod
+$(DOMAIN_DIV).o: mpivar.mod shakerattleroll.mod trj_mpi.mod trj_org.mod
+$(DOMAIN_DIV).o: unitcell.mod ompvar.mod
+$(K_ENERGY).o: atommass.mod md_const.mod md_fmm.mod md_fmm_domdiv_flg.mod
+$(K_ENERGY).o: ompvar.mod mpivar.mod param.mod trj_mpi.mod trj_org.mod
 main_f90.o: md_condition.mod md_fmm_domdiv_flg.mod md_forces.mod
 main_f90.o: md_monitors.mod md_multiplestep.mod md_segment.mod mpivar.mod
 main_f90.o: shakerattleroll.mod trj_mpi.mod version.mod
@@ -116,60 +145,54 @@ md_fmm_f90.o: comm_base.mod md_const.mod md_coulomb.mod md_fmm.mod
 md_fmm_f90.o: md_fmm_domdiv_flg.mod md_forces.mod md_monitors.mod
 md_fmm_f90.o: md_periodic.mod md_segment.mod mod_wk_fmmewald.mod mpivar.mod
 md_fmm_f90.o: param.mod trj_mpi.mod trj_org.mod unitcell.mod ompvar.mod
-mpitool.o: mpivar.mod
-nve_integrate.o: atommass.mod md_condition.mod md_const.mod
-nve_integrate.o: md_fmm.mod md_fmm_domdiv_flg.mod md_forces.mod md_monitors.mod
-nve_integrate.o: md_multiplestep.mod md_periodic.mod md_segment.mod mpivar.mod
-nve_integrate.o: param.mod shakerattleroll.mod trj_mpi.mod unitcell.mod
-parse_input.o: atommass.mod md_charmm_lj.mod md_condition.mod md_const.mod
-parse_input.o: md_coulomb.mod md_file.mod md_fmm_domdiv_flg.mod
-parse_input.o: md_multiplestep.mod md_periodic.mod md_segment.mod mpivar.mod
-parse_input.o: nhc.mod param.mod shakerattleroll.mod
-parse_input.o: g_main.mod cutoffradius.mod md_fmm.mod md_ewald.mod
-parse_input.o: trj_org.mod trj_mpi.mod unitcell.mod
+$(MPITOOL).o: mpivar.mod
+$(NVE_INTEGRATE).o: atommass.mod md_condition.mod md_const.mod
+$(NVE_INTEGRATE).o: md_fmm.mod md_fmm_domdiv_flg.mod md_forces.mod md_monitors.mod
+$(NVE_INTEGRATE).o: md_multiplestep.mod md_periodic.mod md_segment.mod mpivar.mod
+$(NVE_INTEGRATE).o: param.mod shakerattleroll.mod trj_mpi.mod unitcell.mod
 shake_rattle_roll.o: atommass.mod md_fmm.mod md_fmm_domdiv_flg.mod
 shake_rattle_roll.o: md_segment.mod mpivar.mod param.mod pshake.mod
 shake_rattle_roll.o: pshake_init.mod shakerattleroll.mod trj_mpi.mod trj_org.mod
-atommass.mod: .//fmodules.o
-comm_base.mod: .//fmodules.o
-comm_bd.mod: .//fmodules.o
-comm_d3.mod: .//fmodules.o
-cutoffradius.mod: .//fmodules.o
-g_main.mod: .//fmodules.o
-get_wtime.mod: .//fmodules.o
-md_charmm_lj.mod: .//fmodules.o
-md_condition.mod: .//fmodules.o
-md_const.mod: .//fmodules.o
-md_coulomb.mod: .//fmodules.o
-md_ewald.mod: .//fmodules.o
-md_file.mod: .//fmodules.o
-md_fmm.mod: .//fmodules.o
-md_fmm_domdiv_flg.mod: .//fmodules.o
-md_forces.mod: .//fmodules.o
-md_monitors.mod: .//fmodules.o
-md_multiplestep.mod: .//fmodules.o
-md_periodic.mod: .//fmodules.o
-md_segment.mod: .//fmodules.o
-md_void.mod: .//fmodules.o
-mod_wk_fmmewald.mod: .//fmodules.o
-mod_wk_k_ene.mod: .//fmodules.o
-mpivar.mod: .//fmodules.o
-ompvar.mod: .//fmodules.o
-nhc.mod: .//fmodules.o
-param.mod: .//fmodules.o
-pshake.mod: .//fmodules.o
-pshake_init.mod: .//fmodules.o
-shakerattleroll.mod: .//fmodules.o
-trj_mpi.mod: .//fmodules.o
-trj_org.mod: .//fmodules.o
-unitcell.mod: .//fmodules.o
-version.mod: .//fmodules.o
+atommass.mod: .//$(FMODULES).o
+comm_base.mod: .//$(FMODULES).o
+comm_bd.mod: .//$(FMODULES).o
+comm_d3.mod: .//$(FMODULES).o
+cutoffradius.mod: .//$(FMODULES).o
+g_main.mod: .//$(FMODULES).o
+get_wtime.mod: .//$(FMODULES).o
+md_charmm_lj.mod: .//$(FMODULES).o
+md_condition.mod: .//$(FMODULES).o
+md_const.mod: .//$(FMODULES).o
+md_coulomb.mod: .//$(FMODULES).o
+md_ewald.mod: .//$(FMODULES).o
+md_file.mod: .//$(FMODULES).o
+md_fmm.mod: .//$(FMODULES).o
+md_fmm_domdiv_flg.mod: .//$(FMODULES).o
+md_forces.mod: .//$(FMODULES).o
+md_monitors.mod: .//$(FMODULES).o
+md_multiplestep.mod: .//$(FMODULES).o
+md_periodic.mod: .//$(FMODULES).o
+md_segment.mod: .//$(FMODULES).o
+md_void.mod: .//$(FMODULES).o
+mod_wk_fmmewald.mod: .//$(FMODULES).o
+mod_wk_k_ene.mod: .//$(FMODULES).o
+mpivar.mod: .//$(FMODULES).o
+ompvar.mod: .//$(FMODULES).o
+nhc.mod: .//$(FMODULES).o
+param.mod: .//$(FMODULES).o
+pshake.mod: .//$(FMODULES).o
+pshake_init.mod: .//$(FMODULES).o
+shakerattleroll.mod: .//$(FMODULES).o
+trj_mpi.mod: .//$(FMODULES).o
+trj_org.mod: .//$(FMODULES).o
+unitcell.mod: .//$(FMODULES).o
+version.mod: .//$(FMODULES).o
 
 opening.o: version.mod md_file.mod mpivar.mod trj_org.mod ompvar.mod
 opening.o: md_fmm.mod md_fmm_domdiv_flg.mod cutoffradius.mod
 opening.o: md_condition.mod md_multiplestep.mod md_ewald.mod
 closing.o: mpivar.mod
-main_f90.o opening.o nve_integrate.o md_fmm_f90.o: timing.h90
+main_f90.o opening.o $(NVE_INTEGRATE).o md_fmm_f90.o: timing.h90
 ifneq (, $(findstring -DPROF_MAPROF, $(FFLAGS)))
 timing.h90: $(MAPROF_LIB)
 endif
@@ -177,4 +200,4 @@ endif
 ConfigReader.o: ConfigReader.h
 ConfigReader.o: params.h
 configread.mod: ConfigRead.o
-parse_input.o: configread.mod
+$(PARSE_INPUT).o: configread.mod

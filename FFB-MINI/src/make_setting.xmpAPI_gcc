@@ -1,14 +1,23 @@
 CC = mpicc
-FC = xmpf90
+FC = mpif90
+
+USE_XMP_API = yes
+OMNI_HOME = $(shell xmpcc --show-env | grep OMNI_HOME | sed -e 's/OMNI_HOME=//' -e 's/"//g')
+LIBS = $(shell xmpcc --show-env | grep OMNI_LINKER_OPT | sed -e 's/OMNI_LINKER_OPT=//' -e 's/"//g')
+
+MPIBIN = $(shell dirname `which mpicc`) 
+MPIHOME = $(shell dirname ${MPIBIN})
 
 DEFINE += -DNO_METIS
 DEFINE += -DNO_REFINER
 
 # timing option
 DEFINE += -DPROF_MAPROF
-MPIHOME = 
-CFLAGS += $(DEFINE) -O2
+
+#FFLAGS = -I$(OMNI_HOME)/include -J$(OMNI_HOME)/include -fopenmp
+FFLAGS = -I$(OMNI_HOME)/include -fopenmp
 FFLAGS += $(DEFINE) -O2 -I$(MPIHOME)/include
+CFLAGS += $(DEFINE) -O2
 
 
 ifeq (, $(findstring -DNO_METIS, $(FFLAGS)))

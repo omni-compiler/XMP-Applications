@@ -1,0 +1,12 @@
+# general PC cluster with GNU (gfortran) based mpif90 + OpenBLAS library
+# via spack
+
+./config/configure \
+--lapack="`pkg-config --libs openblas`" \
+--blas="`pkg-config --libs openblas`" \
+--atlas= \
+linux64_xmp_omp_gfortran_spack
+
+cd ./config
+ln -sf makeconfig makeconfig.xmp
+

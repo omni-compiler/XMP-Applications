@@ -1,0 +1,18 @@
+# general PC cluster with GNU (gfortran) based mpif90 + ATLAS library
+# Set ATLAS_DIR to the ATLAS library directory path
+
+#	ATLAS_DIR=${HOME}/atlas/lib
+ATLAS_DIR=/usr/lib
+LDFLAGS=
+
+./config/configure \
+--lapack='-llapack' \
+--blas='-lblas' \
+--atlas= \
+linux64_xmp_api_gfortran
+
+cd ./config
+ln -sf makeconfig makeconfig.xmp
+
+#	linux64_mpif90_omp
+

@@ -20,26 +20,40 @@ FFLAGS += -DFFB_MINI_VERSION=\"$(VERSION)\"
 all: $(LES3X.MPI) $(FFB_MINI)
 
 OBJS = \
-  les3x.o  bcgs3x.o bcgsxe.o calax3.o          \
-           callap.o caluel.o clrcrs.o \
+  caluel.o clrcrs.o \
   csin3x.o datcnv.o dgnscl.o e2plst.o e2pmtr.o \
-           elm3dx.o          errchk.o          \
-  fild3x.o fld3x2.o                            \
-  grad3x.o          icalel.o          int3dx.o \
-           lesrop.o lesrpx.o lessfx.o lumpex.o \
-  match4.o matgau.o          mkcrs.o  neibr2.o \
-  nodlex.o pres3e.o rcmelm.o          reordr.o \
-  rfname.o sethex.o srfexx.o          subcnv.o \
-           vel3d1.o vel3d2.o          \
+  errchk.o fild3x.o fld3x2.o \
+  icalel.o int3dx.o \
+  lesrop.o lesrpx.o lumpex.o \
+  match4.o matgau.o mkcrs.o  neibr2.o \
+  reordr.o \
+  rfname.o sethex.o srfexx.o subcnv.o \
   mfname.o \
   miniapp_util.o
+
+OBJS0 = \
+  les3x.o bcgs3x.o bcgsxe.o calax3.o \
+  callap.o elm3dx.o grad3x.o lessfx.o \
+  nodlex.o pres3e.o rcmelm.o vel3d1.o vel3d2.o
+OBJS1 = \
+  xmpAPI_les3x.o xmpAPI_bcgs3x.o xmpAPI_bcgsxe.o xmpAPI_calax3.o \
+  xmpAPI_callap.o xmpAPI_elm3dx.o xmpAPI_grad3x.o xmpAPI_lessfx.o \
+  xmpAPI_nodlex.o xmpAPI_pres3e.o xmpAPI_rcmelm.o xmpAPI_vel3d1.o xmpAPI_vel3d2.o
+
+ifeq ($(USE_XMP_API), yes)
+  OBJS += $(OBJS1)
+  FBMOBJ = xmpAPI_ffb_mini_main.o
+else
+  OBJS += $(OBJS0)
+  FBMOBJ = ffb_mini_main.o
+endif
 
 ifeq (, $(findstring -DNO_METIS, $(FFLAGS)))
 OBJS += metis_wrapper.o
 endif
 
 ifeq (, $(findstring -DNO_REFINER, $(FFLAGS)))
-OBJS += lrfnms.o extrfn.o
+OBJS += xmpAPI_lrfnms.o xmpAPI_extrfn.o
 endif
 
 param.h: param.h.in
@@ -75,8 +89,8 @@ $(LIB_DD_MPI):
 $(LES3X.MPI): $(LIB_GF2) $(LIB_DD_MPI) $(OBJS) les3x_main.o
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) les3x_main.o $(LIB_GF2) $(LIB_DD_MPI) $(LIBS)
 
-$(FFB_MINI): $(LIB_GF2) $(LIB_DD_MPI) $(OBJS) ffb_mini_main.o makemesh.o
-	$(LD) $(LDFLAGS) -o $@ $(OBJS) ffb_mini_main.o makemesh.o $(LIB_GF2) $(LIB_DD_MPI) $(LIBS)
+$(FFB_MINI): $(LIB_GF2) $(LIB_DD_MPI) $(OBJS) $(FBMOBJ) makemesh.o
+	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(FBMOBJ) makemesh.o $(LIB_GF2) $(LIB_DD_MPI) $(LIBS)
 
 .SUFFIXES:
 .SUFFIXES: .f .f90 .F .F90 .c .o
@@ -114,16 +128,16 @@ test_fx10: $(FFB_MINI)
 	$(MAKE) -C ../test test_fx10
 
 
-ffb_mini_main.o: param.h
-ffb_mini_main.o: makemesh.o
+xmpAPI_ffb_mini_main.o: param.h makemesh.o
+ffb_mini_main.o: param.h makemesh.o
 
-les3x.o: timing.h
-vel3d1.o: timing.h
-bcgs3x.o: timing.h
-pres3e.o: timing.h
-bcgs3x.o: timing.h
-rcmelm.o: timing.h
-bcgsxe.o: timing.h
-callap.o: timing.h
-calax3.o: timing.h
-grad3x.o: timing.h
+xmpAPI_les3x.o: timing.h
+xmpAPI_vel3d1.o: timing.h
+xmpAPI_bcgs3x.o: timing.h
+xmpAPI_pres3e.o: timing.h
+#bcgs3x.o: timing.h
+xmpAPI_rcmelm.o: timing.h
+xmpAPI_bcgsxe.o: timing.h
+xmpAPI_callap.o: timing.h
+xmpAPI_calax3.o: timing.h
+xmpAPI_grad3x.o: timing.h
