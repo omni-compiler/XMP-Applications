@@ -23,6 +23,8 @@ C      REAL*4  SN,DNX,DNY,DNZ,E,EX,EY,EZ,EXX,EYY,EZZ,EXY,EYZ,EXZ
       REAL*4 , POINTER :: DNX ( : , : ) => null ( )
       REAL*4 , POINTER :: DNY ( : , : ) => null ( )
       INTEGER*8 :: rx_desc, ry_desc
+      INTEGER*8, DIMENSION(2) :: rx_lb, rx_ub, ry_lb, ry_ub
+      INTEGER*4 :: img_dims(1)
 C Fujitsu end 202103
       INTEGER IUT0,IERR
       REAL*8  NN,NC,PSI,PSIC,WW
@@ -104,6 +106,19 @@ C
       INTEGER IE,J
 C
 C Fujitsu start 202103
+      rx_lb(1) = 1
+      rx_lb(2) = N1
+      rx_ub(1) = 1
+      rx_ub(2) = NE+1
+      ry_lb(1) = 1
+      ry_lb(2) = N1
+      ry_ub(1) = 1
+      ry_ub(2) = NE+1
+      call xmp_reshape_coarray(rx_desc, rx_desc, 4, 2,
+     *                         rx_lb, rx_ub, 1, img_dims)
+      call xmp_reshape_coarray(ry_desc, ry_desc, 4, 2,
+     *                         ry_lb, ry_ub, 1, img_dims)
+C
       call xmp_coarray_bind(rx_desc,DNX)
       call xmp_coarray_bind(ry_desc,DNY)
 C Fujitsu end 202103

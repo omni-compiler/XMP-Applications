@@ -793,8 +793,7 @@
       END
 !
       SUBROUTINE DDCOMX(IPART,IDIM,LDOM,NBPDOM,NDOM,IPSLF,IPSND,MBPDOM,FX,FY,FZ,NP,IUT0,IERR,&
-!                        snd_desc, rcv_desc, MAXBUF)
-                        snd_desc_org, rcv_desc_org, MAXBUF)
+                        snd_desc, rcv_desc, MAXBUF)
 !fj                        BUFSND, BUFRCV, MAXBUF)
 ! Fujitsu start 202103
       use xmp_api
@@ -811,7 +810,6 @@
 !      DIMENSION BUFSND(MAXBUF)[*], BUFRCV(MAXBUF)[*]
       REAL*4 , POINTER :: BUFSND ( : ) => null ( )
       REAL*4 , POINTER :: BUFRCV ( : ) => null ( )
-      INTEGER*8 :: snd_desc_org, rcv_desc_org
       INTEGER*8 :: snd_desc, rcv_desc
       INTEGER*8 :: snd_sec, rcv_sec
       INTEGER*8, DIMENSION(1) :: snd_lb, snd_ub, rcv_lb, rcv_ub
@@ -936,9 +934,9 @@
 !      call xmp_new_coarray(snd_desc, 4, 1, snd_lb, snd_ub, 1, img_dims)
 !      call xmp_new_coarray(rcv_desc, 4, 1, rcv_lb, rcv_ub, 1, img_dims)
 !
-      call xmp_reshape_coarray(snd_desc, snd_desc_org, 4, 1, &
+      call xmp_reshape_coarray(snd_desc, snd_desc, 4, 1, &
                                snd_lb, snd_ub, 1, img_dims)
-      call xmp_reshape_coarray(rcv_desc, rcv_desc_org, 4, 1, &
+      call xmp_reshape_coarray(rcv_desc, rcv_desc, 4, 1, &
                                rcv_lb, rcv_ub, 1, img_dims)
 
       call xmp_coarray_bind(snd_desc,BUFSND)
@@ -1140,7 +1138,6 @@
                              START_RR,status);
 ! Fujitsu end 202103
         END_RR = START_RR + (END_S(LDOM(IDOM)) - START_S(LDOM(IDOM)))
-!
 ! Fujitsu start 202103
 !        BUFRCV(START_RR:END_RR)[LDOM(IDOM)] = &
 !             BUFSND(START_S(LDOM(IDOM)):END_S(LDOM(IDOM)))
