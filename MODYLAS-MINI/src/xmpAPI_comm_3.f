@@ -53,7 +53,6 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(icbufp_desc,4,1,
      & icbufp_lb,icbufp_ub,1,img_dims)
       call xmp_coarray_bind(icbufp_desc,icbufp)
-      call xmp_new_array_section(icbufp_sec,1)
 
 !     allocate(ircbufp((ncell/npy)*(ncell/npx)*2)[*])
       ircbufp_lb(1) = 1
@@ -61,57 +60,50 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(ircbufp_desc,4,1,
      & ircbufp_lb,ircbufp_ub,1,img_dims)
       call xmp_coarray_bind(ircbufp_desc,ircbufp)
-      call xmp_new_array_section(ircbufp_sec,1)
 
-      !allocate(icbufm ((ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(icbufm ((ncell/npy)*(ncell/npx)*2)[*])
       icbufm_lb(1) = 1
       icbufm_ub(1) = (ncell/npy)*(ncell/npx)*2
       call xmp_new_coarray(icbufm_desc,4,1,
      & icbufm_lb,icbufm_ub,1,img_dims)
       call xmp_coarray_bind(icbufm_desc,icbufm)
-      call xmp_new_array_section(icbufm_sec,1)
 
-      !allocate(ircbufm((ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(ircbufm((ncell/npy)*(ncell/npx)*2)[*])
       ircbufm_lb(1) = 1
       ircbufm_ub(1) = (ncell/npy)*(ncell/npx)*2
       call xmp_new_coarray(ircbufm_desc,4,1,
      & ircbufm_lb,ircbufm_ub,1,img_dims)
       call xmp_coarray_bind(ircbufm_desc,ircbufm)
-      call xmp_new_array_section(ircbufm_sec,1)
 
-      !allocate(ibuffp (na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(ibuffp (na1cell*(ncell/npy)*(ncell/npx)*2)[*])
       ibuffp_lb(1) = 1
       ibuffp_ub(1) = na1cell*(ncell/npy)*(ncell/npx)*2
       call xmp_new_coarray(ibuffp_desc,4,1,
      & ibuffp_lb,ibuffp_ub,1,img_dims)
       call xmp_coarray_bind(ibuffp_desc,ibuffp)
-      call xmp_new_array_section(ibuffp_sec,1)
 
-      !allocate(irbuffp(na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(irbuffp(na1cell*(ncell/npy)*(ncell/npx)*2)[*])
       irbuffp_lb(1) = 1
       irbuffp_ub(1) = na1cell*(ncell/npy)*(ncell/npx)*2
       call xmp_new_coarray(irbuffp_desc,4,1,
      & irbuffp_lb,irbuffp_ub,1,img_dims)
       call xmp_coarray_bind(irbuffp_desc,irbuffp)
-      call xmp_new_array_section(irbuffp_sec,1)
 
-      !allocate(ibuffm (na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(ibuffm (na1cell*(ncell/npy)*(ncell/npx)*2)[*])
       ibuffm_lb(1) = 1
       ibuffm_ub(1) = na1cell*(ncell/npy)*(ncell/npx)*2
       call xmp_new_coarray(ibuffm_desc,4,1,
      & ibuffm_lb,ibuffm_ub,1,img_dims)
       call xmp_coarray_bind(ibuffm_desc,ibuffm)
-      call xmp_new_array_section(ibuffm_sec,1)
 
-      !allocate(irbuffm(na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(irbuffm(na1cell*(ncell/npy)*(ncell/npx)*2)[*])
       irbuffm_lb(1) = 1
       irbuffm_ub(1) = na1cell*(ncell/npy)*(ncell/npx)*2
       call xmp_new_coarray(irbuffm_desc,4,1,
      & irbuffm_lb,irbuffm_ub,1,img_dims)
       call xmp_coarray_bind(irbuffm_desc,irbuffm)
-      call xmp_new_array_section(irbuffm_sec,1)
 
-      !allocate(buffp (3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(buffp (3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
       buffp_lb(1) = 1
       buffp_ub(1) = 3
       buffp_lb(2) = 1
@@ -119,9 +111,8 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(buffp_desc,8,2,
      & buffp_lb,buffp_ub,1,img_dims)
       call xmp_coarray_bind(buffp_desc,buffp)
-      call xmp_new_array_section(buffp_sec,2)
 
-      !allocate(rbuffp(3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(rbuffp(3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
       rbuffp_lb(1) = 1
       rbuffp_ub(1) = 3
       rbuffp_lb(2) = 1
@@ -129,9 +120,8 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(rbuffp_desc,8,2,
      & rbuffp_lb,rbuffp_ub,1,img_dims)
       call xmp_coarray_bind(rbuffp_desc,rbuffp)
-      call xmp_new_array_section(rbuffp_sec,2)
 
-      !allocate(buffm (3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(buffm (3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
       buffm_lb(1) = 1
       buffm_ub(1) = 3
       buffm_lb(2) = 1
@@ -139,9 +129,8 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(buffm_desc,8,2,
      & buffm_lb,buffm_ub,1,img_dims)
       call xmp_coarray_bind(buffm_desc,buffm)
-      call xmp_new_array_section(buffm_sec,2)
 
-      !allocate(rbuffm(3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
+!      allocate(rbuffm(3,na1cell*(ncell/npy)*(ncell/npx)*2)[*])
       rbuffm_lb(1) = 1
       rbuffm_ub(1) = 3
       rbuffm_lb(2) = 1
@@ -149,7 +138,6 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(rbuffm_desc,8,2,
      & rbuffm_lb,rbuffm_ub,1,img_dims)
       call xmp_coarray_bind(rbuffm_desc,rbuffm)
-      call xmp_new_array_section(rbuffm_sec,2)
 
 
       return
@@ -216,6 +204,18 @@ c----------------------------------------------------------------------
       integer nd
       integer(4) status
 !!
+      call xmp_new_array_section(rbuffm_sec,2)
+      call xmp_new_array_section(buffm_sec,2)
+      call xmp_new_array_section(buffp_sec,2)
+      call xmp_new_array_section(rbuffp_sec,2)
+      call xmp_new_array_section(irbuffm_sec,1)
+      call xmp_new_array_section(ibuffm_sec,1)
+      call xmp_new_array_section(irbuffp_sec,1)
+      call xmp_new_array_section(ibuffp_sec,1)
+      call xmp_new_array_section(ircbufm_sec,1)
+      call xmp_new_array_section(icbufm_sec,1)
+      call xmp_new_array_section(icbufp_sec,1)
+      call xmp_new_array_section(ircbufp_sec,1)
       call xmp_new_array_section(na_per_cell_l_sec,3)
       call xmp_new_array_section(na_per_cell_r_sec,3)
       call xmp_new_array_section(wkxyz_l_sec,2)
@@ -934,7 +934,7 @@ c----- common parameters for coordinate communication. -----
       call xmp_array_section_set_triplet(wkxyz_r_sec,
      & 1,int(1,kind=8),int(3,kind=8),1,status)
       call xmp_array_section_set_triplet(wkxyz_r_sec,
-     & 2,int(icarp,kind=8),int(icarp+ncam-1,kind=8),1,status)
+     & 2,int(icarm,kind=8),int(icarm+ncam-1,kind=8),1,status)
 
       call xmp_array_section_set_triplet(wkxyz_l_sec,
      & 1,int(1,kind=8),int(3,kind=8),1,status)
@@ -1862,5 +1862,6 @@ c----- common parameters for coordinate communication. -----
       call xmp_free_array_section(m2i_r_sec)
       call xmp_free_array_section(na_per_cell_l_sec)
       call xmp_free_array_section(na_per_cell_r_sec)
+
       return
       end

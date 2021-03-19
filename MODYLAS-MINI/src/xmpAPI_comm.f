@@ -109,7 +109,6 @@ c----------------------------------------------------------------------
       buffp_ub(2) = max_cellcbd*max_mvatom
       call xmp_new_local_array(buffp_local_desc,8,2, 
      & buffp_lb,buffp_ub,loc(buffp))
-      call xmp_new_array_section(buffp_local_sec,2)
 
       allocate(buffm   (6,max_cellcbd*max_mvatom))
       buffm_lb(1) = 1
@@ -118,14 +117,12 @@ c----------------------------------------------------------------------
       buffm_ub(2) = max_cellcbd*max_mvatom
       call xmp_new_local_array(buffm_local_desc,8,2, 
      & buffm_lb,buffm_ub,loc(buffm))
-      call xmp_new_array_section(buffm_local_sec,2)
 
       allocate(ibuffp  (  max_cellcbd*max_mvatom))
       ibuffp_lb(1) = 1
       ibuffp_ub(1) = max_cellcbd*max_mvatom
       call xmp_new_local_array(ibuffp_local_desc,8,1,
      & ibuffp_lb,ibuffp_ub,loc(ibuffp))
-      call xmp_new_array_section(ibuffp_local_sec,1)
 
       allocate(ibuffm  (  max_cellcbd*max_mvatom))
 
@@ -134,14 +131,12 @@ c----------------------------------------------------------------------
       isbufp_ub(1) = 2*max_cellcbd + 1 + max_cellcbd*max_mvseg
       call xmp_new_local_array(isbufp_local_desc,4,1, 
      & isbufp_lb,isbufp_ub,loc(isbufp))
-      call xmp_new_array_section(isbufp_local_sec,1)
 
       allocate(isbufm  (2*max_cellcbd + 1 + max_cellcbd*max_mvseg))
       isbufm_lb(1) = 1
       isbufm_ub(1) = 2*max_cellcbd + 1 + max_cellcbd*max_mvseg
       call xmp_new_local_array(isbufm_local_desc,4,1,
      & isbufm_lb,isbufm_ub,loc(isbufm))
-      call xmp_new_array_section(isbufm_local_sec,1)
 
 
       allocate( ncatmw(32, nczdiv+2, ncydiv+2, ncxdiv+2) )
@@ -154,7 +149,6 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(rbuff_p_desc,8,2,
      & rbuff_p_lb,rbuff_p_ub,1,img_dims)
       call xmp_coarray_bind(rbuff_p_desc,rbuff_p)
-      call xmp_new_array_section(rbuff_p_sec,2)
 
 !      !allocate(rbuff_m (6,max_cellcbd*max_mvatom)[*])
       rbuff_m_lb(1) = 1
@@ -164,7 +158,6 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(rbuff_m_desc,8,2,
      & rbuff_m_lb,rbuff_m_ub,1,img_dims)
       call xmp_coarray_bind(rbuff_m_desc,rbuff_m)
-      call xmp_new_array_section(rbuff_m_sec,2)
 
 !      !allocate(irbuff_p(  max_cellcbd*max_mvatom)[*])
       irbuff_p_lb(1) = 1
@@ -172,7 +165,6 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(irbuff_p_desc,4,1,
      & irbuff_p_lb,irbuff_p_ub,1,img_dims)
       call xmp_coarray_bind(irbuff_p_desc,irbuff_p)
-      call xmp_new_array_section(irbuff_p_sec,1)
 
 !      !allocate(irbuff_m(  max_cellcbd*max_mvatom)[*])
       irbuff_m_lb(1) = 1
@@ -180,7 +172,6 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(irbuff_m_desc,4,1,
      & irbuff_m_lb,irbuff_m_ub,1,img_dims)
       call xmp_coarray_bind(irbuff_m_desc,irbuff_m)
-      call xmp_new_array_section(irbuff_m_sec,1)
 
 !      !allocate(irsbuf_p(2*max_cellcbd + 1 + max_cellcbd*max_mvseg)[*])
        irsbuf_p_lb(1) = 1
@@ -188,7 +179,6 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(irsbuf_p_desc,4,1,
      & irsbuf_p_lb,irsbuf_p_ub,1,img_dims)
       call xmp_coarray_bind(irsbuf_p_desc,irsbuf_p)
-      call xmp_new_array_section(irsbuf_p_sec,1)
 
 !      !allocate(irsbuf_m(2*max_cellcbd + 1 + max_cellcbd*max_mvseg)[*])
        irsbuf_m_lb(1) = 1
@@ -196,7 +186,6 @@ c----------------------------------------------------------------------
       call xmp_new_coarray(irsbuf_m_desc,4,1,
      & irsbuf_m_lb,irsbuf_m_ub,1,img_dims)
       call xmp_coarray_bind(irsbuf_m_desc,irsbuf_m)
-      call xmp_new_array_section(irsbuf_m_sec,1)
 
       return
       end
@@ -250,6 +239,20 @@ c----------------------------------------------------------------------
       integer istatus(mpi_status_size), ierr
 !
       integer(4) status
+
+      call xmp_new_array_section(buffp_local_sec,2)
+      call xmp_new_array_section(buffm_local_sec,2)
+      call xmp_new_array_section(ibuffp_local_sec,1)
+      call xmp_new_array_section(isbufp_local_sec,1)
+      call xmp_new_array_section(isbufm_local_sec,1)
+      call xmp_new_array_section(rbuff_p_sec,2)
+      call xmp_new_array_section(rbuff_m_sec,2)
+      call xmp_new_array_section(irbuff_p_sec,1)
+      call xmp_new_array_section(irbuff_m_sec,1)
+      call xmp_new_array_section(irsbuf_p_sec,1)
+      call xmp_new_array_section(irsbuf_m_sec,1)
+
+
       rdcellx=dble(ncell)/cellx
       rdcelly=dble(ncell)/celly
       rdcellz=dble(ncell)/cellz
@@ -1860,6 +1863,20 @@ c----------------------------------------------------------------------
 !$omp end do
 !$omp end parallel
 !
+
+
+      call xmp_free_array_section(buffp_local_sec)
+      call xmp_free_array_section(buffm_local_sec)
+      call xmp_free_array_section(ibuffp_local_sec)
+      call xmp_free_array_section(isbufp_local_sec)
+      call xmp_free_array_section(isbufm_local_sec)
+      call xmp_free_array_section(rbuff_p_sec)
+      call xmp_free_array_section(rbuff_m_sec)
+      call xmp_free_array_section(irbuff_p_sec)
+      call xmp_free_array_section(irbuff_m_sec)
+      call xmp_free_array_section(irsbuf_p_sec)
+      call xmp_free_array_section(irsbuf_m_sec)
+
       return
       end
 c----------------------------------------------------------------------
@@ -2314,5 +2331,9 @@ c----------------------------------------------------------------------
 
       call cell_edge()
 
+      call xmp_free_array_section(rcvx_sec)
+      call xmp_free_array_section(m2i_tmp_local_sec)
+      call xmp_free_array_section(snd_local_sec)
+      call xmp_free_array_section(natmlist_sec)
       return
       end

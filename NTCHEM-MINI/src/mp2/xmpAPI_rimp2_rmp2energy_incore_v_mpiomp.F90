@@ -614,7 +614,7 @@
                        RecvBuf(1:bufsize,jsta) = rbuf(1:bufsize)
 !                       if (allocated(sbuf)) deallocate(sbuf)
 !                       if (allocated(rbuf)) deallocate(rbuf)
-! TODO: check
+
                        if (associated(sbuf)) then
                          !deallocate(sbuf)
                          call xmp_coarray_deallocate(sbuf_desc,status)

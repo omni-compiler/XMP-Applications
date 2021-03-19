@@ -128,8 +128,8 @@ test_fx10: $(FFB_MINI)
 	$(MAKE) -C ../test test_fx10
 
 
-xmpAPI_ffb_mini_main.o: param.h
-xmpAPI_ffb_mini_main.o: makemesh.o
+xmpAPI_ffb_mini_main.o: param.h makemesh.o
+ffb_mini_main.o: param.h makemesh.o
 
 xmpAPI_les3x.o: timing.h
 xmpAPI_vel3d1.o: timing.h
